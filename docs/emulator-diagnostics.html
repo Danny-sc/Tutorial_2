@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5 Emulator diagnostics | Case Study -1: An introduction to the Emulatorr package</title>
+  <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5 Emulator diagnostics | Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5 Emulator diagnostics | Case Study -1: An introduction to the Emulatorr package" />
+  
+  <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  
+
+<meta name="author" content="Danny Scarponi" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="constructing-the-emulators.html"/>
+<link rel="next" href="point-generation.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script language="javascript"> 
+    function toggle(id) {
+        var ele = document.getElementById("toggleText" + id);
+        var text = document.getElementById("displayText" + id);
+        var buttonText = text.innerHTML.replace("Show ", "");
+        buttonText = buttonText.replace("Hide ", "");
+        if(ele.style.display == "block") {
+            ele.style.display = "none";
+            text.innerHTML = "Show " + buttonText;
+        } else {
+            ele.style.display = "block";
+            text.innerHTML = "Hide " + buttonText;
+        }
+    } 
+</script>
+
+<script language="javascript">
+    function openCode(evt, codeName, id) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent" + id);
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks" + id);
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(codeName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+<script language="javascript">
+    function hide(id){
+        document.getElementById(id).style.display = "none";
+    }
+</script>
+</script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
+<li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
+<li class="chapter" data-level="4" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html"><i class="fa fa-check"></i><b>4</b> Constructing the emulators</a><ul>
+<li class="chapter" data-level="4.1" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>4.1</b> Background: the structure of an emulator</a></li>
+<li class="chapter" data-level="4.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>4.2</b> Constructing the emulators step by step</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 1</a></li>
+<li class="chapter" data-level="4.2.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-2"><i class="fa fa-check"></i><b>4.2.2</b> Step 2</a></li>
+<li class="chapter" data-level="4.2.3" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-3"><i class="fa fa-check"></i><b>4.2.3</b> Step 3</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
+<li class="chapter" data-level="5.1" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#background-the-implausibility-measure"><i class="fa fa-check"></i><b>5.1</b> Background: the implausibility measure</a></li>
+<li class="chapter" data-level="5.2" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#implausibility-visualisations"><i class="fa fa-check"></i><b>5.2</b> Implausibility visualisations</a></li>
+<li class="chapter" data-level="5.3" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#three-emulator-diagnostics"><i class="fa fa-check"></i><b>5.3</b> Three emulator diagnostics</a></li>
+<li class="chapter" data-level="5.4" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.4</b> Parameter sets failing diagnostics</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#visualisation"><i class="fa fa-check"></i><b>5.4.1</b> Visualisation</a></li>
+<li class="chapter" data-level="5.4.2" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#space-removed-function"><i class="fa fa-check"></i><b>5.4.2</b> Space removed function</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="point-generation.html"><a href="point-generation.html"><i class="fa fa-check"></i><b>6</b> Point Generation</a><ul>
+<li class="chapter" data-level="6.1" data-path="point-generation.html"><a href="point-generation.html#generating-sets-of-parameters-for-the-next-wave"><i class="fa fa-check"></i><b>6.1</b> Generating sets of parameters for the next wave</a></li>
+<li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
+<li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Case Study -1: An introduction to the Emulatorr package</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="emulator-diagnostics" class="section level1">
+<h1><span class="header-section-number">5</span> Emulator diagnostics</h1>
+<p>For a given set of emulators, we want to assess how accurately they reflect the model’s outputs over the space. To do so, we can consider a number of diagnostic tests.</p>
+<p>This section is divided in four parts:</p>
+<ol style="list-style-type: decimal">
+<li><p>First we introduce the concept of implausibility;</p></li>
+<li><p>We show how to visualise the emulator’s implausibility for a given output;</p></li>
+<li><p>Three standard emulator diagnostics are introduced together with functions that help us visualise them;</p></li>
+<li><p>We then conclude by analysing parameter sets that fail diagnostics.</p></li>
+</ol>
+<div id="background-the-implausibility-measure" class="section level2">
+<h2><span class="header-section-number">5.1</span> Background: the implausibility measure</h2>
+<p>For a given output, and an observed value, the implausibility is defined as the difference between the predicted output and the actual observation, taking into account all sources of uncertainty; for input values <span class="math inline">\(x\)</span> the schematic form for the implausibility <span class="math inline">\(I(x)\)</span> is</p>
+<p><span class="math display">\[I(x) = \frac{|f(x)-z|}{\sqrt{\sum \sigma^2}},\]</span></p>
+<p>where <span class="math inline">\(f(x)\)</span> is the predicted output, <span class="math inline">\(z\)</span> the observation, and the <span class="math inline">\(\sigma\)</span> terms represent uncertainties.</p>
+<p>The uncertainties that go into the denominator of the emulator implausibility are the ensemble variability defined, and the emulator variance at the given parameter set. Note that if our data were not synthetic, we would also include the observation uncertainty, to represent the finite accuracy with which real data is observed, and the model discrepancy, accounting for the fact that no model perfectly represents reality.</p>
+<p>An important aspect to consider is the choice of cut-off for the implausibility measure. The implausibility is a metric for evaluating how far out from being a good fit any input parameter set is: there is no hard-and-fast rule for deciding at what point a parameter set is too implausible. Indeed, there are two things to consider when we have multiple univariate emulators.</p>
+<p>First of all: what cut-off should we impose? A rough rule of thumb loosely follows Pukelsheim’s <span class="math inline">\(3\sigma\)</span> rule, which states that any unimodal distribution can be treated normally, in the sense that a <span class="math inline">\(5\%\)</span> confidence interval corresponds to <span class="math inline">\(3\sigma\)</span> around the mean. This is only the case for a single such distribution; for multiple univariate emulators it is slightly more involved. However a rough starting cut-off <span class="math inline">\(m\)</span>, for confidence interval <span class="math inline">\(1-\alpha\)</span> and <span class="math inline">\(N\)</span> emulators, would be
+<span class="math display">\[m = \Phi^{-1}\left(\frac{1+(1-\alpha^{1/N})}{2}\right)\]</span>
+where <span class="math inline">\(\Phi^{-1}\)</span> is the inverse of the normal distribution CDF.</p>
+<p>Second: given multiple emulators, how do we measure overall implausibility? We want a single measure for the implausibility at a given parameter set, but for each emulator we obtain an individual value for <span class="math inline">\(I\)</span>. The simplest way to combine them is to consider maximum implausibility at each parameter set:
+<span class="math display">\[I_M(x) = \max_{i=1,\dots,N}I_{i}(x),\]</span>
+where <span class="math inline">\(I_i(x)\)</span> is the implausibility at <span class="math inline">\(x\)</span> coming from the <span class="math inline">\(i\)</span>th emulator. For large collections of emulators, it may be useful to instead consider the second-, or third-maximum implausibility. Where some outputs are deemed more important than others (for instance, putting greater weight on emulation of the peak of an epidemic), we may instead take a weighted average across the implausibity measures.</p>
+</div>
+<div id="implausibility-visualisations" class="section level2">
+<h2><span class="header-section-number">5.2</span> Implausibility visualisations</h2>
+<p>To calculate the implausibility we will use list <code>targets</code>, which represents our observations.</p>
+<p>The default behaviour of the diagnostics and plots we will see here is to take a cut-off of <span class="math inline">\(3\)</span> (following Pukelsheim’s <span class="math inline">\(3\sigma\)</span> rule), and take maximum implausibility across the outputs. For instance, to find the emulator implausibility for the first output we use the <code>emulator_plot</code> function specifying ‘imp’ for implausibility and passing it the target for the first output:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="kw">emulator_plot</span>(ems0_adjusted[[<span class="dv">1</span>]], <span class="st">&#39;imp&#39;</span>, <span class="dt">targets =</span> targets[[<span class="dv">1</span>]])</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /></p>
+<p>This is a 2D slice through the input space: chosen a pair <span class="math inline">\((\bar\beta,\bar\gamma)\)</span>, the plot shows the implausibility of the input parameter set <span class="math inline">\((\bar\beta, \bar\gamma, \delta_M, \mu_M)\)</span>, where <span class="math inline">\(\delta_M\)</span> denotes the mid-range value of the delta parameter and similarly for <span class="math inline">\(\mu_M\)</span>. Parameter sets with a high implausibility (orange region) are highly unlikely to give a good fit and will be discarded when forming the parameters sets for the next wave.</p>
+</div>
+<div id="three-emulator-diagnostics" class="section level2">
+<h2><span class="header-section-number">5.3</span> Three emulator diagnostics</h2>
+<p>The first three diagnostics are relatively straightforward, and can be presented together. For a given validation set, we can consider the following:</p>
+<ul>
+<li><p>Within uncertainties, does the emulator output accurately represent the equivalent model output?</p></li>
+<li><p>What are the standard errors of the emulator outputs in light of the model outputs?</p></li>
+<li><p>Does the emulator adequately classify parameter sets as implausible or non-implausible?</p></li>
+</ul>
+<p>These are encapsulated in the <code>validation_diagnostics</code> function.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">which_invalid &lt;-<span class="st"> </span><span class="kw">validation_diagnostics</span>(ems0_adjusted, valid0, output_names, <span class="dt">targets =</span> targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /><img src="_main_files/figure-html/unnamed-chunk-26-2.png" style="display: block; margin: auto;" /></p>
+<p>The first column of plots gives an indication of the emulator outputs against the model outputs: the emulator outputs are plotted against the model outputs with a <span class="math inline">\(3\sigma\)</span> confidence interval overlaid. An ‘ideal’ emulator would exactly reproduce the model results: this behaviour is represented by the green line <span class="math inline">\(f(x)=E[f(x)]\)</span>. Any parameter set whose emulated prediction lies more than <span class="math inline">\(3\sigma\)</span> away from the simulated output is highlighted in red.</p>
+<p>The second column gives the standard errors: generally we would like the standard errors to be within <span class="math inline">\(-2\)</span> and <span class="math inline">\(2\)</span>.</p>
+<p>Finally, the third column compares the emulator implausibility at the parameter sets to the equivalent model implausibility. There are three cases to consider:</p>
+<ul>
+<li><p>The emulator and model both classify a set as implausible/non-implausible: this is fine. Both are giving the same classification for the set of points.</p></li>
+<li><p>The emulator classifies a set as non-implausible, while the model rules it out: this is also fine. The emulator should not be expected to shrink the parameter space as much as the model does, at least not on a single wave. Points classified in this way will survive this wave, but may be removed on subsequent waves as the emulators grow more accurate on a reduced parameter space.</p></li>
+<li><p>The emulator rules out a set, but the model does not: these are the problem sets, suggesting that the emulator is ruling out parts of the parameter space that it should not be ruling out.</p></li>
+</ul>
+<p>The function <code>validation_diagnostic</code>, along with producing the plots, also returns a data.frame consisting of those parameters sets which failed one or more diagnostic tests.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">which_invalid</a>
+<a class="sourceLine" id="cb21-2" title="2"><span class="co">#&gt;         beta     gamma     delta        mu</span></a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="co">#&gt; 59 0.7830258 0.2534491 0.4573816 0.2839310</span></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="co">#&gt; 60 0.3691619 0.7308761 0.1072148 0.1069617</span></a>
+<a class="sourceLine" id="cb21-5" title="5"><span class="co">#&gt; 65 0.5387941 0.2755354 0.4964976 0.4515998</span></a>
+<a class="sourceLine" id="cb21-6" title="6"><span class="co">#&gt; 75 0.7464346 0.5595566 0.4305315 0.4907506</span></a></code></pre></div>
+<p>It is often worth considering these points, particularly if they lie close to the boundary of the space: having a few parameter sets which fail diagnostics is not the end of the world, but we should at least consider whether the emulator is failing in parts of the space we would want it to be performing well on.</p>
+</div>
+<div id="parameter-sets-failing-diagnostics" class="section level2">
+<h2><span class="header-section-number">5.4</span> Parameter sets failing diagnostics</h2>
+<div id="visualisation" class="section level3">
+<h3><span class="header-section-number">5.4.1</span> Visualisation</h3>
+<p>A helper for visualising problematic parameter sets is provided in the function <code>validation_pairs</code>: this gives pairs plots of the validation points for each parameter pair, colouring the points by their diagnostic success (bottom left) and predicted implausibility (top right). The diagnostics part gives the maximum standard error at each point: the standard error is <span class="math display">\[\frac{|\text{emulator value}-\text{model value}|}{\sqrt{\text{emulator variance}}}\]</span> for each output and we maximise over the outputs.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">vp &lt;-<span class="st"> </span><span class="kw">validation_pairs</span>(ems0_adjusted, valid0, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" /></p>
+<p>We can see that the points that are struggling with diagnostics are indeed on the boundaries of the space, particularly on the boundary of the <span class="math inline">\((\delta,\mu)\)</span> space. Examination of the upper half of this plot shows that a large proportion of the points are due to be ruled out as non-implausible, so they lie in parts of the parameter space that will have no impact on the overall history matching process.</p>
+<p>A box “Show more options for the validation_pairs function” should appear here, with the following content:</p>
+<p>Where multiple outputs are concerned, emulator functions make a call to <code>nth_implausible</code> with default <span class="math inline">\(n=1\)</span>. This can be modified in any function call that uses it. For instance, the above diagnostic plot will consider minimum implausibility in its upper plots if we set <span class="math inline">\(n\)</span> to be the number of emulators:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">vp2 &lt;-<span class="st"> </span><span class="kw">validation_pairs</span>(ems0_adjusted, valid0, targets, <span class="dt">n=</span><span class="kw">length</span>(ems0))</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /></p>
+<p>End of the box.</p>
+</div>
+<div id="space-removed-function" class="section level3">
+<h3><span class="header-section-number">5.4.2</span> Space removed function</h3>
+<p>One way we can get a feel for what cut-off value is reasonable is via the <code>space_removed</code> function, which for a given set of emulators will determine how much of the space will be removed by a particular implausibility cut-off. By default, <code>space_removed</code> considers varying the structural discrepancy, and does so in steps of <span class="math inline">\(10\%\)</span> around <span class="math inline">\(100\%\)</span>. Being our data synthetic, the <code>space_removed</code> function will vary the ensemble variability, which we can consider as a form of internal discrepancy.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">sp1 &lt;-<span class="st"> </span><span class="kw">space_removed</span>(ems0_adjusted, valid0, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
+<p>A cut-off of <span class="math inline">\(3\)</span> here, using maximum implausibility, would be sufficient to remove around <span class="math inline">\(75\%\)</span> of the current parameter space. This is a reasonable level of removal for a first wave: however, if the expected amount of removal was much lower we could consider whether it is sensible to reduce the cut-off (a companion plot that shows how many diagnostic failures would result from a particular cutoff value is in the pipeline).</p>
+<p>A box “Show more options for the space_removed function” should appear here with the content:</p>
+<p>We can also consider what would happen if we were to modify the emulator variances or the correlation lengths. To do this we set <code>modified ='var'</code> or <code>modified='corr'</code>. This evaluates over a fairly large set of parameter sets and has to retrain multiple sets of emulators, so does take a while to run. For the purposes of speed, here, we set <code>n_points</code> to <span class="math inline">\(5\)</span>: this creates a set of <span class="math inline">\(5^d\)</span> points to evaluate over, where <span class="math inline">\(d\)</span> is the dimension of the input space. As before, the default behaviour considers steps of <span class="math inline">\(10\%\)</span> around <span class="math inline">\(100\%\)</span>. Here we set the <code>u_mod</code> argument in the function call to choose different steps for the variance.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">sp2 &lt;-<span class="st"> </span><span class="kw">space_removed</span>(ems0_adjusted, valid0, targets, <span class="dt">u_mod =</span> <span class="kw">c</span>(<span class="fl">0.75</span>, <span class="dv">1</span>, <span class="fl">1.25</span>), <span class="dt">modified =</span> <span class="st">&#39;var&#39;</span>, <span class="dt">n_points =</span> <span class="dv">5</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">sp3 &lt;-<span class="st"> </span><span class="kw">space_removed</span>(ems0_adjusted, valid0, targets, <span class="dt">modified =</span> <span class="st">&#39;corr&#39;</span>, <span class="dt">n_points =</span> <span class="dv">5</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-31-2.png" style="display: block; margin: auto;" /></p>
+<p>We can see that changing the correlation lengths has a minimal impact on the resultant space reduction: this should not be surprising in this case, as the linear part of the emulators (i.e. the <span class="math inline">\(g(x)\beta\)</span> term) is sufficient to capture much of the dynamics of the points:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">map_dbl</span>(ems0, <span class="op">~</span><span class="kw">summary</span>(.<span class="op">$</span>model)<span class="op">$</span>adj.r.squared)</a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="co">#&gt;       I10       I15       I20       I25       I30 </span></a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="co">#&gt; 0.9582686 0.9410490 0.9216215 0.9090185 0.8999996</span></a></code></pre></div>
+<p>The adjusted <span class="math inline">\(R^2\)</span> of the linear models are all high, so the correlation structure is having to do very little ‘work’ for the emulators to match the data. If we instead had a model where the linear part cannot accurately represent the output surface, the choice of correlation lengths would be a much more important choice, and the final plot above would be a much stronger indicator of suitability.</p>
+<p>End of the box.</p>
+<p>In any event, the diagnostics here give an indication of the suitability of the emulators in emulating the outputs at this wave. If there are particular outputs for which the emulators do not give a good fit, then we can modify the specifications for that emulator directly (for example, modifying the correlation length, the variance, or the regression surface) and re-train; if the emulator simply cannot provide a good fit to the output, we can choose not to emulate this output for the wave in question.</p>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="constructing-the-emulators.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="point-generation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": null,
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
