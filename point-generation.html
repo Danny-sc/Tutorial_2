@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>6 Point Generation | Case Study -1: An introduction to the Emulatorr package</title>
+  <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  
+  <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
+  
+
+<meta name="author" content="Danny Scarponi" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="emulator-diagnostics.html"/>
+<link rel="next" href="further-waves.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script language="javascript"> 
+    function toggle(id) {
+        var ele = document.getElementById("toggleText" + id);
+        var text = document.getElementById("displayText" + id);
+        var buttonText = text.innerHTML.replace("Show ", "");
+        buttonText = buttonText.replace("Hide ", "");
+        if(ele.style.display == "block") {
+            ele.style.display = "none";
+            text.innerHTML = "Show " + buttonText;
+        } else {
+            ele.style.display = "block";
+            text.innerHTML = "Hide " + buttonText;
+        }
+    } 
+</script>
+
+<script language="javascript">
+    function openCode(evt, codeName, id) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent" + id);
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks" + id);
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(codeName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+<script language="javascript">
+    function hide(id){
+        document.getElementById(id).style.display = "none";
+    }
+</script>
+</script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
+<li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
+<li class="chapter" data-level="4" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html"><i class="fa fa-check"></i><b>4</b> Constructing the emulators</a><ul>
+<li class="chapter" data-level="4.1" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>4.1</b> Background: the structure of an emulator</a></li>
+<li class="chapter" data-level="4.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>4.2</b> Constructing the emulators step by step</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 1</a></li>
+<li class="chapter" data-level="4.2.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-2"><i class="fa fa-check"></i><b>4.2.2</b> Step 2</a></li>
+<li class="chapter" data-level="4.2.3" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-3"><i class="fa fa-check"></i><b>4.2.3</b> Step 3</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
+<li class="chapter" data-level="5.1" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#background-the-implausibility-measure"><i class="fa fa-check"></i><b>5.1</b> Background: the implausibility measure</a></li>
+<li class="chapter" data-level="5.2" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#implausibility-visualisations"><i class="fa fa-check"></i><b>5.2</b> Implausibility visualisations</a></li>
+<li class="chapter" data-level="5.3" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#three-emulator-diagnostics"><i class="fa fa-check"></i><b>5.3</b> Three emulator diagnostics</a></li>
+<li class="chapter" data-level="5.4" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.4</b> Parameter sets failing diagnostics</a><ul>
+<li class="chapter" data-level="5.4.1" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#visualisation"><i class="fa fa-check"></i><b>5.4.1</b> Visualisation</a></li>
+<li class="chapter" data-level="5.4.2" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html#space-removed-function"><i class="fa fa-check"></i><b>5.4.2</b> Space removed function</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="point-generation.html"><a href="point-generation.html"><i class="fa fa-check"></i><b>6</b> Point Generation</a><ul>
+<li class="chapter" data-level="6.1" data-path="point-generation.html"><a href="point-generation.html#generating-sets-of-parameters-for-the-next-wave"><i class="fa fa-check"></i><b>6.1</b> Generating sets of parameters for the next wave</a></li>
+<li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
+<li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Case Study -1: An introduction to the Emulatorr package</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="point-generation" class="section level1">
+<h1><span class="header-section-number">6</span> Point Generation</h1>
+<p>Having generated emulators based on the first wave of data, evaluated their suitability, and considered a means by which to rule out parameter sets, we can now produce a new set of parameter sets to pass to the model.</p>
+<p>This section is divided in two parts:</p>
+<ol style="list-style-type: decimal">
+<li><p>We first see how to generate new sets of parameters (that will be used to train wave 1 emulators);</p></li>
+<li><p>We then compare the performance of the initial parameter sets with the new parameter sets. In other words, we ask: do the simulator outputs at the new parameter sets match the observations better than the simulator outputs at the initial parameter sets?</p></li>
+</ol>
+<div id="generating-sets-of-parameters-for-the-next-wave" class="section level2">
+<h2><span class="header-section-number">6.1</span> Generating sets of parameters for the next wave</h2>
+<p>The function <code>generate_new_runs</code> is designed to generate new sets of parameters; its default behaviour is as follows.</p>
+<ul>
+<li>If no prior parameter sets are provided, a set is generated using a <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube Design</a>, rejecting implausible points;</li>
+<li>Using these as seeding points, more parameter sets are generated using <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> to attempt to fully cover the non-implausible region;</li>
+<li>Finally, pairs of parameter sets are selected at random and more sets are sampled from lines connecting them, with particular importance given to those that are close to the non-implausible boundary.</li>
+</ul>
+<p>All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</a>
+<a class="sourceLine" id="cb28-2" title="2"><span class="co">#&gt; 410 non-implausible points generated. Applying V-optimality...</span></a>
+<a class="sourceLine" id="cb28-3" title="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb28-4" title="4"><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /></p>
+<p>We can start to see the structure of the non-implausible region, here. The <code>wave_points</code> function provides a better indication of the difference between the two sets of wave data.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /></p>
+<p>Here <code>wave0</code> points are in yellow and <code>new_points</code> are in purple. The plots in the main diagonal show the distribution of points in <code>wave0</code> and that of <code>new_points</code>.</p>
+</div>
+<div id="comparing-next-and-old-parameter-sets" class="section level2">
+<h2><span class="header-section-number">6.2</span> Comparing next and old parameter sets</h2>
+<p>Now we can put <code>new_points</code> into the model and obtain the outputs:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
+<p>Binding together <code>new_points</code> and <code>next_wave</code> we obtain <code>wave1</code>, the full data for the next wave.</p>
+<p>We can see how much better the <code>wave1</code> parameter sets perform compared to the original <code>wave0</code> parameter sets using <code>simulator_plot</code>.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
+<a class="sourceLine" id="cb31-3" title="3">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
+<a class="sourceLine" id="cb31-4" title="4"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /></p>
+<p>We can see that, compared to the space-filling random parameter sets used to train the first emulators, the new parameter sets are in much closer agreement with the data we wish to match to. Subsequent waves, trained on these new parameter sets, will be more confident in the new non-implausible region and will therefore refine the region in light of the greater certainty.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="emulator-diagnostics.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="further-waves.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": null,
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
