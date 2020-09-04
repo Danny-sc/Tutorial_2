@@ -236,7 +236,7 @@ In this section we show a simple and direct way of performing a full wave of emu
 
 - The observations: for each of the outputs we want to emulate, we need to specify its value and standard deviation; 
 
-- The number of points to evaluate the parameters on;
+- The number of points to generate for the next wave;
 
 - The sampling method we want to use.
 
@@ -669,7 +669,7 @@ We can see that, compared to the space-filling random parameter sets used to tra
 
 # Further waves
 
-We follow the same procedure for subsequent waves, with a couple of caveats:
+We follow the same procedure for subsequent waves, with a couple of caveats.
 
 ## Next wave: wave 1
 
@@ -729,7 +729,119 @@ wave_points(list(wave1, new_new_points), in_names = names(ranges))
 
 <img src="_main_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" />
 
+The last step is to create `wave2`, that will be used to train
+`wave2` emulators.
+
+
+```r
+next_next_wave <- getOutputs(new_new_points, seq(10,30,by=5))
+wave2 <- data.frame(cbind(new_new_points,next_next_wave))%>%   
+  setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
+```
+
+Through the `simulator_plot` function we see how much better the `wave2` parameter sets perform compared to the original `wave1` parameter sets.
+
+
+```r
+all_points <- list(wave1[1:9], wave2[1:9])
+simulator_plot(all_points, targets)
+```
+
+<img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" />
+
 Next waves of the process can be produced simply repeating all the steps in this section.
+
+## Next wave: wave 2
+
+### Training wave 2 emulators 
+
+
+```r
+sampling <- sample(nrow(wave2), 40)
+train2 <- wave2[sampling,1:9]
+valid2 <- wave2[!seq_along(wave2[,1])%in%sampling,1:9]
+new_new_ranges <- map(names(ranges), ~c(min(wave2[,.]), max(wave2[,.]))) %>% setNames(names(ranges))
+ems2 <- emulator_from_data(train2, output_names, new_new_ranges, quadratic = T)
+deltas <- apply(wave2[,10:14], 2, mean)/map_dbl(ems2, ~.$u_sigma)
+ems2 <- emulator_from_data(train2, output_names, new_new_ranges, deltas = deltas, quadratic = TRUE)
+for (i in 1:length(ems2)) ems2[[i]]$output_name <- output_names[i]
+ems2_adjusted <- map(seq_along(ems2), ~ems2[[.]]$adjust(train2, output_names[[.]]))
+names(ems2_adjusted) <- output_names
+```
+
+### Evaluating implausibility across all waves
+
+As before, we need to consider implausibility across all waves, rather than just the wave under consideration at the time.
+
+
+```r
+all_waves <- c(ems0_adjusted, ems1_adjusted, ems2_adjusted)
+all_targets <- c(targets, targets, targets)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets)
+```
+
+<img src="_main_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" />
+
+To generate new parameter sets:
+
+
+```r
+new_new_new_points <- generate_new_runs(all_waves, ranges, n_points = 120, z = all_targets)
+#> 228 non-implausible points generated. Applying V-optimality...
+#> 
+plot(new_new_new_points, pch = 16, cex = 0.5)
+```
+
+<img src="_main_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" />
+
+We now create `wave3`:
+
+
+```r
+next_next_next_wave <- getOutputs(new_new_new_points, seq(10,30,by=5))
+wave3 <- data.frame(cbind(new_new_new_points,next_next_next_wave))%>%   
+  setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
+```
+
+Through the `simulator_plot` function we check how much better the `wave3` parameter sets perform compared to the original `wave2` parameter sets.
+
+
+```r
+all_points <- list(wave2[1:9], wave3[1:9])
+simulator_plot(all_points, targets)
+```
+
+<img src="_main_files/figure-html/unnamed-chunk-47-1.png" style="display: block; margin: auto;" />
+
+The graph does not show a clear improvement in the performance of `wave3` parameter sets compared to that of `wave2` parameter sets. To understand the reason behind this, let us compare the variability of the outputs we are emulating with the emulators uncertainty. Below we show the ensemble variability and the uncertainty for `ems0` and `ems2` for each of the outputs.
+
+
+```r
+targets$I10$sigma
+#> [1] 25.27
+targets$I15$sigma
+#> [1] 40.99
+targets$I20$sigma
+#> [1] 46.48
+targets$I25$sigma
+#> [1] 43.98
+targets$I30$sigma
+#> [1] 40.3
+sigmas0 <- map_dbl(ems0, ~.$u_sigma)
+sigmas0
+#>      I10      I15      I20      I25      I30 
+#> 25.02941 39.90951 46.96881 50.12662 52.34127
+sigmas2 <- map_dbl(ems2, ~.$u_sigma)
+sigmas2
+#>       I10       I15       I20       I25       I30 
+#>  9.607539 16.217742 18.393964 16.282659 14.902990
+```
+
+
+We see that while `ems0` uncertainties (`sigmas0`) are similar or larger than the ensemble variabilities, `ems2` uncertainties (`sigmas2`) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the nonimplausible
+space already contains acceptable matches and is unlikely to
+decrease in size in the next iteration. 
+For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the nonimplausible space down further. 
 
 <!--
 # TJ material
@@ -851,9 +963,9 @@ gives:
 <div class="panel panel-default"><div class="panel-heading"> Task </div><div class="panel-body"> 
 Add 2 and 2 together </div></div>
 
-<button id="displayTextunnamed-chunk-46" onclick="javascript:toggle('unnamed-chunk-46');">Show Solution</button>
+<button id="displayTextunnamed-chunk-54" onclick="javascript:toggle('unnamed-chunk-54');">Show Solution</button>
 
-<div id="toggleTextunnamed-chunk-46" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body">
+<div id="toggleTextunnamed-chunk-54" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body">
 
 ```r
 2 + 2
@@ -884,9 +996,9 @@ gives:
 <div class="panel panel-default"><div class="panel-heading"> Question </div><div class="panel-body"> 
 What is the meaning of life, the universe and everything? </div></div>
 
-<button id="displayTextunnamed-chunk-48" onclick="javascript:toggle('unnamed-chunk-48');">Show Answer</button>
+<button id="displayTextunnamed-chunk-56" onclick="javascript:toggle('unnamed-chunk-56');">Show Answer</button>
 
-<div id="toggleTextunnamed-chunk-48" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Answer </div><div class="panel-body">
+<div id="toggleTextunnamed-chunk-56" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Answer </div><div class="panel-body">
 Why 42 of course!</div></div></div>
 
 ### Turning tasks and solutions on and off
@@ -951,9 +1063,9 @@ will typeset to:
 <div class="panel panel-default"><div class="panel-heading"> Task </div><div class="panel-body"> 
 Filter the `iris` data by `Species == "setosa"` and find the mean `Petal.Length`. </div></div>
 
-<button id="displayTextunnamed-chunk-53" onclick="javascript:toggle('unnamed-chunk-53');">Show Solution</button>
+<button id="displayTextunnamed-chunk-61" onclick="javascript:toggle('unnamed-chunk-61');">Show Solution</button>
 
-<div id="toggleTextunnamed-chunk-53" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body"><div class="tab"><button class="tablinksunnamed-chunk-53 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-53', 'unnamed-chunk-53');">Base R</button><button class="tablinksunnamed-chunk-53" onclick="javascript:openCode(event, 'option2unnamed-chunk-53', 'unnamed-chunk-53');">tidyverse</button></div><div id="option1unnamed-chunk-53" class="tabcontentunnamed-chunk-53">
+<div id="toggleTextunnamed-chunk-61" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body"><div class="tab"><button class="tablinksunnamed-chunk-61 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-61', 'unnamed-chunk-61');">Base R</button><button class="tablinksunnamed-chunk-61" onclick="javascript:openCode(event, 'option2unnamed-chunk-61', 'unnamed-chunk-61');">tidyverse</button></div><div id="option1unnamed-chunk-61" class="tabcontentunnamed-chunk-61">
 
 ```r
 ## base R solution
@@ -961,7 +1073,7 @@ mean(iris$Petal.Length[
     iris$Species == "setosa"])
 #> [1] 1.462
 ```
-</div><div id="option2unnamed-chunk-53" class="tabcontentunnamed-chunk-53">
+</div><div id="option2unnamed-chunk-61" class="tabcontentunnamed-chunk-61">
 
 ```r
 ## tidyverse solution
@@ -973,7 +1085,7 @@ iris %>%
 #> 1 1.462
 ```
     
-</div><script> javascript:hide('option2unnamed-chunk-53') </script></div></div></div>
+</div><script> javascript:hide('option2unnamed-chunk-61') </script></div></div></div>
 
 Note that there is also a `multCode` chunk that does not link to task and solution boxes e.g.
 
@@ -997,17 +1109,17 @@ Two options:
 
 will typeset to:
 
-<div class="tab"><button class="tablinksunnamed-chunk-54 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-54', 'unnamed-chunk-54');">Option 1</button><button class="tablinksunnamed-chunk-54" onclick="javascript:openCode(event, 'option2unnamed-chunk-54', 'unnamed-chunk-54');">Option 2</button></div><div id="option1unnamed-chunk-54" class="tabcontentunnamed-chunk-54">
+<div class="tab"><button class="tablinksunnamed-chunk-62 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-62', 'unnamed-chunk-62');">Option 1</button><button class="tablinksunnamed-chunk-62" onclick="javascript:openCode(event, 'option2unnamed-chunk-62', 'unnamed-chunk-62');">Option 2</button></div><div id="option1unnamed-chunk-62" class="tabcontentunnamed-chunk-62">
 
 Two options: 
 
 * Option 1
-</div><div id="option2unnamed-chunk-54" class="tabcontentunnamed-chunk-54">
+</div><div id="option2unnamed-chunk-62" class="tabcontentunnamed-chunk-62">
 
 Two options:
     
 * Option 2
-</div><script> javascript:hide('option2unnamed-chunk-54') </script>
+</div><script> javascript:hide('option2unnamed-chunk-62') </script>
 
 The `titles` option can be set as before.
 -->
