@@ -198,6 +198,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
 <li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
+<li class="chapter" data-level="7.2" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-2"><i class="fa fa-check"></i><b>7.2</b> Next wave: wave 2</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-2-emulators"><i class="fa fa-check"></i><b>7.2.1</b> Training wave 2 emulators</a></li>
+<li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -218,7 +222,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="further-waves" class="section level1">
 <h1><span class="header-section-number">7</span> Further waves</h1>
-<p>We follow the same procedure for subsequent waves, with a couple of caveats:</p>
+<p>We follow the same procedure for subsequent waves, with a couple of caveats.</p>
 <div id="next-wave-wave-1" class="section level2">
 <h2><span class="header-section-number">7.1</span> Next wave: wave 1</h2>
 <div id="training-wave-1-emulators" class="section level3">
@@ -253,7 +257,77 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>We can compare the distribution of parameter sets at the end of <code>wave0</code> with that of parameter sets at the end of <code>wave1</code>:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave1, new_new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" /></p>
+<p>The last step is to create <code>wave2</code>, that will be used to train
+<code>wave2</code> emulators.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">next_next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb36-2" title="2">wave2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_new_points,next_next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a></code></pre></div>
+<p>Through the <code>simulator_plot</code> function we see how much better the <code>wave2</code> parameter sets perform compared to the original <code>wave1</code> parameter sets.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave2[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
+<a class="sourceLine" id="cb37-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" /></p>
 <p>Next waves of the process can be produced simply repeating all the steps in this section.</p>
+</div>
+</div>
+<div id="next-wave-wave-2" class="section level2">
+<h2><span class="header-section-number">7.2</span> Next wave: wave 2</h2>
+<div id="training-wave-2-emulators" class="section level3">
+<h3><span class="header-section-number">7.2.1</span> Training wave 2 emulators</h3>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1">sampling &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">nrow</span>(wave2), <span class="dv">40</span>)</a>
+<a class="sourceLine" id="cb38-2" title="2">train2 &lt;-<span class="st"> </span>wave2[sampling,<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>]</a>
+<a class="sourceLine" id="cb38-3" title="3">valid2 &lt;-<span class="st"> </span>wave2[<span class="op">!</span><span class="kw">seq_along</span>(wave2[,<span class="dv">1</span>])<span class="op">%in%</span>sampling,<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>]</a>
+<a class="sourceLine" id="cb38-4" title="4">new_new_ranges &lt;-<span class="st"> </span><span class="kw">map</span>(<span class="kw">names</span>(ranges), <span class="op">~</span><span class="kw">c</span>(<span class="kw">min</span>(wave2[,.]), <span class="kw">max</span>(wave2[,.]))) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">setNames</span>(<span class="kw">names</span>(ranges))</a>
+<a class="sourceLine" id="cb38-5" title="5">ems2 &lt;-<span class="st"> </span><span class="kw">emulator_from_data</span>(train2, output_names, new_new_ranges, <span class="dt">quadratic =</span> T)</a>
+<a class="sourceLine" id="cb38-6" title="6">deltas &lt;-<span class="st"> </span><span class="kw">apply</span>(wave2[,<span class="dv">10</span><span class="op">:</span><span class="dv">14</span>], <span class="dv">2</span>, mean)<span class="op">/</span><span class="kw">map_dbl</span>(ems2, <span class="op">~</span>.<span class="op">$</span>u_sigma)</a>
+<a class="sourceLine" id="cb38-7" title="7">ems2 &lt;-<span class="st"> </span><span class="kw">emulator_from_data</span>(train2, output_names, new_new_ranges, <span class="dt">deltas =</span> deltas, <span class="dt">quadratic =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb38-8" title="8"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(ems2)) ems2[[i]]<span class="op">$</span>output_name &lt;-<span class="st"> </span>output_names[i]</a>
+<a class="sourceLine" id="cb38-9" title="9">ems2_adjusted &lt;-<span class="st"> </span><span class="kw">map</span>(<span class="kw">seq_along</span>(ems2), <span class="op">~</span>ems2[[.]]<span class="op">$</span><span class="kw">adjust</span>(train2, output_names[[.]]))</a>
+<a class="sourceLine" id="cb38-10" title="10"><span class="kw">names</span>(ems2_adjusted) &lt;-<span class="st"> </span>output_names</a></code></pre></div>
+</div>
+<div id="evaluating-implausibility-across-all-waves-1" class="section level3">
+<h3><span class="header-section-number">7.2.2</span> Evaluating implausibility across all waves</h3>
+<p>As before, we need to consider implausibility across all waves, rather than just the wave under consideration at the time.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">all_waves &lt;-<span class="st"> </span><span class="kw">c</span>(ems0_adjusted, ems1_adjusted, ems2_adjusted)</a>
+<a class="sourceLine" id="cb39-2" title="2">all_targets &lt;-<span class="st"> </span><span class="kw">c</span>(targets, targets, targets)</a>
+<a class="sourceLine" id="cb39-3" title="3"><span class="kw">emulator_plot</span>(all_waves, <span class="dt">var =</span> <span class="st">&#39;maximp&#39;</span>, <span class="dt">targets =</span> all_targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" /></p>
+<p>To generate new parameter sets:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">new_new_new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(all_waves, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> all_targets)</a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="co">#&gt; 228 non-implausible points generated. Applying V-optimality...</span></a>
+<a class="sourceLine" id="cb40-3" title="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb40-4" title="4"><span class="kw">plot</span>(new_new_new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" /></p>
+<p>We now create <code>wave3</code>:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">next_next_next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_new_new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb41-2" title="2">wave3 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_new_new_points,next_next_next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
+<a class="sourceLine" id="cb41-3" title="3"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a></code></pre></div>
+<p>Through the <code>simulator_plot</code> function we check how much better the <code>wave3</code> parameter sets perform compared to the original <code>wave2</code> parameter sets.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave2[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave3[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
+<a class="sourceLine" id="cb42-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-47-1.png" style="display: block; margin: auto;" /></p>
+<p>The graph does not show a clear improvement in the performance of <code>wave3</code> parameter sets compared to that of <code>wave2</code> parameter sets. To understand the reason behind this, let us compare the variability of the outputs we are emulating with the emulators uncertainty. Below we show the ensemble variability and the uncertainty for <code>ems0</code> and <code>ems2</code> for each of the outputs.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">targets<span class="op">$</span>I10<span class="op">$</span>sigma</a>
+<a class="sourceLine" id="cb43-2" title="2"><span class="co">#&gt; [1] 25.27</span></a>
+<a class="sourceLine" id="cb43-3" title="3">targets<span class="op">$</span>I15<span class="op">$</span>sigma</a>
+<a class="sourceLine" id="cb43-4" title="4"><span class="co">#&gt; [1] 40.99</span></a>
+<a class="sourceLine" id="cb43-5" title="5">targets<span class="op">$</span>I20<span class="op">$</span>sigma</a>
+<a class="sourceLine" id="cb43-6" title="6"><span class="co">#&gt; [1] 46.48</span></a>
+<a class="sourceLine" id="cb43-7" title="7">targets<span class="op">$</span>I25<span class="op">$</span>sigma</a>
+<a class="sourceLine" id="cb43-8" title="8"><span class="co">#&gt; [1] 43.98</span></a>
+<a class="sourceLine" id="cb43-9" title="9">targets<span class="op">$</span>I30<span class="op">$</span>sigma</a>
+<a class="sourceLine" id="cb43-10" title="10"><span class="co">#&gt; [1] 40.3</span></a>
+<a class="sourceLine" id="cb43-11" title="11">sigmas0 &lt;-<span class="st"> </span><span class="kw">map_dbl</span>(ems0, <span class="op">~</span>.<span class="op">$</span>u_sigma)</a>
+<a class="sourceLine" id="cb43-12" title="12">sigmas0</a>
+<a class="sourceLine" id="cb43-13" title="13"><span class="co">#&gt;      I10      I15      I20      I25      I30 </span></a>
+<a class="sourceLine" id="cb43-14" title="14"><span class="co">#&gt; 25.02941 39.90951 46.96881 50.12662 52.34127</span></a>
+<a class="sourceLine" id="cb43-15" title="15">sigmas2 &lt;-<span class="st"> </span><span class="kw">map_dbl</span>(ems2, <span class="op">~</span>.<span class="op">$</span>u_sigma)</a>
+<a class="sourceLine" id="cb43-16" title="16">sigmas2</a>
+<a class="sourceLine" id="cb43-17" title="17"><span class="co">#&gt;       I10       I15       I20       I25       I30 </span></a>
+<a class="sourceLine" id="cb43-18" title="18"><span class="co">#&gt;  9.607539 16.217742 18.393964 16.282659 14.902990</span></a></code></pre></div>
+<p>We see that while <code>ems0</code> uncertainties (<code>sigmas0</code>) are similar or larger than the ensemble variabilities, <code>ems2</code> uncertainties (<code>sigmas2</code>) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the nonimplausible
+space already contains acceptable matches and is unlikely to
+decrease in size in the next iteration.
+For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the nonimplausible space down further.</p>
 <!--
 # TJ material
 
@@ -374,9 +448,9 @@ gives:
 <div class="panel panel-default"><div class="panel-heading"> Task </div><div class="panel-body"> 
 Add 2 and 2 together </div></div>
 
-<button id="displayTextunnamed-chunk-46" onclick="javascript:toggle('unnamed-chunk-46');">Show Solution</button>
+<button id="displayTextunnamed-chunk-54" onclick="javascript:toggle('unnamed-chunk-54');">Show Solution</button>
 
-<div id="toggleTextunnamed-chunk-46" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body">
+<div id="toggleTextunnamed-chunk-54" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body">
 
 ```r
 2 + 2
@@ -407,9 +481,9 @@ gives:
 <div class="panel panel-default"><div class="panel-heading"> Question </div><div class="panel-body"> 
 What is the meaning of life, the universe and everything? </div></div>
 
-<button id="displayTextunnamed-chunk-48" onclick="javascript:toggle('unnamed-chunk-48');">Show Answer</button>
+<button id="displayTextunnamed-chunk-56" onclick="javascript:toggle('unnamed-chunk-56');">Show Answer</button>
 
-<div id="toggleTextunnamed-chunk-48" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Answer </div><div class="panel-body">
+<div id="toggleTextunnamed-chunk-56" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Answer </div><div class="panel-body">
 Why 42 of course!</div></div></div>
 
 ### Turning tasks and solutions on and off
@@ -474,9 +548,9 @@ will typeset to:
 <div class="panel panel-default"><div class="panel-heading"> Task </div><div class="panel-body"> 
 Filter the `iris` data by `Species == "setosa"` and find the mean `Petal.Length`. </div></div>
 
-<button id="displayTextunnamed-chunk-53" onclick="javascript:toggle('unnamed-chunk-53');">Show Solution</button>
+<button id="displayTextunnamed-chunk-61" onclick="javascript:toggle('unnamed-chunk-61');">Show Solution</button>
 
-<div id="toggleTextunnamed-chunk-53" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body"><div class="tab"><button class="tablinksunnamed-chunk-53 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-53', 'unnamed-chunk-53');">Base R</button><button class="tablinksunnamed-chunk-53" onclick="javascript:openCode(event, 'option2unnamed-chunk-53', 'unnamed-chunk-53');">tidyverse</button></div><div id="option1unnamed-chunk-53" class="tabcontentunnamed-chunk-53">
+<div id="toggleTextunnamed-chunk-61" style="display: none"><div class="panel panel-default"><div class="panel-heading panel-heading1"> Solution </div><div class="panel-body"><div class="tab"><button class="tablinksunnamed-chunk-61 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-61', 'unnamed-chunk-61');">Base R</button><button class="tablinksunnamed-chunk-61" onclick="javascript:openCode(event, 'option2unnamed-chunk-61', 'unnamed-chunk-61');">tidyverse</button></div><div id="option1unnamed-chunk-61" class="tabcontentunnamed-chunk-61">
 
 ```r
 ## base R solution
@@ -484,7 +558,7 @@ mean(iris$Petal.Length[
     iris$Species == "setosa"])
 #> [1] 1.462
 ```
-</div><div id="option2unnamed-chunk-53" class="tabcontentunnamed-chunk-53">
+</div><div id="option2unnamed-chunk-61" class="tabcontentunnamed-chunk-61">
 
 ```r
 ## tidyverse solution
@@ -496,7 +570,7 @@ iris %>%
 #> 1 1.462
 ```
     
-</div><script> javascript:hide('option2unnamed-chunk-53') </script></div></div></div>
+</div><script> javascript:hide('option2unnamed-chunk-61') </script></div></div></div>
 
 Note that there is also a `multCode` chunk that does not link to task and solution boxes e.g.
 
@@ -520,17 +594,17 @@ Two options:
 
 will typeset to:
 
-<div class="tab"><button class="tablinksunnamed-chunk-54 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-54', 'unnamed-chunk-54');">Option 1</button><button class="tablinksunnamed-chunk-54" onclick="javascript:openCode(event, 'option2unnamed-chunk-54', 'unnamed-chunk-54');">Option 2</button></div><div id="option1unnamed-chunk-54" class="tabcontentunnamed-chunk-54">
+<div class="tab"><button class="tablinksunnamed-chunk-62 active" onclick="javascript:openCode(event, 'option1unnamed-chunk-62', 'unnamed-chunk-62');">Option 1</button><button class="tablinksunnamed-chunk-62" onclick="javascript:openCode(event, 'option2unnamed-chunk-62', 'unnamed-chunk-62');">Option 2</button></div><div id="option1unnamed-chunk-62" class="tabcontentunnamed-chunk-62">
 
 Two options: 
 
 * Option 1
-</div><div id="option2unnamed-chunk-54" class="tabcontentunnamed-chunk-54">
+</div><div id="option2unnamed-chunk-62" class="tabcontentunnamed-chunk-62">
 
 Two options:
     
 * Option 2
-</div><script> javascript:hide('option2unnamed-chunk-54') </script>
+</div><script> javascript:hide('option2unnamed-chunk-62') </script>
 
 The `titles` option can be set as before.
 -->
