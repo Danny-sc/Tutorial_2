@@ -46,7 +46,7 @@ knit_engines$set(solution = function(options) {
                 solLabels[[taskCtr]][2] <- out
                 solLabels[[taskCtr]][3] <- headerName
                 assign("solLabels", solLabels, pos = 1)
-                out <- paste0("\\hyperlink{sol", taskCtr, "}{\\buttonS{Show ", headerName, " on P\\colpageref{tsk", taskCtr, "}}}")
+                out <- paste0("\\hyperlink{sol", taskCtr, "}{\\buttonS{ ", headerName, " on P\\colpageref{tsk", taskCtr, "}}}")
             }
             return(out)
         } else {
