@@ -53,14 +53,14 @@
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
         var text = document.getElementById("displayText" + id);
-        var buttonText = text.innerHTML.replace("Show ", "");
-        buttonText = buttonText.replace("Hide ", "");
+        var buttonText = text.innerHTML.replace("Show: ", "");
+        buttonText = buttonText.replace("Hide: ", "");
         if(ele.style.display == "block") {
             ele.style.display = "none";
-            text.innerHTML = "Show " + buttonText;
+            text.innerHTML = "Show: " + buttonText;
         } else {
             ele.style.display = "block";
-            text.innerHTML = "Hide " + buttonText;
+            text.innerHTML = "Hide: " + buttonText;
         }
     } 
 </script>
@@ -85,7 +85,6 @@
     function hide(id){
         document.getElementById(id).style.display = "none";
     }
-</script>
 </script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -194,7 +193,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
-<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
 <li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
 <li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
@@ -203,6 +202,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 </ul>
 
       </nav>
@@ -222,8 +222,39 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="introduction-to-the-model" class="section level1">
 <h1><span class="header-section-number">2</span> Introduction to the model</h1>
-<p>The model in question is a stochastic SEIRS model, with four parameters: rate of transmission between each infectious person and each susceptible person <span class="math inline">\(\beta_M\)</span>; transition rate from exposed to infectious <span class="math inline">\(\gamma_M\)</span>; recovery rate from infectious to recovered <span class="math inline">\(\delta_M\)</span>; and a ‘reinfection’ rate from recovered to susceptible <span class="math inline">\(\mu_M\)</span>.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-5"></span>
+<p>The model in question is a stochastic<br />
+<span class="abbr" title="A model consisting of four compartments 
+
+- $S$: Susceptible individuals,
+- $E$: Exposed individuals (i.e. people that are infected but not infectious yet), 
+- $I$: Infectious individuals,  
+- $R$: Recovered individuals, 
+
+and four possible transitions
+
+- $S \rightarrow E$, when a susceptible individual becomes infected, 
+- $E \rightarrow I$, when an infected individual becomes infectious,
+- $I \rightarrow R$, when an infectious individual recovers,
+- $R \rightarrow S$, when a recovered individual becomes susceptible again.
+
+SEIRS models are used to study those infectious diseases that do not confer permanent immunity."><abbr title="A model consisting of four compartments 
+
+- S: Susceptible individuals,
+- E: Exposed individuals (i.e. people that are infected but not infectious yet), 
+- I: Infectious individuals,  
+- R: Recovered individuals, 
+
+and four possible transitions
+
+- S to E, when a susceptible individual becomes infected, 
+- E to I, when an infected individual becomes infectious,
+- I to R, when an infectious individual recovers,
+- R to S, when a recovered individual becomes susceptible again.
+
+SEIRS models are suitable to study those infectious diseases that have an incubation period and do not confer permanent immunity.">
+SEIRS</abbr></span>
+model, with four parameters: rate of transmission between each infectious person and each susceptible person <span class="math inline">\(\beta_M\)</span>; transition rate from exposed to infectious <span class="math inline">\(\gamma_M\)</span>; recovery rate from infectious to recovered <span class="math inline">\(\delta_M\)</span>; and a ‘reinfection’ rate from recovered to susceptible <span class="math inline">\(\mu_M\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
 <img src="SEIRSdiagram.PNG" alt="SEIRS Diagram" width="1916" />
 <p class="caption">
 Figure 2.1: SEIRS Diagram
@@ -254,13 +285,13 @@ with one infectious individual, there would a be a significant probability that 
 <a class="sourceLine" id="cb1-12" title="12">  <span class="dt">I =</span> <span class="kw">rep</span>(<span class="dv">50</span>, nreps),</a>
 <a class="sourceLine" id="cb1-13" title="13">  <span class="dt">R =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps)</a>
 <a class="sourceLine" id="cb1-14" title="14">)</a></code></pre></div>
-<p>We select parameter values and parse the model using the function <code>mparse</code>, which takes transitions, compartments, initial data, parameter values and the time span to simulate a trajectory. We then run the model and plot the trajectories of interest.</p>
+<p>We select parameter values and parse the model using the function <code>mparse</code>, which takes transitions, compartments, initial values of each compartment, parameter values and the time span to simulate a trajectory. We then run the model and plot the trajectories of interest.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">params &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">beta =</span> <span class="fl">0.5</span>, <span class="dt">gamma =</span> <span class="fl">0.5</span>, <span class="dt">delta =</span> <span class="fl">0.1</span>, <span class="dt">mu =</span> <span class="fl">0.1</span>)</a>
 <a class="sourceLine" id="cb2-2" title="2">model &lt;-<span class="st"> </span><span class="kw">mparse</span>(<span class="dt">transitions =</span> transitions, <span class="dt">compartments =</span> compartments,</a>
 <a class="sourceLine" id="cb2-3" title="3">                <span class="dt">u0 =</span> u0, <span class="dt">gdata =</span> params, <span class="dt">tspan =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">60</span>)</a>
 <a class="sourceLine" id="cb2-4" title="4">result =<span class="st"> </span><span class="kw">run</span>(model)</a>
 <a class="sourceLine" id="cb2-5" title="5"><span class="kw">plot</span>(result, <span class="dt">compartments =</span> <span class="kw">c</span>(<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;#07AF3F&quot;</span>, <span class="st">&quot;#FAAE48&quot;</span>,<span class="st">&quot;#48E2FA&quot;</span>))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /></p>
 <p>In order to extract the relevant information from the data provided by the SimInf run, a helper function <code>getOutputs</code> has been included in this document. It takes a data.frame of parameter sets, and a list of times, and returns a data.frame of the results. We then create a data.frame <code>outputs</code> by binding the parameter values and the results obtained.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">points &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="kw">list</span>(<span class="dt">beta =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</a>
 <a class="sourceLine" id="cb3-2" title="2">                           <span class="dt">gamma =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</a>
@@ -288,7 +319,7 @@ with one infectious individual, there would a be a significant probability that 
 <span class="abbr" title="Running a stochastic model at a given set of parameters produces different results each time. We refer to this form of uncertainty as Ensemble Variability"><abbr title="Running a stochastic model at a given set of parameters produces different results each time. We refer to this form of uncertainty as Ensemble Variability.">
 ensemble variability</abbr></span>
 for each parameter set, at each desidered time: this is defined here as the standard deviation of the <span class="math inline">\(50\)</span> runs, plus <span class="math inline">\(3\%\)</span> of the range of the runs. The trained emulators outputs will be estimates of the means, while the ensemble variability will be used to quantify the uncertainty of such estimates.</p>
-<p>Before we actually tackle the emulation, we need a set of <code>wave0</code> data. For this, we define a set of ranges for the parameters, and generate parameter sets using a <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube</a> design. We will run the model over <span class="math inline">\(80\)</span> parameter sets; <span class="math inline">\(40\)</span> of these will be used for training while the other <span class="math inline">\(40\)</span> will form the validation set for the emulators.</p>
+<p>Before we tackle the emulation, we need a set of <code>wave0</code> data. For this, we define a set of ranges for the parameters, and generate parameter sets using a <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube</a> design. We will run the model over <span class="math inline">\(80\)</span> parameter sets; <span class="math inline">\(40\)</span> of these will be used for training while the other <span class="math inline">\(40\)</span> will form the validation set for the emulators.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">ranges &lt;-<span class="st"> </span><span class="kw">list</span>(</a>
 <a class="sourceLine" id="cb4-2" title="2">  <span class="dt">beta =</span> <span class="kw">c</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>),</a>
 <a class="sourceLine" id="cb4-3" title="3">  <span class="dt">gamma =</span> <span class="kw">c</span>(<span class="fl">0.2</span>, <span class="dv">1</span>),</a>

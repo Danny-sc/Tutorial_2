@@ -53,14 +53,14 @@
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
         var text = document.getElementById("displayText" + id);
-        var buttonText = text.innerHTML.replace("Show ", "");
-        buttonText = buttonText.replace("Hide ", "");
+        var buttonText = text.innerHTML.replace("Show: ", "");
+        buttonText = buttonText.replace("Hide: ", "");
         if(ele.style.display == "block") {
             ele.style.display = "none";
-            text.innerHTML = "Show " + buttonText;
+            text.innerHTML = "Show: " + buttonText;
         } else {
             ele.style.display = "block";
-            text.innerHTML = "Hide " + buttonText;
+            text.innerHTML = "Hide: " + buttonText;
         }
     } 
 </script>
@@ -85,7 +85,6 @@
     function hide(id){
         document.getElementById(id).style.display = "none";
     }
-</script>
 </script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -194,7 +193,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
-<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
 <li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
 <li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
@@ -203,6 +202,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 </ul>
 
       </nav>
@@ -222,20 +222,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="perfoming-a-full-wave-of-emulation-and-history-matching" class="section level1">
 <h1><span class="header-section-number">3</span> Perfoming a full wave of emulation and history matching</h1>
-<p>In this section we show a simple and direct way of performing a full wave of emulation and history matching (the first one). This is done by using the function
+<p>In this section we show a simple and direct way of performing a full wave of emulation and history matching (the first wave). This is done by using the function
 <code>full_wave</code>, which needs the following information:</p>
 <ul>
-<li><p>A set of training points;</p></li>
-<li><p>A set of validation points;</p></li>
+<li><p>Training data;</p></li>
+<li><p>Validation data;</p></li>
 <li><p>A list of ranges for the parameters;</p></li>
-<li><p>A list with the names of the outputs to emulate;</p></li>
-<li><p>The observations: for each of the outputs we want to emulate, we need to specify its value and standard deviation;</p></li>
-<li><p>The number of points to generate for the next wave;</p></li>
+<li><p>A list with the names of the model outputs to emulate;</p></li>
+<li><p>The targets: for each of the model outputs to emulate, we need a pair (val, sigma) that we will use to evaluate implausibility. The ‘val’ component represents the mean value of the output and ‘sigma’ represents our uncertainty about it;</p></li>
+<li><p>The number of parameter sets to generate for the next wave;</p></li>
 <li><p>The sampling method we want to use.</p></li>
 </ul>
-<p>We already have almost all of these pieces. We just need to define the output names</p>
+<p>We already have almost all of these pieces. We just need the model output names</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">output_names &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>, <span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
-<p>and the observations. As our dataset is synthetic, we will take as our observations the model runs from a chosen parameter set, with a large number of repetitions; the means will provide the values of the outputs and the standard deviations at each parameter set will give the ‘ensemble variability’ representing the stochastic nature of the model.</p>
+<p>and the targets:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">targets =<span class="st"> </span><span class="kw">list</span>(</a>
 <a class="sourceLine" id="cb8-2" title="2">  <span class="dt">I10 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">240</span>, <span class="dt">sigma =</span> <span class="fl">25.27</span>),</a>
 <a class="sourceLine" id="cb8-3" title="3">  <span class="dt">I15 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">396</span>, <span class="dt">sigma =</span> <span class="fl">40.99</span>),</a>
@@ -243,13 +243,20 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb8-5" title="5">  <span class="dt">I25 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">428</span>, <span class="dt">sigma =</span> <span class="fl">43.98</span>),</a>
 <a class="sourceLine" id="cb8-6" title="6">  <span class="dt">I30 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">392</span>, <span class="dt">sigma =</span> <span class="fl">40.30</span>)</a>
 <a class="sourceLine" id="cb8-7" title="7">)</a></code></pre></div>
-<p>We are now ready to perform the first wave of the process:</p>
+<p><infobutton id="displayTextunnamed-chunk-13" onclick="javascript:toggle('unnamed-chunk-13');">Show: More on how targets were set</infobutton></p>
+<div id="toggleTextunnamed-chunk-13" style="display: none">
+<div class="panel panel-default">
+<div class="panel-body">
+As our dataset is synthetic, we couldn’t rely on observed data to define our targets. Instead, we ran the model from a chosen parameter set, with a large number of repetitions. The means from the various runs provided the mean values, while the standard deviations, estimating the ensemble variability, provided the sigmas. Note that here we factor in neither model discrepancy nor observation uncertainty when defining the sigmas. These two sources of uncertainty need to be included when dealing with empirical data.
+</div>
+</div>
+</div>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">test_full_wave &lt;-<span class="st"> </span><span class="kw">full_wave</span>(train0, valid0, ranges, output_names, targets, <span class="dv">120</span>, <span class="dt">sample_method =</span> <span class="st">&#39;importance&#39;</span>)</a>
 <a class="sourceLine" id="cb9-2" title="2"><span class="co">#&gt; Running diagnostics...</span></a>
 <a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt; Generating new sample points...</span></a>
 <a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt; 497 non-implausible points generated. Applying V-optimality...</span></a>
 <a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt; </span></a></code></pre></div>
-<p>Note that here we specified that we want to use importance sampling for example. The <code>full_wave</code> function does the following for us:</p>
+<p>Here we set the argument <code>sample_method</code> to ‘importance’, to specify that <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> should be used when selecting parameter sets for the next wave. The <code>full_wave</code> function does the following for us:</p>
 <ul>
 <li><p>creates <code>base_emulators</code>: these are a premilinary version of the emulators necessary to set our priors for the Bayes Linear method;</p></li>
 <li><p>creates the <code>emulators</code>: these are obtained by adjusting the base emulators through the Bayes Linear update formulae;</p></li>
@@ -259,7 +266,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>To see how the parameter space has changed after the first wave of the process, we use the function <code>wave_points</code>, which plots the old and the new set of parameters on the same pair of axis:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, test_full_wave<span class="op">$</span>next_sample), <span class="kw">names</span>(ranges))</a></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /></p>
-<p>Here <code>wave0</code> parameter sets are in yellow and the new sets are in purple. The plots in the main diagonal show the distribution of points in the two sets. As an example, let us look at the delta parameter: while the distribution of points in <code>wave0</code> is rather uniform, that of the new wave picks at low values of delta and clearly excludes large values of delta. Similarly, if we look at the delta-mu plot, the yellow points are uniformly distributed, while the purple points are concentrated in the upper left region: this suggests that parameter sets with high values of delta and low values of mu are unlikely to give a good fit for the model.</p>
+<p>Here <code>wave0</code> parameter sets are in yellow and the new sets are in purple. The plots in the main diagonal show the distribution of points in the two sets. Let us take a look at the yellow and purple distributions for the delta parameter. While the distribution of points in <code>wave0</code> is rather uniform, the distribution of the new wave peaks at low values of delta and decreases to zero for large values of delta. Similarly, if we look at the delta-mu plot, the yellow points are uniformly distributed, while the purple points are concentrated in the upper left region: this suggests that parameter sets with high values of delta and low values of mu are unlikely to give a good fit for the model.</p>
 <p>In the following sections we will explain step by step what <code>full_wave</code> does behind the scenes. This will not only enhance the reader’s overall understanding, but will also provide them with the necessary tools to have more control over the process and customise it through their judgement.</p>
 </div>
             </section>
