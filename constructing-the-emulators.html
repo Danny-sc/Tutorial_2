@@ -53,14 +53,14 @@
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
         var text = document.getElementById("displayText" + id);
-        var buttonText = text.innerHTML.replace("Show ", "");
-        buttonText = buttonText.replace("Hide ", "");
+        var buttonText = text.innerHTML.replace("Show: ", "");
+        buttonText = buttonText.replace("Hide: ", "");
         if(ele.style.display == "block") {
             ele.style.display = "none";
-            text.innerHTML = "Show " + buttonText;
+            text.innerHTML = "Show: " + buttonText;
         } else {
             ele.style.display = "block";
-            text.innerHTML = "Hide " + buttonText;
+            text.innerHTML = "Hide: " + buttonText;
         }
     } 
 </script>
@@ -85,7 +85,6 @@
     function hide(id){
         document.getElementById(id).style.display = "none";
     }
-</script>
 </script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -194,7 +193,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
-<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
 <li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
 <li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
@@ -203,6 +202,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 </ul>
 
       </nav>
@@ -222,22 +222,22 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="constructing-the-emulators" class="section level1">
 <h1><span class="header-section-number">4</span> Constructing the emulators</h1>
-<p>The first task that the <code>full_wave</code> function accomplishes, is to build the emulators based on the given data. We start this section by establishing the structure of the emulators that we want to construct. We then show how to build emulators step by step.</p>
+<p>The first task that the <code>full_wave</code> function accomplishes, is to build the emulators based on the training data. We start this section by establishing the structure of the emulators that we want to construct. We then show how to build emulators step by step.</p>
 <div id="background-the-structure-of-an-emulator" class="section level2">
 <h2><span class="header-section-number">4.1</span> Background: the structure of an emulator</h2>
-<p>An <a href="https://en.wikipedia.org/wiki/Emulator">emulator</a> is a way of representing our beliefs about the behaviour of an unknown function. In our case, where the model is stochastic, the unknown function is taken to be the mean of each of the model outputs over multiple runs. Given a set of model runs and an estimate of the parameters, we use the emulator to get a probability distribution for the mean of a model’s output at any input parameter set, without the need to run the model at the chosen input.</p>
+<p>An <a href="https://en.wikipedia.org/wiki/Emulator">emulator</a> is a way of representing our beliefs about the behaviour of an unknown function. In our case, where the model is stochastic, the unknown function is taken to be the mean of each of the model outputs over multiple runs. Given a set of model runs and an estimate of the parameters, we can use the emulator to get a probability distribution for the mean of a model output at any parameter set, without the need to run the model at the chosen set.</p>
 <p>In this tutorial, we will construct an emulator for each of the model outputs separately. The general structure of a univariate emulator is as follows:
 <span class="math display">\[f(x) = g(x) \beta + u(x),\]</span>
 where <span class="math inline">\(g(x)\)</span> are the regression functions, <span class="math inline">\(\beta\)</span> the regression parameters, and <span class="math inline">\(u(x)\)</span> is the correlation structure. We split the correlation structure further into two pieces - for two parameter sets <span class="math inline">\(x\)</span> and <span class="math inline">\(x^{\prime}\)</span>, the structure is:
-<span class="math display">\[u(x) = \sigma^2 (1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}.\]</span>
+<span class="math display">\[u(x) = \sigma^2 \left[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}\right].\]</span>
 Here <span class="math inline">\(\sigma^2\)</span> is the (prior) emulator variance and <span class="math inline">\(c(x,x^{\prime})\)</span> is a correlation function; the simplest such function is squared-exponential
 <span class="math display">\[c(x,x^{\prime}) = \exp\left(-\frac{\sum\limits_{i}(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).\]</span>
-The subscript <span class="math inline">\(A\)</span> indicates that the correlation function operates only on the active inputs for the emulator: that is, inputs that contribute to the regression surface. To ensure the correlation structure is well-defined, the ‘nugget’ term <span class="math inline">\(\delta I_{\{x=x^{\prime}\}}\)</span> is included: this operates on all the parameters in the input space and represents the proportion of the overall variance due to the ensemble variability. The <span class="math inline">\(\theta_i\)</span> hyperparameters are the correlation lengths for the emulator. The size of the correlation lengths determine how close two points must be in order for the corresponding
+The subscript <span class="math inline">\(A\)</span> indicates that the correlation function operates only on the active parameters for the emulator: that is, parameters that contribute to the regression surface. To ensure the correlation structure is well-defined, the ‘nugget’ term <span class="math inline">\(\delta I_{\{x=x^{\prime}\}}\)</span> is included: this operates on all the parameters in the input space and represents the proportion of the overall variance due to the ensemble variability. The <span class="math inline">\(\theta_i\)</span> hyperparameters are the correlation lengths for the emulator. The size of the correlation lengths determine how close two parameter sets must be in order for the corresponding
 residual values to be highly correlated. A smaller <span class="math inline">\(\theta_i\)</span> value means that we believe
-that the function is less smooth with respect to input <span class="math inline">\(i\)</span>, and thus that the values
-for the corresponding inputs <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_i^{\prime}\)</span> must be closer together in order to be highly
+that the function is less smooth with respect to parameter <span class="math inline">\(i\)</span>, and thus that the values
+for the corresponding parameters <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_i^{\prime}\)</span> must be closer together in order to be highly
 correlated. The simplifying assumption that all the correlation length parameters
-are the same, that is <span class="math inline">\(\theta_i = \theta\)</span> for all $i£, is commonly made. In this case, the larger <span class="math inline">\(\theta\)</span> is, the smoother the local variations of the emulators will be.</p>
+are the same, that is <span class="math inline">\(\theta_i = \theta\)</span> for all <span class="math inline">\(i\)</span>, is commonly made. In this case, the larger <span class="math inline">\(\theta\)</span> is, the smoother the local variations of the emulators will be.</p>
 </div>
 <div id="constructing-the-emulators-step-by-step" class="section level2">
 <h2><span class="header-section-number">4.2</span> Constructing the emulators step by step</h2>
@@ -245,17 +245,17 @@ are the same, that is <span class="math inline">\(\theta_i = \theta\)</span> for
 <ol style="list-style-type: decimal">
 <li><p>We create a set of ‘initial’ emulators <code>ems0</code> by fitting a regression surface to <code>train0</code> and setting <span class="math inline">\(\delta\)</span> to zero. These simple emulators will provide us with estimates for the regression surface parameters and the basic correlation specifications;</p></li>
 <li><p>The ensemble variability in <code>train0</code> is compared to the variance of the ‘initial’ emulators, and their ratio is used as an estimate for <span class="math inline">\(\delta\)</span>. We then train the ‘initial’ emulators again with the estimated value for <span class="math inline">\(\delta\)</span>;</p></li>
-<li><p>The new emulators <code>ems0</code> constitute our prior which we adjust to the data through the Bayes Linear update formulae. In this way we obtain the final version of our first wave emulators: <code>ems0_adjusted</code>.</p></li>
+<li><p>The new emulators <code>ems0</code> constitute our prior which we adjust to the training data through the Bayes Linear update formulae. In this way we obtain the final version of our first wave emulators: <code>ems0_adjusted</code>.</p></li>
 </ol>
 <p>Let us now go through each step in detail.</p>
 <div id="step-1" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Step 1</h3>
-<p>The function <code>emulator_from_data</code> creates the initial emulators for us. We pass <code>emulator_from_data</code> the training data, the name of the outputs we want to emulate and the list of parameter ranges. We also specify that we want to fit a quadratic surface, rather than a hyperplane (which is the default setting). Taken this information, <code>emulator_from_data</code> finds both the regression parameters and the active inputs for each of the indicated outputs. Model selection is performed using <a href="https://en.wikipedia.org/wiki/Stepwise_regression">stepwise addition or deletion</a> (as appropriate), using the <a href="https://en.wikipedia.org/wiki/Akaike_information_criterion">AIC criterion</a> to find the minimal best fit.</p>
+<p>The function <code>emulator_from_data</code> creates the initial emulators for us. We pass <code>emulator_from_data</code> the training data, the name of the model outputs we want to emulate and the list of parameter ranges. We also specify that we want to fit a quadratic surface, rather than a hyperplane (which is the default setting). Taken this information, <code>emulator_from_data</code> finds both the regression parameters and the active parameters for each of the indicated model outputs. Model selection is performed using <a href="https://en.wikipedia.org/wiki/Stepwise_regression">stepwise addition or deletion</a> (as appropriate), using the <a href="https://en.wikipedia.org/wiki/Akaike_information_criterion">AIC criterion</a> to find the minimal best fit.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">ems0 &lt;-<span class="st"> </span><span class="kw">emulator_from_data</span>(train0, output_names, ranges, <span class="dt">quadratic=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 <div id="step-2" class="section level3">
 <h3><span class="header-section-number">4.2.2</span> Step 2</h3>
-<p>Now that we have our simple <code>ems0</code>, we can find an approximation for the value of the deltas in our model. As recalled in the background section above, the delta parameter represents the proportion of the total variance due to the ensemble variability. The ensemble variability for a given output is just the mean of the relative column <span class="math inline">\(EV\)</span> in <code>wave0</code>. The overall variance <span class="math inline">\(\sigma\)</span> is estimated through the standard error of the relative emulator in <code>ems0</code>. Once their ratio is taken, we are ready to create a new set of emulators, which we still call <code>ems0</code>, using the estimated deltas:</p>
+<p>Now that we have our simple <code>ems0</code>, we can find an approximation for the value of the deltas in our model. As described in the background section above, the delta parameter represents the proportion of the total variance due to the ensemble variability. The ensemble variability for a given model output is just the mean of the relative column <span class="math inline">\(EV\)</span> in <code>wave0</code>. The overall variance <span class="math inline">\(\sigma\)</span> is estimated through the standard error of the relative emulator in <code>ems0</code>. Once their ratio is taken, we are ready to create a new set of emulators, which we still call <code>ems0</code>, using the estimated deltas:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">delts &lt;-<span class="st"> </span><span class="kw">apply</span>(wave0[<span class="dv">10</span><span class="op">:</span><span class="kw">ncol</span>(wave0)], <span class="dv">2</span>, mean)<span class="op">/</span><span class="kw">map_dbl</span>(ems0, <span class="op">~</span>.<span class="op">$</span>u_sigma)</a>
 <a class="sourceLine" id="cb12-2" title="2">ems0 &lt;-<span class="st"> </span><span class="kw">emulator_from_data</span>(train0, output_names, ranges, <span class="dt">quadratic =</span> <span class="ot">TRUE</span>, <span class="dt">deltas =</span> delts)</a>
 <a class="sourceLine" id="cb12-3" title="3">ems0[[<span class="dv">1</span>]]</a>
@@ -271,14 +271,9 @@ are the same, that is <span class="math inline">\(\theta_i = \theta\)</span> for
 <a class="sourceLine" id="cb12-13" title="13"><span class="co">#&gt;   Correlation length:  0.6250149 </span></a>
 <a class="sourceLine" id="cb12-14" title="14"><span class="co">#&gt;   Nugget term:  0.1708911 </span></a>
 <a class="sourceLine" id="cb12-15" title="15"><span class="co">#&gt; Mixed covariance:  0 0 0 0 0 0 0 0 0 0</span></a></code></pre></div>
-<button id="displayTextunnamed-chunk-19" onclick="javascript:toggle(&#39;unnamed-chunk-19&#39;);">
-Show more details about the ems0 objects
-</button>
-<div id="toggleTextunnamed-chunk-19" style="display: none">
+<p><infobutton id="displayTextunnamed-chunk-18" onclick="javascript:toggle('unnamed-chunk-18');">Show: More details about the ems0 objects</infobutton></p>
+<div id="toggleTextunnamed-chunk-18" style="display: none">
 <div class="panel panel-default">
-<div class="panel-heading panel-heading1">
-more details about the ems0 objects
-</div>
 <div class="panel-body">
 <p>The print statement provides an overview of the emulator specifications and correlation structure, including</p>
 <ul>
@@ -293,31 +288,31 @@ more details about the ems0 objects
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(ems0)) ems0[[i]]<span class="op">$</span>output_name &lt;-<span class="st"> </span>output_names[i]</a>
 <a class="sourceLine" id="cb13-2" title="2"><span class="kw">names</span>(ems0) &lt;-<span class="st"> </span>output_names</a>
 <a class="sourceLine" id="cb13-3" title="3"><span class="kw">emulator_plot</span>(ems0)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /></p>
-<p>The emulator expectation plots show the structure of the regression surface, which is at most quadratic in its parameters, through a 2D slice of the input space. In particular the two parameters <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\gamma\)</span> are selected and the plot shows the expected value of each output for all possible pairs <span class="math inline">\((\beta,\gamma)\)</span>.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /></p>
+<p>The emulator expectation plots show the structure of the regression surface, which is at most quadratic in its parameters, through a 2D slice of the input space. The two parameters <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\gamma\)</span> are selected and for each model output the plot shows the expected value produced by the relative emulator for all possible pairs <span class="math inline">\((\beta,\gamma)\)</span>.</p>
 <p>To plot the emulators standard deviation we just use <code>emulator_plot</code> passing ‘sd’ as second argument:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">emulator_plot</span>(ems0, <span class="st">&#39;sd&#39;</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /></p>
-<p>Here we immediately see that the emulator variance (or equivalently, standard deviation) is simply constant across the parameter space for each output. This is not what we want though, since one would expect emulators to be less uncertain around training points, where the model was evaluated. This will be taken care of in the next step.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /></p>
+<p>Here we immediately see that the emulator variance (or equivalently, standard deviation) is simply constant across the parameter space for each emulated output. This is not what we want though, since one would expect emulators to be less uncertain around the parameter sets in the training data, where the model was evaluated. This will be taken care of in the next step.</p>
 </div>
 <div id="step-3" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> Step 3</h3>
 <p>We now use the <code>adjust</code> method on our emulators to obtain the final Bayes Linear version of our <code>wave0</code> emulators:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">ems0_adjusted &lt;-<span class="st"> </span><span class="kw">map</span>(<span class="kw">seq_along</span>(ems0), <span class="op">~</span>ems0[[.]]<span class="op">$</span><span class="kw">adjust</span>(train0, output_names[[.]]))</a></code></pre></div>
-<p>Note that the <code>adjust</code> method works with the data in <code>train0</code> exactly as the function <code>emulator_from_data</code> did: it performs Bayes Linear adjustment, given the data. This function creates a new emulator object with the adjusted expectation and variance of beta as the primitive specifications, and supplies the data for the new emulator to compute the adjusted expectation and variance of <span class="math inline">\(u(x)\)</span>, and the adjusted <span class="math inline">\(Cov[\beta, u(x)]\)</span>. Due to the update formulae, the correlation structure isn’t stationary anymore: the value of <span class="math inline">\(\sigma^2\)</span> is now <span class="math inline">\(x\)</span>-dependent.</p>
+<p>Note that the <code>adjust</code> method works with the data in <code>train0</code> exactly as the function <code>emulator_from_data</code> did: it performs Bayes Linear adjustment, given the data. This function creates a new emulator object with the adjusted expectation and variance of beta as the primitive specifications, and supplies the values for the new emulator to compute the adjusted expectation and variance of <span class="math inline">\(u(x)\)</span>, and the adjusted <span class="math inline">\(Cov[\beta, u(x)]\)</span>. Due to the update formulae, the correlation structure isn’t stationary anymore: the value of <span class="math inline">\(\sigma^2\)</span> is now <span class="math inline">\(x\)</span>-dependent.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">names</span>(ems0_adjusted) &lt;-<span class="st"> </span>output_names</a>
 <a class="sourceLine" id="cb16-2" title="2"><span class="kw">emulator_plot</span>(ems0_adjusted)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">emulator_plot</span>(ems0_adjusted, <span class="dt">var =</span> <span class="st">&#39;sd&#39;</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-23-2.png" style="display: block; margin: auto;" /></p>
-<p>We can see that the adjusted emulators more reasonably show the structure of the model. The variance has been updated: the closer the evaluation point is to a training point, the lower the variance (as it ‘knows’ the value at this point). In fact, evaluating these emulators at the training points demonstrates this fact:</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-22-2.png" style="display: block; margin: auto;" /></p>
+<p>We can see that the adjusted emulators more reasonably show the structure of the model. The variance has been updated: the closer the evaluation point is to a training point, the lower the variance (as it ‘knows’ the value at this point). In fact, evaluating these emulators at parameter sets in the training data demonstrates this fact:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">em_evals &lt;-<span class="st"> </span>ems0_adjusted<span class="op">$</span>I10<span class="op">$</span><span class="kw">get_exp</span>(train0[,<span class="kw">names</span>(ranges)])</a>
 <a class="sourceLine" id="cb18-2" title="2"><span class="kw">all</span>(<span class="kw">abs</span>(em_evals <span class="op">-</span><span class="st"> </span>train0<span class="op">$</span>I10) <span class="op">&lt;</span><span class="st"> </span><span class="dv">10</span><span class="op">^</span>(<span class="op">-</span><span class="dv">12</span>))</a>
 <a class="sourceLine" id="cb18-3" title="3"><span class="co">#&gt; [1] TRUE</span></a>
 <a class="sourceLine" id="cb18-4" title="4"><span class="kw">all</span>(ems0_adjusted<span class="op">$</span>I10<span class="op">$</span><span class="kw">get_cov</span>(train0[,<span class="kw">names</span>(ranges)]) <span class="op">&lt;</span><span class="st"> </span><span class="dv">10</span><span class="op">^</span>(<span class="op">-</span><span class="dv">12</span>))</a>
 <a class="sourceLine" id="cb18-5" title="5"><span class="co">#&gt; [1] TRUE</span></a></code></pre></div>
 <p>Note the comparative speeds of evaluation, here. The initial <span class="math inline">\(80\)</span> parameter sets we generated from the model took around 45 seconds on a relatively powerful laptop; evaluating the emulator expectation over a <span class="math inline">\(40\times40\)</span> grid takes less than 5 seconds; evaluating the emulator variance over the same grid takes 30 seconds.</p>
-<p>This is all fine, but we need to consider whether these emulators are actually performing as we would expect them to. For this, we need to consider emulator diagnostics.</p>
+<p>We now need to consider whether these emulators are actually performing as we would expect them to. For this, we need to consider emulator diagnostics.</p>
 </div>
 </div>
 </div>

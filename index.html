@@ -53,14 +53,14 @@
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
         var text = document.getElementById("displayText" + id);
-        var buttonText = text.innerHTML.replace("Show ", "");
-        buttonText = buttonText.replace("Hide ", "");
+        var buttonText = text.innerHTML.replace("Show: ", "");
+        buttonText = buttonText.replace("Hide: ", "");
         if(ele.style.display == "block") {
             ele.style.display = "none";
-            text.innerHTML = "Show " + buttonText;
+            text.innerHTML = "Show: " + buttonText;
         } else {
             ele.style.display = "block";
-            text.innerHTML = "Hide " + buttonText;
+            text.innerHTML = "Hide: " + buttonText;
         }
     } 
 </script>
@@ -85,7 +85,6 @@
     function hide(id){
         document.getElementById(id).style.display = "none";
     }
-</script>
 </script>
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -194,7 +193,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.2" data-path="point-generation.html"><a href="point-generation.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
-<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
+<li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
 <li class="chapter" data-level="7.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>7.1.1</b> Training wave 1 emulators</a></li>
 <li class="chapter" data-level="7.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>7.1.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
@@ -203,6 +202,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 </ul>
 
       </nav>
@@ -229,27 +229,23 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>This tutorial is an introduction to the main functionality of the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package, using a synthetic example of an epidemiological model. We start by briefly highligthing what history matching with emulation is and how it works.</p>
 <p>Computer models, otherwise known as simulators, have been widely used in almost all fields in science and technology.
 A computer model is usually represented as a set of differential equations, which reflect the fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters.</p>
-<p>Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to empirical data. This poses a considerable problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when hundreds or thousands of realisations are required for each scenario. As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Bayes linear emulation, combined with history matching, allows us to overcome this issue.</p>
+<p>Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario. As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Bayes linear emulation, combined with history matching, allows us to overcome this issue.</p>
 <div id="history-matching" class="section level2">
 <h2><span class="header-section-number">1.1</span> History Matching</h2>
-<p>History matching concerns the problem of identifying the set of inputs that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible inputs are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether an input <span class="math inline">\(x\)</span> is implausible we introduce the implausibility measure, which evaluates the distance between the observed data and the model’s output at <span class="math inline">\(x\)</span>. If such measure is too high, the input is discarded in the next wave of the process.</p>
-<p>Note that history matching as just described still relies on the evaluation of the model at a large number of inputs, which is often unfeasible. Here is where emulators play a crucial role.</p>
+<p>History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set <span class="math inline">\(x\)</span> is implausible we introduce the implausibility measure, which evaluates the distance between the observed data and the model output at <span class="math inline">\(x\)</span>. If such measure is too high, the parameter set is discarded in the next wave of the process.</p>
+<p>Note that history matching as just described still relies on the evaluation of the model at a large number of parameter sets, which is often unfeasible. Here is where emulators play a crucial role.</p>
 </div>
 <div id="emulators" class="section level2">
 <h2><span class="header-section-number">1.2</span> Emulators</h2>
 <p>A long established method for handling computationally expensive models is to first construct an emulator: a fast statistical approximation of the model that can be used as a surrogate. In other words, we can think of an emulator as a way of representing our
 <span class="abbr" title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials."><abbr title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials.">beliefs</abbr></span> about the behaviour of a complex model.</p>
-<p>The model is first run at a manageable number of parameter sets, to provide training data to build the emulator. The trained emulator will then provide an expected value of the model output at any input <span class="math inline">\(x\)</span>, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation. In the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package we adopt a <a href="https://en.wikipedia.org/wiki/Bayes_linear_statistics">Bayes Linear</a> approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
-distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior mean vectors and covariance matrices for the uncertain quantities, without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.</p>
-<button id="displayTextunnamed-chunk-4" onclick="javascript:toggle(&#39;unnamed-chunk-4&#39;);">
-Show more on Bayes Linear method
-</button>
-<div id="toggleTextunnamed-chunk-4" style="display: none">
+<p>The model is first run at a manageable number of parameter sets, to provide training data to build the emulator. The trained emulator will then provide an expected value of the model output at any parameter set <span class="math inline">\(x\)</span>, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation.</p>
+<p><infobutton id="displayTextunnamed-chunk-3" onclick="javascript:toggle('unnamed-chunk-3');">Show: The Bayes Linear method</infobutton></p>
+<div id="toggleTextunnamed-chunk-3" style="display: none">
 <div class="panel panel-default">
-<div class="panel-heading panel-heading1">
-more on Bayes Linear method
-</div>
 <div class="panel-body">
+<p>In the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package we adopt a <a href="https://en.wikipedia.org/wiki/Bayes_linear_statistics">Bayes Linear</a> approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
+distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior mean vectors and covariance matrices for the uncertain quantities, without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.</p>
 <p>The Bayes linear approach to statistical inference takes expectation
 as primitive. Suppose that there are two collections of random quantities, <span class="math inline">\(B = (B_1,\dots,B_r)\)</span> and
 <span class="math inline">\(D =(1,D_1, \dots D_s)\)</span>. Bayes linear analysis involves updating subjective beliefs about <span class="math inline">\(B\)</span>
@@ -271,8 +267,7 @@ is, the linear combination of <span class="math inline">\(D\)</span> most inform
 </div>
 </div>
 </div>
-<p><br />
-Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator’s output, rather than the model’s output. This speeds up the process and allows for a comprehensive exploration of the input space.</p>
+<p>Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator output, rather than the model output. This speeds up the process and allows for a comprehensive exploration of the input space.</p>
 </div>
 </div>
             </section>
