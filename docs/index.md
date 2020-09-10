@@ -589,9 +589,8 @@ vp2 <- validation_pairs(ems0_adjusted, valid0, targets, n=length(ems0))
 ### Space removed function 
 
 One way we can get a feel for what cut-off value is reasonable is via the `space_removed` function, which for a given set of emulators will determine how much of the space will be removed by a particular implausibility cut-off.  By default, `space_removed`  shows the percentage of space that is removed by a specific wave when:
-- the discrepancy is exactly the value provided by the modeller,
-- the discrepancy is $80%$ (resp. $90%, 110%, 120%$) of the value provided by the modeller. 
-In our case study, since the data is synthetic, we made the `space_removed` function vary the sigma values in the `targets` list.
+- the ensemble variability is exactly the value provided by the modeller,
+- the ensemble variability is $80%$ (resp. $90%, 110%, 120%$) of the value provided by the modeller. 
 
 
 ```r

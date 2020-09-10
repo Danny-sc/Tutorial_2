@@ -302,9 +302,8 @@ where <span class="math inline">\(I_i(x)\)</span> is the implausibility at <span
 <div id="space-removed-function" class="section level3">
 <h3><span class="header-section-number">5.4.2</span> Space removed function</h3>
 <p>One way we can get a feel for what cut-off value is reasonable is via the <code>space_removed</code> function, which for a given set of emulators will determine how much of the space will be removed by a particular implausibility cut-off. By default, <code>space_removed</code> shows the percentage of space that is removed by a specific wave when:
-- the discrepancy is exactly the value provided by the modeller,
-- the discrepancy is <span class="math inline">\(80%\)</span> (resp. <span class="math inline">\(90%, 110%, 120%\)</span>) of the value provided by the modeller.
-In our case study, since the data is synthetic, we made the <code>space_removed</code> function vary the sigma values in the <code>targets</code> list.</p>
+- the ensemble variability is exactly the value provided by the modeller,
+- the ensemble variability is <span class="math inline">\(80%\)</span> (resp. <span class="math inline">\(90%, 110%, 120%\)</span>) of the value provided by the modeller.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">sp1 &lt;-<span class="st"> </span><span class="kw">space_removed</span>(ems0_adjusted, valid0, targets)</a></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /></p>
 <p>A cut-off of <span class="math inline">\(3\)</span> here, using maximum implausibility, would be sufficient to remove around <span class="math inline">\(75\%\)</span> of the current parameter space. This is a reasonable level of removal for a first wave: however, if the expected amount of removal was much lower we could consider whether it is sensible to reduce the cut-off (a companion plot that shows how many diagnostic failures would result from a particular cutoff value is in the pipeline).</p>
