@@ -168,6 +168,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.3</b> A simple example of history matching and emulation</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
 <li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
@@ -203,6 +204,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="bayes-linear-emulation.html"><a href="bayes-linear-emulation.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 </ul>
 
       </nav>
@@ -244,8 +247,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>We can apply diagnostics to this as before, using <code>valid1</code> as the validation set. Assuming the diagnostics are acceptable, we then proceed to consider implausibility - however, we need the implausibility over the whole input space, and the new emulators have only been trained on a subset thereof. We must therefore consider implausibility across all waves, rather than just the wave under consideration at the time.</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">all_waves &lt;-<span class="st"> </span><span class="kw">c</span>(ems0_adjusted, ems1_adjusted)</a>
 <a class="sourceLine" id="cb33-2" title="2">all_targets &lt;-<span class="st"> </span><span class="kw">c</span>(targets, targets)</a>
-<a class="sourceLine" id="cb33-3" title="3"><span class="kw">emulator_plot</span>(all_waves, <span class="dt">var =</span> <span class="st">&#39;maximp&#39;</span>, <span class="dt">targets =</span> all_targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /></p>
+<a class="sourceLine" id="cb33-3" title="3"><span class="kw">emulator_plot</span>(all_waves, <span class="dt">var =</span> <span class="st">&#39;maximp&#39;</span>, <span class="dt">targets =</span> all_targets, <span class="dt">cb=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /></p>
 <p>This may seem an unwieldy way to approach this (and it is, at present); however, it is important to remember that the number of emulators at each wave may not be the same; for example, if we have had to remove a model output at wave 1, then the targets would be accordingly changed. In this illustration case, we did not have to worry about doing so since we have assumed that all targets can be emulated.</p>
 <p>If we compare the implausibility plot we just obtained with the implausibility plot from the previous wave, we see that the red area has increased significantly: this shows that wave 1 is shrinking down the non-implausible space, exactly as we expected.</p>
 <p>The remainder of the analysis proceeds much as in the first wave. In generating new parameter sets, we would of course provide all_waves to the point generation function.</p>
@@ -253,19 +256,19 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb34-2" title="2"><span class="co">#&gt; 293 non-implausible points generated. Applying V-optimality...</span></a>
 <a class="sourceLine" id="cb34-3" title="3"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb34-4" title="4"><span class="kw">plot</span>(new_new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /></p>
 <p>We can compare the distribution of parameter sets at the end of <code>wave0</code> with that of parameter sets at the end of <code>wave1</code>:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave1, new_new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-38-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" /></p>
 <p>The last step is to create <code>wave2</code>, that will be used to train
 <code>wave2</code> emulators.</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">next_next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a>
 <a class="sourceLine" id="cb36-2" title="2">wave2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_new_points,next_next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
 <a class="sourceLine" id="cb36-3" title="3"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a></code></pre></div>
-<p>Through the <code>simulator_plot</code> function we see how much better the <code>wave2</code> parameter sets perform compared to the original <code>wave1</code> parameter sets.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave2[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
-<a class="sourceLine" id="cb37-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" /></p>
+<p>Through the <code>simulator_plot</code> function we see how much better the <code>wave2</code> parameter sets perform compared to <code>wave1</code> and <code>wave0</code> parameter sets.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave2[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
+<a class="sourceLine" id="cb37-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets, <span class="dt">palette=</span><span class="kw">c</span>(<span class="st">&quot;#F9F920&quot;</span>, <span class="st">&quot;#FA8816&quot;</span>,<span class="st">&quot;#C98CFF&quot;</span>))</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-39-1.png" style="display: block; margin: auto;" /></p>
 <p>Next waves of the process can be produced simply repeating all the steps in section <a href="further-waves.html#wave1">7.1</a>.</p>
 </div>
 </div>
@@ -289,22 +292,22 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>As before, we need to consider implausibility across all waves, rather than just the wave under consideration at the time.</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">all_waves &lt;-<span class="st"> </span><span class="kw">c</span>(ems0_adjusted, ems1_adjusted, ems2_adjusted)</a>
 <a class="sourceLine" id="cb39-2" title="2">all_targets &lt;-<span class="st"> </span><span class="kw">c</span>(targets, targets, targets)</a>
-<a class="sourceLine" id="cb39-3" title="3"><span class="kw">emulator_plot</span>(all_waves, <span class="dt">var =</span> <span class="st">&#39;maximp&#39;</span>, <span class="dt">targets =</span> all_targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" /></p>
+<a class="sourceLine" id="cb39-3" title="3"><span class="kw">emulator_plot</span>(all_waves, <span class="dt">var =</span> <span class="st">&#39;maximp&#39;</span>, <span class="dt">targets =</span> all_targets, <span class="dt">cb=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-41-1.png" style="display: block; margin: auto;" /></p>
 <p>To generate new parameter sets:</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">new_new_new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(all_waves, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> all_targets)</a>
 <a class="sourceLine" id="cb40-2" title="2"><span class="co">#&gt; 228 non-implausible points generated. Applying V-optimality...</span></a>
 <a class="sourceLine" id="cb40-3" title="3"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb40-4" title="4"><span class="kw">plot</span>(new_new_new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-43-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" /></p>
 <p>We now create <code>wave3</code>:</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1">next_next_next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_new_new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a>
 <a class="sourceLine" id="cb41-2" title="2">wave3 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_new_new_points,next_next_next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
 <a class="sourceLine" id="cb41-3" title="3"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a></code></pre></div>
 <p>Through the <code>simulator_plot</code> function we check how much better the <code>wave3</code> parameter sets perform compared to the original <code>wave2</code> parameter sets.</p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave2[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave3[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
-<a class="sourceLine" id="cb42-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" /></p>
+<a class="sourceLine" id="cb42-2" title="2"><span class="kw">simulator_plot</span>(all_points, targets, <span class="dt">zero_in=</span><span class="ot">FALSE</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" /></p>
 <p>The graph does not show a clear improvement in the performance of <code>wave3</code> parameter sets compared to that of <code>wave2</code> parameter sets. To understand the reason behind this, let us compare the variability of the model outputs we are emulating with the emulators uncertainty. Below we show the ensemble variability and the uncertainty for <code>ems0</code> and <code>ems2</code> for each of the emulated outputs.</p>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">targets<span class="op">$</span>I10<span class="op">$</span>sigma</a>
 <a class="sourceLine" id="cb43-2" title="2"><span class="co">#&gt; [1] 25.27</span></a>
@@ -324,10 +327,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb43-16" title="16">sigmas2</a>
 <a class="sourceLine" id="cb43-17" title="17"><span class="co">#&gt;       I10       I15       I20       I25       I30 </span></a>
 <a class="sourceLine" id="cb43-18" title="18"><span class="co">#&gt;  9.607539 16.217742 18.393964 16.282659 14.902990</span></a></code></pre></div>
-<p>We see that while <code>ems0</code> uncertainties (<code>sigmas0</code>) are similar or larger than the ensemble variabilities, <code>ems2</code> uncertainties (<code>sigmas2</code>) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the nonimplausible
+<p>We see that while <code>ems0</code> uncertainties (<code>sigmas0</code>) are similar or larger than the ensemble variabilities, <code>ems2</code> uncertainties (<code>sigmas2</code>) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the non-implausible
 space already contains acceptable matches and is unlikely to
 decrease in size in the next iteration.
-For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the nonimplausible space down further.</p>
+For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the non-implausible space down further.</p>
 </div>
 </div>
 </div>

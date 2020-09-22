@@ -168,6 +168,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.3</b> A simple example of history matching and emulation</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
 <li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
@@ -203,6 +204,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="bayes-linear-emulation.html"><a href="bayes-linear-emulation.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 </ul>
 
       </nav>
@@ -243,8 +246,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb8-5" title="5">  <span class="dt">I25 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">428</span>, <span class="dt">sigma =</span> <span class="fl">43.98</span>),</a>
 <a class="sourceLine" id="cb8-6" title="6">  <span class="dt">I30 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">392</span>, <span class="dt">sigma =</span> <span class="fl">40.30</span>)</a>
 <a class="sourceLine" id="cb8-7" title="7">)</a></code></pre></div>
-<p><infobutton id="displayTextunnamed-chunk-13" onclick="javascript:toggle('unnamed-chunk-13');">Show: More on how targets were set</infobutton></p>
-<div id="toggleTextunnamed-chunk-13" style="display: none">
+<p><infobutton id="displayTextunnamed-chunk-12" onclick="javascript:toggle('unnamed-chunk-12');">Show: More on how targets were set</infobutton></p>
+<div id="toggleTextunnamed-chunk-12" style="display: none">
 <div class="panel panel-default">
 <div class="panel-body">
 As our dataset is synthetic, we couldn’t rely on observed data to define our targets. Instead, we ran the model from a chosen parameter set, with a large number of repetitions. The means from the various runs provided the mean values, while the standard deviations, estimating the ensemble variability, provided the sigmas. Note that here we factor in neither model discrepancy nor observation uncertainty when defining the sigmas. These two sources of uncertainty need to be included when dealing with empirical data.
@@ -265,7 +268,7 @@ As our dataset is synthetic, we couldn’t rely on observed data to define our t
 </ul>
 <p>To see how the parameter space has changed after the first wave of the process, we use the function <code>wave_points</code>, which plots the old and the new set of parameters on the same pair of axis:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, test_full_wave<span class="op">$</span>next_sample), <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /></p>
 <p>Here <code>wave0</code> parameter sets are in yellow and the new sets are in purple. The plots in the main diagonal show the distribution of points in the two sets. Let us take a look at the yellow and purple distributions for the delta parameter. While the distribution of points in <code>wave0</code> is rather uniform, the distribution of the new wave peaks at low values of delta and decreases to zero for large values of delta. Similarly, if we look at the delta-mu plot, the yellow points are uniformly distributed, while the purple points are concentrated in the upper left region: this suggests that parameter sets with high values of delta and low values of mu are unlikely to give a good fit for the model.</p>
 <p>In the following sections we will explain step by step what <code>full_wave</code> does behind the scenes. This will not only enhance the reader’s overall understanding, but will also provide them with the necessary tools to have more control over the process and customise it through their judgement.</p>
 </div>

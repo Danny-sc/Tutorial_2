@@ -168,6 +168,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.3</b> A simple example of history matching and emulation</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
 <li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
@@ -203,6 +204,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="bayes-linear-emulation.html"><a href="bayes-linear-emulation.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 </ul>
 
       </nav>
@@ -226,48 +229,67 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
-<p>This tutorial is an introduction to the main functionality of the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package, using a synthetic example of an epidemiological model. We start by briefly highligthing what history matching with emulation is and how it works.</p>
+<p>This tutorial is an introduction to the main functionality of the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package, using a synthetic example of an epidemiological model. We start by briefly highlighting what history matching with emulation is and how it works.</p>
 <p>Computer models, otherwise known as simulators, have been widely used in almost all fields in science and technology.
-A computer model is usually represented as a set of differential equations, which reflect the fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters.</p>
-<p>Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario. As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Bayes linear emulation, combined with history matching, allows us to overcome this issue.</p>
+A computer model is a way of representing the fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters.</p>
+<p>Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario. As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Emulation, combined with history matching, allows us to overcome this issue.</p>
 <div id="history-matching" class="section level2">
 <h2><span class="header-section-number">1.1</span> History Matching</h2>
-<p>History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set <span class="math inline">\(x\)</span> is implausible we introduce the implausibility measure, which evaluates the distance between the observed data and the model output at <span class="math inline">\(x\)</span>. If such measure is too high, the parameter set is discarded in the next wave of the process.</p>
+<p>History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set <span class="math inline">\(x\)</span> is implausible we introduce the implausibility measure, which evaluates the difference between the emulator and computer model results, weighted by how uncertain we are at <span class="math inline">\(x\)</span>. If such measure is too high, the parameter set is discarded in the next wave of the process.</p>
 <p>Note that history matching as just described still relies on the evaluation of the model at a large number of parameter sets, which is often unfeasible. Here is where emulators play a crucial role.</p>
 </div>
 <div id="emulators" class="section level2">
 <h2><span class="header-section-number">1.2</span> Emulators</h2>
 <p>A long established method for handling computationally expensive models is to first construct an emulator: a fast statistical approximation of the model that can be used as a surrogate. In other words, we can think of an emulator as a way of representing our
 <span class="abbr" title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials."><abbr title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials.">beliefs</abbr></span> about the behaviour of a complex model.</p>
-<p>The model is first run at a manageable number of parameter sets, to provide training data to build the emulator. The trained emulator will then provide an expected value of the model output at any parameter set <span class="math inline">\(x\)</span>, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation.</p>
-<p><infobutton id="displayTextunnamed-chunk-3" onclick="javascript:toggle('unnamed-chunk-3');">Show: The Bayes Linear method</infobutton></p>
-<div id="toggleTextunnamed-chunk-3" style="display: none">
-<div class="panel panel-default">
-<div class="panel-body">
-<p>In the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package we adopt a <a href="https://en.wikipedia.org/wiki/Bayes_linear_statistics">Bayes Linear</a> approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
-distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior mean vectors and covariance matrices for the uncertain quantities, without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.</p>
-<p>The Bayes linear approach to statistical inference takes expectation
-as primitive. Suppose that there are two collections of random quantities, <span class="math inline">\(B = (B_1,\dots,B_r)\)</span> and
-<span class="math inline">\(D =(1,D_1, \dots D_s)\)</span>. Bayes linear analysis involves updating subjective beliefs about <span class="math inline">\(B\)</span>
-given observation of <span class="math inline">\(D\)</span>. In order to do so, prior mean vectors and covariance matrices
-for <span class="math inline">\(B\)</span> and <span class="math inline">\(D\)</span> (that is <span class="math inline">\(E[B], E[D], Var[B]\)</span> and <span class="math inline">\(Var[D]\)</span>), along with a covariance matrix
-between <span class="math inline">\(B\)</span> and <span class="math inline">\(D\)</span> (that is <span class="math inline">\(Cov[B,D]\)</span>), must be specified.</p>
-The Bayes linear update formulae for a vector B given a vector D are:
-<span class="math display">\[\begin{align}
-E_D[B] &amp;= E[B] + Cov[B,D]Var[D]^{-1}(D - E[D]) \\
-Var_D[B] &amp;= Var[B] - Cov[B,D]Var[D]^{-1}Cov[D,B] \\
-Cov_D[B_1,B_2] &amp;= Cov[B_1,B_2] - Cov[B_1,D]Var[D]^{-1}Cov[D,B_2].
-\end{align}\]</span>
-<span class="math inline">\(E_D[B]\)</span> and <span class="math inline">\(Var_D[B]\)</span> are termed the adjusted expectation and variance of <span class="math inline">\(B\)</span> given <span class="math inline">\(D\)</span>. <span class="math inline">\(Cov_D[B_1,B_2]\)</span> is termed the adjusted covariance of <span class="math inline">\(B_1\)</span> and <span class="math inline">\(B_2\)</span> given <span class="math inline">\(D\)</span>,
-where <span class="math inline">\(B_1\)</span> and <span class="math inline">\(B_2\)</span> are subcollections of <span class="math inline">\(B\)</span>.
-The formula given for <span class="math inline">\(E_D(B)\)</span> represents
-the best linear fit for <span class="math inline">\(B\)</span> given <span class="math inline">\(D\)</span> in terms of minimising the expected squared loss
-functions <span class="math inline">\(E[(B_k-a_k^TD)^2]\)</span> over choices of <span class="math inline">\(a_k\)</span> for each quantity in <span class="math inline">\(B; k = 1,\dots,r\)</span>, that
-is, the linear combination of <span class="math inline">\(D\)</span> most informative for <span class="math inline">\(B\)</span>.
-</div>
-</div>
-</div>
+<p>First of all the model is run at a manageable number of parameter sets, to provide training data to build the emulator. Then prior beliefs about the structure of the emulator are set to reflect our prior knowledge. Once this is done, the training data can be exploited to adjust our prior beliefs and obtain a more accurate representation of the model. The trained emulator will then provide an expected value of the model output at any parameter set <span class="math inline">\(x\)</span>, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation.</p>
 <p>Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator output, rather than the model output. This speeds up the process and allows for a comprehensive exploration of the input space.</p>
+</div>
+<div id="a-simple-example-of-history-matching-and-emulation" class="section level2">
+<h2><span class="header-section-number">1.3</span> A simple example of history matching and emulation</h2>
+<p>To show how history matching and emulation work, we present an example with a one-dimensional emulator.</p>
+<p>The model we consider is the deterministic function
+<span class="math inline">\(f (x)=\sin (0.04\pi x)\)</span>. The value of <span class="math inline">\(f(x)\)</span> is considered unknown at all parameters, apart from <span class="math inline">\(x=\{0,10,20,30,45,50\}\)</span>, where the
+model is run. These six known points are represented by the black dots in the top graph of
+figure <a href="index.html#fig:fig1">1.1</a> and are used to train the emulator. The blue line is the emulator’s posterior mean, and the red
+lines represent its posterior uncertainty. The three horizontal
+lines represent the observed data <span class="math inline">\((z=-0.7)\)</span> and the <span class="math inline">\(95\%\)</span> confidence interval <span class="math inline">\((\pm 0.06)\)</span> that we use to history match the model.</p>
+<div class="figure" style="text-align: center"><span id="fig:fig1"></span>
+<img src="sinwave1.png" alt="First wave of history matching" width="70%" />
+<p class="caption">
+Figure 1.1: First wave of history matching
+</p>
+</div>
+<p>The next step involves choosing an implausibility measure. Such measure weighs the difference between <span class="math inline">\(z\)</span> and
+the value suggested by the emulator at a given point, taking into consideration all the uncertainties that are present in the system.
+The bottom graph of figure <a href="index.html#fig:fig1">1.1</a> shows the implausibility for the emulator and observed
+data. The horizontal green line is an implausibility
+cut-off, which determines whether an input <span class="math inline">\(x\)</span> is implausible or not.
+The implausibility plot shows that a match between the model’s
+output and the observed data is unlikely to be found for values of
+x smaller than 30 and larger than 45.</p>
+<p>With the emulator and the implausibility measure at our
+disposal, we can now sample the non-implausible space to obtain a new set of points that will be used to run the model in the next wave of the history matching process.
+Note that at each wave the emulator is only
+constructed over a smaller region of input space compared to the
+previous wave: this means that there is a higher density of
+model runs in the new reduced input space, which leads
+to improvements in the precision of the emulator.</p>
+<p>Figure <a href="index.html#fig:fig2">1.2</a> shows the second wave of history matching for our simple sin model. The model was run for the
+non-implausible value of <span class="math inline">\(x=36\)</span> and this point was included in the
+training data. Note how the emulator’s posterior variance has
+decreased in the region of interest. Consequently, the non-implausible
+region has shrunk dramatically, indicating that a
+match can only be found for <span class="math inline">\(30.5 &lt;x &lt;32.5\)</span> and <span class="math inline">\(42.5 &lt; x &lt; 44.5,\)</span>
+where indeed the function <span class="math inline">\(f (x)\)</span> takes values between <span class="math inline">\(-0.8\)</span> and
+<span class="math inline">\(-0.63\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:fig2"></span>
+<img src="sinwave2.png" alt="Second wave of history matching" width="70%" />
+<p class="caption">
+Figure 1.2: Second wave of history matching
+</p>
+</div>
+<p>Based on the level of accuracy required, one can either stop here or perform more iterations of the process.</p>
 </div>
 </div>
             </section>

@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>6 Point Generation | Case Study -1: An introduction to the Emulatorr package</title>
+  <title>9 Appendix | Case Study -1: An introduction to the Emulatorr package</title>
   <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:title" content="9 Appendix | Case Study -1: An introduction to the Emulatorr package" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  <meta name="twitter:title" content="9 Appendix | Case Study -1: An introduction to the Emulatorr package" />
   
   <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="emulator-diagnostics.html"/>
-<link rel="next" href="further-waves.html"/>
+<link rel="prev" href="glossary.html"/>
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -204,8 +204,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="bayes-linear-emulation.html"><a href="bayes-linear-emulation.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
+<li class="chapter" data-level="9" data-path="appendix.html"><a href="appendix.html"><i class="fa fa-check"></i><b>9</b> Appendix</a></li>
 </ul>
 
       </nav>
@@ -223,54 +222,51 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="point-generation" class="section level1">
-<h1><span class="header-section-number">6</span> Point Generation</h1>
-<p>Having generated emulators based on <code>wave0</code> data, evaluated their suitability, and considered a means by which to rule out parameter sets, we can now produce a new set of parameter sets to pass to the model.</p>
-<p>This section is divided in two parts:</p>
-<ol style="list-style-type: decimal">
-<li><p>We first see how to generate new sets of parameters (that will be used to train wave 1 emulators);</p></li>
-<li><p>We then compare the performance of the initial parameter sets with the new parameter sets. In other words, we ask: do the model outputs at the new parameter sets match the observations better than the model outputs at the initial parameter sets?</p></li>
-</ol>
-<div id="generating-sets-of-parameters-for-the-next-wave" class="section level2">
-<h2><span class="header-section-number">6.1</span> Generating sets of parameters for the next wave</h2>
-<p>The function <code>generate_new_runs</code> is designed to generate new sets of parameters; its default behaviour is as follows.</p>
-<ul>
-<li>If no prior parameter sets are provided, a set is generated using a <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube Design</a>, rejecting implausible parameter sets;</li>
-<li>Pairs of parameter sets are selected at random and more sets are sampled from lines connecting them, with particular importance given to those that are close to the non-implausible boundary;</li>
-<li>Using these as seeding points, more parameter sets are generated using <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> to attempt to fully cover the non-implausible region.</li>
-</ul>
-<p>All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</a>
-<a class="sourceLine" id="cb28-2" title="2"><span class="co">#&gt; 410 non-implausible points generated. Applying V-optimality...</span></a>
-<a class="sourceLine" id="cb28-3" title="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb28-4" title="4"><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
-<p>We can start to see the structure of the non-implausible region, here. The <code>wave_points</code> function provides a better indication of the difference between the two sets of wave data.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /></p>
-<p>Here <code>wave0</code> parameter sets are in yellow and <code>new_points</code> (i.e. new parameter sets) are in purple. The plots in the main diagonal show the distribution of parameter sets in <code>wave0</code> and that of <code>new_points</code>.</p>
-</div>
-<div id="comparing-next-and-old-parameter-sets" class="section level2">
-<h2><span class="header-section-number">6.2</span> Comparing next and old parameter sets</h2>
-<p>Now we can put <code>new_points</code> into the model and obtain the model outputs:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
-<p>Binding together <code>new_points</code> and <code>next_wave</code> we obtain <code>wave1</code>, the full data for the next wave.</p>
-<p>We can see how much better the <code>wave1</code> parameter sets perform compared to the original <code>wave0</code> parameter sets using <code>simulator_plot</code>.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
-<a class="sourceLine" id="cb31-3" title="3">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
-<a class="sourceLine" id="cb31-4" title="4"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /></p>
-<p>We can see that, compared to the space-filling random parameter sets used to train the first emulators, the new parameter sets are in much closer agreement with our targets. Subsequent waves, trained on these new parameter sets, will be more confident in the new non-implausible region and will therefore refine the region in light of the greater certainty.</p>
-</div>
+<div id="appendix" class="section level1">
+<h1><span class="header-section-number">9</span> Appendix</h1>
+<p>In the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package we adopt a <a href="https://en.wikipedia.org/wiki/Bayes_linear_statistics">Bayes Linear</a> approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
+distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior mean vectors and covariance matrices for the uncertain quantities, without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.</p>
+<p>The Bayes linear approach to statistical inference takes expectation
+as primitive. Suppose that there are two collections of random quantities, <span class="math inline">\(B = (B_1,\dots,B_r)\)</span> and
+<span class="math inline">\(D =(1,D_1, \dots D_s)\)</span>. Bayes linear analysis involves updating subjective beliefs about <span class="math inline">\(B\)</span>
+given observation of <span class="math inline">\(D\)</span>. In order to do so, prior mean vectors and covariance matrices
+for <span class="math inline">\(B\)</span> and <span class="math inline">\(D\)</span> (that is <span class="math inline">\(E[B], E[D], Var[B]\)</span> and <span class="math inline">\(Var[D]\)</span>), along with a covariance matrix
+between <span class="math inline">\(B\)</span> and <span class="math inline">\(D\)</span> (that is <span class="math inline">\(Cov[B,D]\)</span>), must be specified.</p>
+<p>The Bayes linear update formulae for a vector B given a vector D are:
+<span class="math display">\[\begin{align}
+E_D[B] &amp;= E[B] + Cov[B,D]Var[D]^{-1}(D - E[D]) \\
+Var_D[B] &amp;= Var[B] - Cov[B,D]Var[D]^{-1}Cov[D,B] \\
+Cov_D[B_1,B_2] &amp;= Cov[B_1,B_2] - Cov[B_1,D]Var[D]^{-1}Cov[D,B_2].
+\end{align}\]</span>
+<span class="math inline">\(E_D[B]\)</span> and <span class="math inline">\(Var_D[B]\)</span> are termed the adjusted expectation and variance of <span class="math inline">\(B\)</span> given <span class="math inline">\(D\)</span>. <span class="math inline">\(Cov_D[B_1,B_2]\)</span> is termed the adjusted covariance of <span class="math inline">\(B_1\)</span> and <span class="math inline">\(B_2\)</span> given <span class="math inline">\(D\)</span>,
+where <span class="math inline">\(B_1\)</span> and <span class="math inline">\(B_2\)</span> are subcollections of <span class="math inline">\(B\)</span>.
+The formula given for <span class="math inline">\(E_D(B)\)</span> represents
+the best linear fit for <span class="math inline">\(B\)</span> given <span class="math inline">\(D\)</span> in terms of minimising the expected squared loss
+functions <span class="math inline">\(E[(B_k-a_k^TD)^2]\)</span> over choices of <span class="math inline">\(a_k\)</span> for each quantity in <span class="math inline">\(B; k = 1,\dots,r\)</span>, that
+is, the linear combination of <span class="math inline">\(D\)</span> most informative for <span class="math inline">\(B\)</span>.</p>
+<!--
+# TJ material
+
+
+
+```
+rmd_files:
+    html: ['index.Rmd', 'ch1.Rmd']
+    latex: ['index.Rmd', 'ch1.Rmd', 'ch_appendix.Rmd']
+output_dir: "docs"
+```
+
+
+-->
+
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="emulator-diagnostics.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="further-waves.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="glossary.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

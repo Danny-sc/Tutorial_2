@@ -29,16 +29,16 @@ description: "An easy guide to the main functionalities of the Emulatorr package
 
 # Introduction
 
-This tutorial is an introduction to the main functionality of the [emulatorr](https://github.com/Tandethsquire/emulatorr) package, using a synthetic example of an epidemiological model. We start by briefly highligthing what history matching with emulation is and how it works.
+This tutorial is an introduction to the main functionality of the [emulatorr](https://github.com/Tandethsquire/emulatorr) package, using a synthetic example of an epidemiological model. We start by briefly highlighting what history matching with emulation is and how it works.
 
 Computer models, otherwise known as simulators, have been widely used in almost all fields in science and technology. 
-A computer model is usually represented as a set of differential equations, which reflect the  fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters. 
+A computer model is a way of representing the  fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters. 
 
-Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario.  As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Bayes linear emulation, combined with history matching, allows us to overcome this issue.
+Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario.  As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Emulation, combined with history matching, allows us to overcome this issue.
 
 ## History Matching
 
-History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set $x$ is implausible we introduce the implausibility measure, which evaluates the distance between the observed data and the model output at $x$. If such measure is too high, the parameter set is discarded in the next wave of the process. 
+History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set $x$ is implausible we introduce the implausibility measure, which evaluates the difference between the emulator and computer model results, weighted by how uncertain we are at $x$. If such measure is too high, the parameter set is discarded in the next wave of the process. 
 
 Note that history matching as just described still relies on the evaluation of the model at a large number of parameter sets, which is often unfeasible. Here is where emulators play a crucial role.
 
@@ -47,40 +47,61 @@ Note that history matching as just described still relies on the evaluation of t
 A long established method for handling computationally expensive models is to first construct an emulator: a fast statistical approximation of the model that can be used as a surrogate. In other words, we can think of an emulator as a way of representing our 
 <span class="abbr" title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials."><abbr title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials.">beliefs</abbr></span> about the behaviour of a complex model. 
 
-The model is first run at a manageable number of parameter sets, to provide training data to build the emulator. The trained emulator will then provide an expected value of the model output at any parameter set $x$, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation. 
-
-<infobutton id="displayTextunnamed-chunk-3" onclick="javascript:toggle('unnamed-chunk-3');">Show: The Bayes Linear method</infobutton>
-
-<div id="toggleTextunnamed-chunk-3" style="display: none"><div class="panel panel-default"><div class="panel-body">
-In the [emulatorr](https://github.com/Tandethsquire/emulatorr) package we adopt a [Bayes Linear](https://en.wikipedia.org/wiki/Bayes_linear_statistics) approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
-distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior  mean vectors and covariance matrices for the uncertain quantities,  without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.
-
-The Bayes linear approach to statistical inference takes expectation
-as primitive. Suppose that there are two collections of random quantities, $B = (B_1,\dots,B_r)$ and 
-$D =(1,D_1, \dots D_s)$. Bayes linear analysis involves updating subjective beliefs about $B$
-given observation of $D$. In order to do so, prior mean vectors and covariance matrices
-for $B$ and $D$ (that is $E[B], E[D], Var[B]$ and $Var[D]$), along with a covariance matrix
-between $B$ and $D$ (that is $Cov[B,D]$), must be specified. 
-
-The Bayes linear update formulae for a vector B given a vector D are:
-\begin{align}
-E_D[B] &= E[B] + Cov[B,D]Var[D]^{-1}(D - E[D]) \\
-Var_D[B] &= Var[B] - Cov[B,D]Var[D]^{-1}Cov[D,B] \\
-Cov_D[B_1,B_2] &= Cov[B_1,B_2] - Cov[B_1,D]Var[D]^{-1}Cov[D,B_2].
-\end{align}
-$E_D[B]$ and $Var_D[B]$ are termed the adjusted expectation and variance of $B$ given $D$. $Cov_D[B_1,B_2]$ is termed the adjusted covariance of $B_1$ and $B_2$ given $D$,
-where $B_1$ and $B_2$ are subcollections of $B$.
-The formula given for $E_D(B)$ represents
-the best linear fit for $B$ given $D$ in terms of minimising the expected squared loss
-functions $E[(B_k-a_k^TD)^2]$ over choices of $a_k$ for each quantity in $B; k = 1,\dots,r$, that
-is, the linear combination of $D$ most informative for $B$. </div></div></div>
+First of all the model is run at a manageable number of parameter sets, to provide training data to build the emulator. Then prior beliefs about the structure of the emulator are set to reflect our prior knowledge. Once this is done, the training data can be exploited to adjust our prior beliefs and obtain a more accurate representation of the model. The trained emulator  will then provide an expected value of the model output at any parameter set $x$, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation. 
 
 Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator output, rather than the model output. This speeds up the process and allows for a comprehensive exploration of the input space.
 
+## A simple example of history matching and emulation
+To show how history matching and emulation work, we present an example with a one-dimensional emulator.
+
+The model we consider is the deterministic function
+$f (x)=\sin (0.04\pi x)$. The value of $f(x)$ is considered unknown at all parameters, apart from $x=\{0,10,20,30,45,50\}$, where the
+model is run. These six known points are represented by the black dots in the top graph of
+figure \@ref(fig:fig1)  and are used to train the emulator. The blue line is the emulator’s posterior mean, and the red
+lines represent its posterior uncertainty. The three horizontal
+lines represent the observed data $(z=-0.7)$ and the $95\%$ confidence interval $(\pm 0.06)$ that we use to history match the model.
+
+<div class="figure" style="text-align: center">
+<img src="sinwave1.png" alt="First wave of history matching" width="70%" />
+<p class="caption">(\#fig:fig1)First wave of history matching</p>
+</div>
+
+The next step involves choosing an implausibility measure. Such measure weighs the difference between $z$ and
+the value suggested by the emulator at a given point, taking into consideration all the uncertainties that are present in the system.
+The bottom graph of figure \@ref(fig:fig1) shows the implausibility for the emulator and observed
+data. The horizontal green line is an implausibility
+cut-off, which determines whether an input $x$ is implausible or not.
+The implausibility plot shows that a match between the model’s
+output and the observed data is unlikely to be found for values of
+x smaller than 30 and larger than 45.
+
+With the emulator and the implausibility measure at our
+disposal, we can now sample the non-implausible space to obtain a new set of points that will be used to run the model in the next wave of the history matching process.
+Note that at each wave the emulator is only
+constructed over a smaller region of input space compared to the
+previous wave: this means that there is a higher density of
+model runs in the new reduced input space, which leads
+to improvements  in the precision of the emulator. 
+
+Figure \@ref(fig:fig2) shows the second wave of history matching for our simple sin model. The model was run for the
+non-implausible value of $x=36$ and this point was included in the
+training data. Note how the emulator’s posterior variance has
+decreased in the region of interest. Consequently, the non-implausible
+region has shrunk dramatically, indicating that a
+match can only be found for $30.5 <x <32.5$ and $42.5 < x < 44.5,$
+where indeed the function $f (x)$ takes values between $-0.8$ and 
+$-0.63$.
+
+<div class="figure" style="text-align: center">
+<img src="sinwave2.png" alt="Second wave of history matching" width="70%" />
+<p class="caption">(\#fig:fig2)Second wave of history matching</p>
+</div>
+
+Based on the level of accuracy required, one can either stop here or perform more iterations of the process.
+
 # Introduction to the model
 
-The model in question is a stochastic  
-<span class="abbr" title="A model consisting of four compartments 
+The model in question is a stochastic <span class="abbr" title="A model consisting of four compartments 
 
 - $S$: Susceptible individuals,
 - $E$: Exposed individuals (i.e. people that are infected but not infectious yet), 
@@ -114,7 +135,7 @@ model, with four parameters: rate of transmission between each infectious person
 
 <div class="figure" style="text-align: center">
 <img src="SEIRSdiagram.png" alt="SEIRS Diagram" width="1916" />
-<p class="caption">(\#fig:unnamed-chunk-4)SEIRS Diagram</p>
+<p class="caption">(\#fig:unnamed-chunk-3)SEIRS Diagram</p>
 </div>
 
 Expressed in terms of differential equations, the transitions are
@@ -128,17 +149,18 @@ where $N$ represents the total population, $N=S+E+I+R$. For simplicity, we consi
 
 To generate runs from this model, we use [SimInf](https://cran.r-project.org/web/packages/SimInf/index.html), a package that provides a framework to conduct data-driven epidemiological modelling in realistic large scale disease spread simulations. This requires us to define the transitions, the compartments, and the initial population. If
 we want multiple repetitions for each choice of parameters, we create a data.frame with identical rows, each of which has the same initial population. Here we will choose $50$ repetitions per choice of parameters and consider an initial population of $1000$ of who $50$ are infected. Note that if we were to start 
-with one infectious individual, there would a be a significant probability that some runs of the model would not show an epidemic (since it could happen that the only infectious person recovers before infecting other people). Choosing a relatively high number of initial infectious people helps us circumvent any problems that would come from bimodality and keep the tutorial simple. Bimodality is dealt in the more advanced case studies. 
+with one infectious individual, there would a be a significant probability that some runs of the model would not show an epidemic (since it could happen that the only infectious person recovers before infecting other people). Choosing a relatively high number of initial infectious people helps us circumvent any problems that would come from bimodality and keep the tutorial simple. Bimodality will be dealt in the more advanced case studies. 
 
 
 ```r
+
+compartments <- c("S","E","I","R")
 transitions <- c(
   "S -> beta*I*S/(S+I+E+R) -> E",
   "E -> gamma*E -> I",
   "I -> delta*I -> R",
   "R -> mu*R -> S"
 )
-compartments <- c("S","E","I","R")
 nreps <- 50
 u0 <- data.frame(
   S = rep(950, nreps),
@@ -153,13 +175,14 @@ We select parameter values and parse the model using the function `mparse`, whic
 
 ```r
 params <- c(beta = 0.5, gamma = 0.5, delta = 0.1, mu = 0.1)
-model <- mparse(transitions = transitions, compartments = compartments,
-                u0 = u0, gdata = params, tspan = 1:60)
+model <- mparse(transitions = transitions, compartments = compartments, u0 = u0, gdata = params, tspan = 1:60)
 result = run(model)
 plot(result, compartments = c("E","I","R"), col=c("#07AF3F", "#FAAE48","#48E2FA"))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+
+Note that the emulatorr package is code-agnostic. Although we chose SimInf for this case study, the user of emulatorr is completely free to select the package (and programming language) that most suits them to obtain simulations of their computer model.
 
 In order to extract the relevant information from the data provided by the SimInf run, a helper function `getOutputs` has been included in this document. It takes a data.frame of parameter sets, and a list of times, and returns a data.frame of the results. We then create a data.frame `outputs` by binding the parameter values and the results obtained.
 
@@ -225,7 +248,7 @@ We obtain the model runs for the parameter sets in `pts` through the `getOutputs
 
 ```r
 wave0 <- data.frame(cbind(pts,getOutputs(pts, seq(10,30,by=5)))) %>% 
-  setNames(c(names(ranges), paste0("I",seq(10,30,by=5)),paste0('EV',seq(10,30,by=5))))
+setNames(c(names(ranges), paste0("I",seq(10,30,by=5)),paste0('EV',seq(10,30,by=5))))
 head(wave0)
 #>        beta     gamma     delta        mu    I10    I15    I20    I25    I30
 #> 1 0.4722596 0.5065206 0.2109966 0.2302821 109.18 162.10 208.64 231.36 238.62
@@ -291,9 +314,9 @@ targets = list(
 )
 ```
 
-<infobutton id="displayTextunnamed-chunk-13" onclick="javascript:toggle('unnamed-chunk-13');">Show: More on how targets were set</infobutton>
+<infobutton id="displayTextunnamed-chunk-12" onclick="javascript:toggle('unnamed-chunk-12');">Show: More on how targets were set</infobutton>
 
-<div id="toggleTextunnamed-chunk-13" style="display: none"><div class="panel panel-default"><div class="panel-body">
+<div id="toggleTextunnamed-chunk-12" style="display: none"><div class="panel panel-default"><div class="panel-body">
 As our dataset is synthetic, we couldn't rely on observed data to define our targets. Instead, we ran the model from a chosen parameter set, with a large number of repetitions. The means from the various runs provided the mean values, while  the standard deviations, estimating the ensemble variability, provided the sigmas. Note that here we factor in neither model discrepancy nor observation uncertainty when defining the sigmas. These two sources of uncertainty need to be included when dealing with empirical data.</div></div></div>
   
 
@@ -322,7 +345,7 @@ To see how the parameter space has changed after the first wave of the process, 
 wave_points(list(wave0, test_full_wave$next_sample), names(ranges))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
 
 Here `wave0` parameter sets are in yellow and the new sets are in purple. The plots in the main diagonal show the distribution of points in the two sets. Let us take a look at the yellow and purple distributions for the delta parameter. While the distribution of points in `wave0` is rather uniform, the distribution of the new wave peaks at low values of delta and decreases to zero for large values of delta.  Similarly, if we look at the delta-mu plot, the yellow points are uniformly distributed, while the purple points are concentrated in the upper left region: this suggests that parameter sets with high values of delta and low values of mu are unlikely to give a good fit for the model.
 
@@ -346,7 +369,7 @@ residual values to be highly correlated. A smaller $\theta_i$ value means that w
 that the function is less smooth with respect to parameter $i$, and thus that the values
 for the corresponding parameters $x_i$ and $x_i^{\prime}$ must be closer together in order to be highly
 correlated. The simplifying assumption that all the correlation length parameters
-are the same, that is $\theta_i = \theta$ for all $i$, is commonly made. In this case, the larger $\theta$ is, the smoother the local variations of the emulators will be.
+are the same, that is $\theta_i = \theta$ for all $i$, can be made. In such case, the larger $\theta$ is, the smoother the local variations of the emulators will be.
 
 ## Constructing the emulators step by step
 To construct the emulators, three steps are required:
@@ -361,7 +384,7 @@ Let us now go through each step in detail.
 
 ### Step 1
 
-The function `emulator_from_data` creates the initial emulators for us. We pass `emulator_from_data` the training data, the name of the model outputs we want to emulate and the list of parameter ranges. We also specify that we want to fit a quadratic surface, rather than a hyperplane (which is the default setting). Taken this information, `emulator_from_data` finds both the regression parameters and the active parameters for each of the indicated model outputs. Model selection is performed using [stepwise addition or deletion](https://en.wikipedia.org/wiki/Stepwise_regression) (as appropriate), using the [AIC criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) to find the minimal best fit. 
+The function `emulator_from_data` creates the initial emulators for us. We pass `emulator_from_data` the training data, the name of the model outputs we want to emulate and the list of parameter ranges. We also specify that we want to fit a quadratic surface (as opposed to fitting a hyperplane). Taken this information, `emulator_from_data` finds both the regression parameters and the active parameters for each of the indicated model outputs. Model selection is performed using [stepwise addition or deletion](https://en.wikipedia.org/wiki/Stepwise_regression) (as appropriate), using the [AIC criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) to find the minimal best fit. 
 
 
 ```r
@@ -391,9 +414,9 @@ ems0[[1]]
 #> Mixed covariance:  0 0 0 0 0 0 0 0 0 0
 ```
 
-<infobutton id="displayTextunnamed-chunk-18" onclick="javascript:toggle('unnamed-chunk-18');">Show: More details about the ems0 objects</infobutton>
+<infobutton id="displayTextunnamed-chunk-17" onclick="javascript:toggle('unnamed-chunk-17');">Show: More details about the ems0 objects</infobutton>
 
-<div id="toggleTextunnamed-chunk-18" style="display: none"><div class="panel panel-default"><div class="panel-body">
+<div id="toggleTextunnamed-chunk-17" style="display: none"><div class="panel panel-default"><div class="panel-body">
 The print statement provides an overview of the emulator specifications and correlation structure, including 
 
 - Basis Functions (here we have the four parameters beta, gamma, delta, mu and products of them, since we chose quadratic regression),
@@ -411,7 +434,7 @@ names(ems0) <- output_names
 emulator_plot(ems0)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
 
 The emulator expectation plots show the structure of the regression surface, which is at most quadratic in its parameters, through a 2D slice of the input space. The two parameters $\beta$ and $\gamma$ are selected and for each model output the plot shows the expected value produced by the relative emulator for all possible pairs $(\beta,\gamma)$.
 
@@ -422,9 +445,9 @@ To plot the emulators standard deviation we just use `emulator_plot` passing 'sd
 emulator_plot(ems0, 'sd')
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
 
-Here we immediately see that the emulator variance (or equivalently, standard deviation) is simply constant across the parameter space for each emulated output. This is not what we want though, since one would expect emulators to be less uncertain around the parameter sets in the training data, where the model was evaluated. This will be taken care of in the next step.
+Here we immediately see that the emulator variance (or equivalently, standard deviation) is simply constant across the parameter space for each emulated output. This is not what we want though, since one would expect emulators to be less uncertain around the parameter sets that have been evaluated by the computer model. This will be taken care of in the next step.
 
 ### Step 3
 
@@ -435,7 +458,7 @@ We now use the `adjust` method on our emulators to obtain the final Bayes Linear
 ems0_adjusted <- map(seq_along(ems0), ~ems0[[.]]$adjust(train0, output_names[[.]]))
 ```
 
-Note that the `adjust` method works with the data in `train0` exactly as the function `emulator_from_data` did: it performs Bayes Linear adjustment, given the data. This function creates a new emulator object with the adjusted expectation and variance of beta as the primitive specifications, and supplies the values for the new emulator to compute the adjusted expectation and variance of $u(x)$, and the adjusted $Cov[\beta, u(x)]$. Due to the update formulae, the correlation structure isn't stationary anymore: the value of $\sigma^2$ is now $x$-dependent. 
+Note that the `adjust` method works with the data in `train0` exactly as the function `emulator_from_data` did: it performs Bayes Linear adjustment, given the data. This function creates a new emulator object with the adjusted expectation and variance of beta as the primitive specifications, and supplies the values for the new emulator to compute the adjusted expectation and variance of $u(x)$, and the adjusted $Cov[\beta, u(x)]$. Due to the update formulae, the correlation structure now depends on where in the input space it is evaluated. 
 
 
 ```r
@@ -443,13 +466,13 @@ names(ems0_adjusted) <- output_names
 emulator_plot(ems0_adjusted)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
 
 ```r
 emulator_plot(ems0_adjusted, var = 'sd')
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-22-2.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-21-2.png" style="display: block; margin: auto;" />
 
 We can see that the adjusted emulators more reasonably show the structure of the model. The variance has been updated: the closer the evaluation point is to a training point, the lower the variance (as it 'knows' the value at this point). In fact, evaluating these emulators at parameter sets in the training data demonstrates this fact:
 
@@ -510,7 +533,7 @@ The default behaviour of the diagnostics and plots we will see here is to take a
 emulator_plot(ems0_adjusted[[1]], 'imp', targets = targets[[1]], cb=TRUE)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
 
 This is a 2D slice through the input space: for a chosen pair $(\bar\beta,\bar\gamma)$, the plot shows the implausibility of the parameter set $(\bar\beta, \bar\gamma, \delta_M, \mu_M)$, where $\delta_M$ denotes the mid-range value of the delta parameter and similarly for $\mu_M$. Parameter sets with a high implausibility (orange region) are highly unlikely to give a good fit and will be discarded when forming the parameters sets for the next wave.
 
@@ -531,7 +554,7 @@ These are encapsulated in the `validation_diagnostics` function.
 which_invalid <- validation_diagnostics(ems0_adjusted, valid0, output_names, targets = targets)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /><img src="_main_files/figure-html/unnamed-chunk-25-2.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /><img src="_main_files/figure-html/unnamed-chunk-24-2.png" style="display: block; margin: auto;" />
 
 The first column of plots gives an indication of the emulator outputs against the model outputs: the emulator outputs are plotted against the model outputs with a $3\sigma$ confidence interval overlaid. An 'ideal' emulator would exactly reproduce the model results: this behaviour is represented by the green line $f(x)=E[f(x)]$. Any parameter set whose emulated prediction lies more than $3\sigma$ away from the model output is highlighted in red. 
 
@@ -570,20 +593,20 @@ A helper for visualising problematic parameter sets is provided in the function 
 vp <- validation_pairs(ems0_adjusted, valid0, targets)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" />
 
 We can see that the parameter sets that are struggling with diagnostics are indeed on the boundaries of the space, particularly on the boundary of the $(\delta,\mu)$ space. Examination of the upper half of this plot shows that a large proportion of such parameter sets will be classified as implausible, so they lie in parts of the parameter space that will have no impact on the overall history matching process.
 
-<infobutton id="displayTextunnamed-chunk-28" onclick="javascript:toggle('unnamed-chunk-28');">Show: More options for the validation\_pairs function</infobutton>
+<infobutton id="displayTextunnamed-chunk-27" onclick="javascript:toggle('unnamed-chunk-27');">Show: More options for the validation\_pairs function</infobutton>
 
-<div id="toggleTextunnamed-chunk-28" style="display: none"><div class="panel panel-default"><div class="panel-body">
+<div id="toggleTextunnamed-chunk-27" style="display: none"><div class="panel panel-default"><div class="panel-body">
 Where we are emulating multiple outputs, emulator functions make a call to `nth_implausible` with default $n=1$. This can be modified in any function call that uses it. For instance, the above diagnostic plot will consider minimum implausibility in its upper plots if we set $n$ to be the number of emulators:
 
 ```r
 vp2 <- validation_pairs(ems0_adjusted, valid0, targets, n=length(ems0))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-50-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-49-1.png" style="display: block; margin: auto;" />
 </div></div></div>
 
 ### Space removed function 
@@ -599,13 +622,13 @@ One way we can get a feel for what cut-off value is reasonable is via the `space
 sp1 <- space_removed(ems0_adjusted, valid0, targets)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
 
 A cut-off of $3$ here, using maximum implausibility, would be sufficient to remove around $75\%$ of the current parameter space. This is a reasonable level of removal for a first wave: however, if the expected amount of removal was much lower we could consider whether it is sensible to reduce the cut-off (a companion plot that shows how many diagnostic failures would result from a particular cutoff value is in the pipeline).
 
-<infobutton id="displayTextunnamed-chunk-30" onclick="javascript:toggle('unnamed-chunk-30');">Show: More details on the space\_removed function</infobutton>
+<infobutton id="displayTextunnamed-chunk-29" onclick="javascript:toggle('unnamed-chunk-29');">Show: More details on the space\_removed function</infobutton>
 
-<div id="toggleTextunnamed-chunk-30" style="display: none"><div class="panel panel-default"><div class="panel-body">
+<div id="toggleTextunnamed-chunk-29" style="display: none"><div class="panel panel-default"><div class="panel-body">
 We can also consider what would happen if we were to modify the emulator variances or the 
 <span class="abbr" title="The correlation lengths are hyperparameters that appear in the structure of the emulators. They determine how close two parameter sets must be in order for the corresponding residual values to be highly correlated. Large values for the correlation lenghts are chosen if we believe the model to be a smooth function of the parameters."><abbr title="The correlation lengths are hyperparameters that appear in the structure of the emulators. They determine how close two parameter sets must be in order for the corresponding residual values to be highly correlated. Large values for the correlation lenghts are chosen if we believe the model to be a smooth function of the parameters.">
 correlation lengths</abbr></span>. To do this we set `modified ='var'` or `modified='corr'`. This evaluates over a fairly large set of parameter sets and has to retrain multiple sets of emulators, so does take a while to run. For the purposes of speed, here, we set `n_points` to $5$: this creates a set of $5^d$ parameter sets to evaluate over, where $d$ is the dimension of the input space. As before, the default behaviour considers steps of $10\%$ around $100\%$. Here we set the `u_mod` argument in the function call to choose different steps for the variance.
@@ -649,8 +672,8 @@ This section is divided in two parts:
 The function `generate_new_runs` is designed to generate new sets of parameters; its default behaviour is as follows.
 
 - If no prior parameter sets are provided, a set is generated using a [Latin Hypercube Design](https://en.wikipedia.org/wiki/Latin_hypercube_sampling), rejecting implausible parameter sets;
-- Using these as seeding points, more parameter sets are generated using [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) to attempt to fully cover the non-implausible region;
-- Finally, pairs of parameter sets are selected at random and more sets are sampled from lines connecting them, with particular importance given to those that are close to the non-implausible boundary.
+- Pairs of parameter sets are selected at random and more sets are sampled from lines connecting them, with particular importance given to those that are close to the non-implausible boundary;
+- Using these as seeding points, more parameter sets are generated using [importance sampling](https://en.wikipedia.org/wiki/Importance_sampling) to attempt to fully cover the non-implausible region.
 
 All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.
 
@@ -662,7 +685,7 @@ new_points <- generate_new_runs(ems0_adjusted, ranges, n_points = 120, z = targe
 plot(new_points, pch = 16, cex = 0.5)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" />
 
 We can start to see the structure of the non-implausible region, here. The `wave_points` function provides a better indication of the difference between the two sets of wave data.
 
@@ -671,7 +694,7 @@ We can start to see the structure of the non-implausible region, here. The `wave
 wave_points(list(wave0, new_points), in_names = names(ranges))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" />
 
 Here `wave0` parameter sets are in yellow and `new_points` (i.e. new parameter sets) are in purple. The plots in the main diagonal show the distribution of parameter sets in `wave0` and that of `new_points`. 
 
@@ -696,7 +719,7 @@ all_points <- list(wave0[1:9], wave1[1:9])
 simulator_plot(all_points, targets)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" />
 
 We can see that, compared to the space-filling random parameter sets used to train the first emulators, the new parameter sets are in much closer agreement with our targets. Subsequent waves, trained on these new parameter sets, will be more confident in the new non-implausible region and will therefore refine the region in light of the greater certainty.
 
@@ -733,10 +756,10 @@ We can apply diagnostics to this as before, using `valid1` as the validation set
 ```r
 all_waves <- c(ems0_adjusted, ems1_adjusted)
 all_targets <- c(targets, targets)
-emulator_plot(all_waves, var = 'maximp', targets = all_targets)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets, cb=TRUE)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" />
 
 This may seem an unwieldy way to approach this (and it is, at present); however, it is important to remember that the number of emulators at each wave may not be the same; for example, if we have had to remove a model output at wave 1, then the targets would be accordingly changed. In this illustration case, we did not have to worry about doing so since we have assumed that all targets can be emulated.
 
@@ -752,7 +775,7 @@ new_new_points <- generate_new_runs(all_waves, ranges, n_points = 120, z = all_t
 plot(new_new_points, pch = 16, cex = 0.5)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" />
 
 We can compare the distribution of parameter sets at the end of `wave0` with that of parameter sets at the end of `wave1`:
 
@@ -761,7 +784,7 @@ We can compare the distribution of parameter sets at the end of `wave0` with tha
 wave_points(list(wave1, new_new_points), in_names = names(ranges))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-38-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" />
 
 The last step is to create `wave2`, that will be used to train
 `wave2` emulators.
@@ -773,15 +796,15 @@ wave2 <- data.frame(cbind(new_new_points,next_next_wave))%>%
   setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
 ```
 
-Through the `simulator_plot` function we see how much better the `wave2` parameter sets perform compared to the original `wave1` parameter sets.
+Through the `simulator_plot` function we see how much better the `wave2` parameter sets perform compared to  `wave1` and `wave0` parameter sets.
 
 
 ```r
-all_points <- list(wave1[1:9], wave2[1:9])
-simulator_plot(all_points, targets)
+all_points <- list(wave0[1:9], wave1[1:9], wave2[1:9])
+simulator_plot(all_points, targets, palette=c("#F9F920", "#FA8816","#C98CFF"))
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-39-1.png" style="display: block; margin: auto;" />
 
 Next waves of the process can be produced simply repeating all the steps in section \@ref(wave1).
 
@@ -811,10 +834,10 @@ As before, we need to consider implausibility across all waves, rather than just
 ```r
 all_waves <- c(ems0_adjusted, ems1_adjusted, ems2_adjusted)
 all_targets <- c(targets, targets, targets)
-emulator_plot(all_waves, var = 'maximp', targets = all_targets)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets, cb=TRUE)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-41-1.png" style="display: block; margin: auto;" />
 
 To generate new parameter sets:
 
@@ -826,7 +849,7 @@ new_new_new_points <- generate_new_runs(all_waves, ranges, n_points = 120, z = a
 plot(new_new_new_points, pch = 16, cex = 0.5)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-43-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" />
 
 We now create `wave3`:
 
@@ -842,10 +865,10 @@ Through the `simulator_plot` function we check how much better the `wave3` param
 
 ```r
 all_points <- list(wave2[1:9], wave3[1:9])
-simulator_plot(all_points, targets)
+simulator_plot(all_points, targets, zero_in=FALSE)
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-45-1.png" style="display: block; margin: auto;" />
+<img src="_main_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" />
 
 The graph does not show a clear improvement in the performance of `wave3` parameter sets compared to that of `wave2` parameter sets. To understand the reason behind this, let us compare the variability of the model outputs we are emulating with the emulators uncertainty. Below we show the ensemble variability and the uncertainty for `ems0` and `ems2` for each of the emulated outputs.
 
@@ -871,11 +894,10 @@ sigmas2
 #>  9.607539 16.217742 18.393964 16.282659 14.902990
 ```
 
-
-We see that while `ems0` uncertainties (`sigmas0`) are similar or larger than the ensemble variabilities, `ems2` uncertainties (`sigmas2`) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the nonimplausible
+We see that while `ems0` uncertainties (`sigmas0`) are similar or larger than the ensemble variabilities, `ems2` uncertainties (`sigmas2`) are smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the non-implausible
 space already contains acceptable matches and is unlikely to
 decrease in size in the next iteration. 
-For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the nonimplausible space down further. 
+For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the non-implausible space down further. 
 
 # Glossary
 
@@ -912,6 +934,35 @@ and R to S, when a recovered individual becomes susceptible again.
 **Validation data**: The data used to validate the emulators. It is obtained by running the model at a given number of parameter sets (different from those used for the training data).
 
 **Wave**: An iteration of the history matching process.
+
+
+# (APPENDIX) Appendix {-} 
+
+# Bayes Linear Emulation
+
+In the [emulatorr](https://github.com/Tandethsquire/emulatorr) package we adopt a [Bayes Linear](https://en.wikipedia.org/wiki/Bayes_linear_statistics) approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
+distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior  mean vectors and covariance matrices for the uncertain quantities,  without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.
+
+The Bayes linear approach to statistical inference takes expectation
+as primitive. Suppose that there are two collections of random quantities, $B = (B_1,\dots,B_r)$ and 
+$D =(1,D_1, \dots D_s)$. Bayes linear analysis involves updating subjective beliefs about $B$
+given observation of $D$. In order to do so, prior mean vectors and covariance matrices
+for $B$ and $D$ (that is $E[B], E[D], Var[B]$ and $Var[D]$), along with a covariance matrix
+between $B$ and $D$ (that is $Cov[B,D]$), must be specified. 
+
+The Bayes linear update formulae for a vector B given a vector D are:
+\begin{align}
+E_D[B] &= E[B] + Cov[B,D]Var[D]^{-1}(D - E[D]) \\
+Var_D[B] &= Var[B] - Cov[B,D]Var[D]^{-1}Cov[D,B] \\
+Cov_D[B_1,B_2] &= Cov[B_1,B_2] - Cov[B_1,D]Var[D]^{-1}Cov[D,B_2].
+\end{align}
+$E_D[B]$ and $Var_D[B]$ are termed the adjusted expectation and variance of $B$ given $D$. $Cov_D[B_1,B_2]$ is termed the adjusted covariance of $B_1$ and $B_2$ given $D$,
+where $B_1$ and $B_2$ are subcollections of $B$.
+The formula given for $E_D(B)$ represents
+the best linear fit for $B$ given $D$ in terms of minimising the expected squared loss
+functions $E[(B_k-a_k^TD)^2]$ over choices of $a_k$ for each quantity in $B; k = 1,\dots,r$, that
+is, the linear combination of $D$ most informative for $B$. 
+
 
 
 <!--
