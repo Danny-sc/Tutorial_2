@@ -168,6 +168,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
 <li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.3</b> A simple example of history matching and emulation</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path="introduction-to-the-model.html"><a href="introduction-to-the-model.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
 <li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
@@ -203,6 +204,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="bayes-linear-emulation.html"><a href="bayes-linear-emulation.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 </ul>
 
       </nav>
@@ -222,8 +225,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="introduction-to-the-model" class="section level1">
 <h1><span class="header-section-number">2</span> Introduction to the model</h1>
-<p>The model in question is a stochastic<br />
-<span class="abbr" title="A model consisting of four compartments 
+<p>The model in question is a stochastic <span class="abbr" title="A model consisting of four compartments 
 
 - $S$: Susceptible individuals,
 - $E$: Exposed individuals (i.e. people that are infected but not infectious yet), 
@@ -254,7 +256,7 @@ and four possible transitions
 SEIRS models are suitable to study those infectious diseases that have an incubation period and do not confer permanent immunity.">
 SEIRS</abbr></span>
 model, with four parameters: rate of transmission between each infectious person and each susceptible person <span class="math inline">\(\beta_M\)</span>; transition rate from exposed to infectious <span class="math inline">\(\gamma_M\)</span>; recovery rate from infectious to recovered <span class="math inline">\(\delta_M\)</span>; and a ‘reinfection’ rate from recovered to susceptible <span class="math inline">\(\mu_M\)</span>.</p>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-4"></span>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
 <img src="SEIRSdiagram.PNG" alt="SEIRS Diagram" width="1916" />
 <p class="caption">
 Figure 2.1: SEIRS Diagram
@@ -270,28 +272,29 @@ Figure 2.1: SEIRS Diagram
 where <span class="math inline">\(N\)</span> represents the total population, <span class="math inline">\(N=S+E+I+R\)</span>. For simplicity, we consider a closed population, so that <span class="math inline">\(N\)</span> is constant.</p>
 <p>To generate runs from this model, we use <a href="https://cran.r-project.org/web/packages/SimInf/index.html">SimInf</a>, a package that provides a framework to conduct data-driven epidemiological modelling in realistic large scale disease spread simulations. This requires us to define the transitions, the compartments, and the initial population. If
 we want multiple repetitions for each choice of parameters, we create a data.frame with identical rows, each of which has the same initial population. Here we will choose <span class="math inline">\(50\)</span> repetitions per choice of parameters and consider an initial population of <span class="math inline">\(1000\)</span> of who <span class="math inline">\(50\)</span> are infected. Note that if we were to start
-with one infectious individual, there would a be a significant probability that some runs of the model would not show an epidemic (since it could happen that the only infectious person recovers before infecting other people). Choosing a relatively high number of initial infectious people helps us circumvent any problems that would come from bimodality and keep the tutorial simple. Bimodality is dealt in the more advanced case studies.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">transitions &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb1-2" title="2">  <span class="st">&quot;S -&gt; beta*I*S/(S+I+E+R) -&gt; E&quot;</span>,</a>
-<a class="sourceLine" id="cb1-3" title="3">  <span class="st">&quot;E -&gt; gamma*E -&gt; I&quot;</span>,</a>
-<a class="sourceLine" id="cb1-4" title="4">  <span class="st">&quot;I -&gt; delta*I -&gt; R&quot;</span>,</a>
-<a class="sourceLine" id="cb1-5" title="5">  <span class="st">&quot;R -&gt; mu*R -&gt; S&quot;</span></a>
-<a class="sourceLine" id="cb1-6" title="6">)</a>
-<a class="sourceLine" id="cb1-7" title="7">compartments &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>)</a>
-<a class="sourceLine" id="cb1-8" title="8">nreps &lt;-<span class="st"> </span><span class="dv">50</span></a>
-<a class="sourceLine" id="cb1-9" title="9">u0 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
-<a class="sourceLine" id="cb1-10" title="10">  <span class="dt">S =</span> <span class="kw">rep</span>(<span class="dv">950</span>, nreps),</a>
-<a class="sourceLine" id="cb1-11" title="11">  <span class="dt">E =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps),</a>
-<a class="sourceLine" id="cb1-12" title="12">  <span class="dt">I =</span> <span class="kw">rep</span>(<span class="dv">50</span>, nreps),</a>
-<a class="sourceLine" id="cb1-13" title="13">  <span class="dt">R =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps)</a>
-<a class="sourceLine" id="cb1-14" title="14">)</a></code></pre></div>
+with one infectious individual, there would a be a significant probability that some runs of the model would not show an epidemic (since it could happen that the only infectious person recovers before infecting other people). Choosing a relatively high number of initial infectious people helps us circumvent any problems that would come from bimodality and keep the tutorial simple. Bimodality will be dealt in the more advanced case studies.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"></a>
+<a class="sourceLine" id="cb1-2" title="2">compartments &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3">transitions &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb1-4" title="4">  <span class="st">&quot;S -&gt; beta*I*S/(S+I+E+R) -&gt; E&quot;</span>,</a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="st">&quot;E -&gt; gamma*E -&gt; I&quot;</span>,</a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="st">&quot;I -&gt; delta*I -&gt; R&quot;</span>,</a>
+<a class="sourceLine" id="cb1-7" title="7">  <span class="st">&quot;R -&gt; mu*R -&gt; S&quot;</span></a>
+<a class="sourceLine" id="cb1-8" title="8">)</a>
+<a class="sourceLine" id="cb1-9" title="9">nreps &lt;-<span class="st"> </span><span class="dv">50</span></a>
+<a class="sourceLine" id="cb1-10" title="10">u0 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</a>
+<a class="sourceLine" id="cb1-11" title="11">  <span class="dt">S =</span> <span class="kw">rep</span>(<span class="dv">950</span>, nreps),</a>
+<a class="sourceLine" id="cb1-12" title="12">  <span class="dt">E =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps),</a>
+<a class="sourceLine" id="cb1-13" title="13">  <span class="dt">I =</span> <span class="kw">rep</span>(<span class="dv">50</span>, nreps),</a>
+<a class="sourceLine" id="cb1-14" title="14">  <span class="dt">R =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps)</a>
+<a class="sourceLine" id="cb1-15" title="15">)</a></code></pre></div>
 <p>We select parameter values and parse the model using the function <code>mparse</code>, which takes transitions, compartments, initial values of each compartment, parameter values and the time span to simulate a trajectory. We then run the model and plot the trajectories of interest.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">params &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">beta =</span> <span class="fl">0.5</span>, <span class="dt">gamma =</span> <span class="fl">0.5</span>, <span class="dt">delta =</span> <span class="fl">0.1</span>, <span class="dt">mu =</span> <span class="fl">0.1</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2">model &lt;-<span class="st"> </span><span class="kw">mparse</span>(<span class="dt">transitions =</span> transitions, <span class="dt">compartments =</span> compartments,</a>
-<a class="sourceLine" id="cb2-3" title="3">                <span class="dt">u0 =</span> u0, <span class="dt">gdata =</span> params, <span class="dt">tspan =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">60</span>)</a>
-<a class="sourceLine" id="cb2-4" title="4">result =<span class="st"> </span><span class="kw">run</span>(model)</a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="kw">plot</span>(result, <span class="dt">compartments =</span> <span class="kw">c</span>(<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;#07AF3F&quot;</span>, <span class="st">&quot;#FAAE48&quot;</span>,<span class="st">&quot;#48E2FA&quot;</span>))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /></p>
+<a class="sourceLine" id="cb2-2" title="2">model &lt;-<span class="st"> </span><span class="kw">mparse</span>(<span class="dt">transitions =</span> transitions, <span class="dt">compartments =</span> compartments, <span class="dt">u0 =</span> u0, <span class="dt">gdata =</span> params, <span class="dt">tspan =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">60</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3">result =<span class="st"> </span><span class="kw">run</span>(model)</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="kw">plot</span>(result, <span class="dt">compartments =</span> <span class="kw">c</span>(<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;#07AF3F&quot;</span>, <span class="st">&quot;#FAAE48&quot;</span>,<span class="st">&quot;#48E2FA&quot;</span>))</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /></p>
+<p>Note that the emulatorr package is code-agnostic. Although we chose SimInf for this case study, the user of emulatorr is completely free to select the package (and programming language) that most suits them to obtain simulations of their computer model.</p>
 <p>In order to extract the relevant information from the data provided by the SimInf run, a helper function <code>getOutputs</code> has been included in this document. It takes a data.frame of parameter sets, and a list of times, and returns a data.frame of the results. We then create a data.frame <code>outputs</code> by binding the parameter values and the results obtained.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">points &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="kw">list</span>(<span class="dt">beta =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</a>
 <a class="sourceLine" id="cb3-2" title="2">                           <span class="dt">gamma =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</a>
@@ -341,7 +344,7 @@ for each parameter set, at each desidered time: this is defined here as the stan
 <p>Note that the first time we create <code>pts</code>, we get <span class="math inline">\(80\)</span> parameter sets where each parameter value is distributed on <span class="math inline">\([-1,1]\)</span>. This is not exactly what we need, since each parameter has a different range. We therefore define <code>r_centers</code> (resp. <code>r_scales</code>) which contains the midpoint (resp. the size) of the range of each parameter. Using these two pieces of information, we re-center and re-scale <code>pts</code>.</p>
 <p>We obtain the model runs for the parameter sets in <code>pts</code> through the <code>getOutputs</code> function. We bind the parameter sets in <code>pts</code> to the model runs and save everything in the data.frame <code>wave0</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">wave0 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(pts,<span class="kw">getOutputs</span>(pts, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)))) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges), <span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),<span class="kw">paste0</span>(<span class="st">&#39;EV&#39;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges), <span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),<span class="kw">paste0</span>(<span class="st">&#39;EV&#39;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
 <a class="sourceLine" id="cb5-3" title="3"><span class="kw">head</span>(wave0)</a>
 <a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt;        beta     gamma     delta        mu    I10    I15    I20    I25    I30</span></a>
 <a class="sourceLine" id="cb5-5" title="5"><span class="co">#&gt; 1 0.4722596 0.5065206 0.2109966 0.2302821 109.18 162.10 208.64 231.36 238.62</span></a>
