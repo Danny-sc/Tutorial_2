@@ -177,7 +177,6 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>4.2</b> Constructing the emulators step by step</a><ul>
 <li class="chapter" data-level="4.2.1" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 1</a></li>
 <li class="chapter" data-level="4.2.2" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-2"><i class="fa fa-check"></i><b>4.2.2</b> Step 2</a></li>
-<li class="chapter" data-level="4.2.3" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html#step-3"><i class="fa fa-check"></i><b>4.2.3</b> Step 3</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="emulator-diagnostics.html"><a href="emulator-diagnostics.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
@@ -240,27 +239,28 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li>Using these as seeding points, more parameter sets are generated using <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> to attempt to fully cover the non-implausible region.</li>
 </ul>
 <p>All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</a>
-<a class="sourceLine" id="cb28-2" title="2"><span class="co">#&gt; 410 non-implausible points generated. Applying V-optimality...</span></a>
-<a class="sourceLine" id="cb28-3" title="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb28-4" title="4"><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</a>
+<a class="sourceLine" id="cb27-2" title="2"><span class="co">#&gt; [1] &quot;Performing Latin hypercube sampling with rejection...&quot;</span></a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="co">#&gt; [1] &quot;Performing line sampling...&quot;</span></a>
+<a class="sourceLine" id="cb27-4" title="4"><span class="co">#&gt; [1] &quot;Performing importance sampling...&quot;</span></a>
+<a class="sourceLine" id="cb27-5" title="5"><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /></p>
 <p>We can start to see the structure of the non-implausible region, here. The <code>wave_points</code> function provides a better indication of the difference between the two sets of wave data.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
 <p>Here <code>wave0</code> parameter sets are in yellow and <code>new_points</code> (i.e. new parameter sets) are in purple. The plots in the main diagonal show the distribution of parameter sets in <code>wave0</code> and that of <code>new_points</code>.</p>
 </div>
 <div id="comparing-next-and-old-parameter-sets" class="section level2">
 <h2><span class="header-section-number">6.2</span> Comparing next and old parameter sets</h2>
 <p>Now we can put <code>new_points</code> into the model and obtain the model outputs:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
 <p>Binding together <code>new_points</code> and <code>next_wave</code> we obtain <code>wave1</code>, the full data for the next wave.</p>
 <p>We can see how much better the <code>wave1</code> parameter sets perform compared to the original <code>wave0</code> parameter sets using <code>simulator_plot</code>.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
-<a class="sourceLine" id="cb31-3" title="3">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
-<a class="sourceLine" id="cb31-4" title="4"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
+<a class="sourceLine" id="cb30-3" title="3">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
+<a class="sourceLine" id="cb30-4" title="4"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /></p>
 <p>We can see that, compared to the space-filling random parameter sets used to train the first emulators, the new parameter sets are in much closer agreement with our targets. Subsequent waves, trained on these new parameter sets, will be more confident in the new non-implausible region and will therefore refine the region in light of the greater certainty.</p>
 </div>
 </div>
