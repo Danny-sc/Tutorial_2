@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>3 Perfoming a full wave of emulation and history matching | Case Study -1: An introduction to the Emulatorr package</title>
+  <title>B Further issues in emulator structure | Case Study -1: An introduction to the Emulatorr package</title>
   <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
   <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="3 Perfoming a full wave of emulation and history matching | Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:title" content="B Further issues in emulator structure | Case Study -1: An introduction to the Emulatorr package" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="3 Perfoming a full wave of emulation and history matching | Case Study -1: An introduction to the Emulatorr package" />
+  <meta name="twitter:title" content="B Further issues in emulator structure | Case Study -1: An introduction to the Emulatorr package" />
   
   <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="intro.html"/>
-<link rel="next" href="buildemul.html"/>
+<link rel="prev" href="bayes.html"/>
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -206,9 +206,9 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="bayes.html"><a href="bayes.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
-<li class="chapter" data-level="B" data-path="emulstr.html"><a href="emulstr.html"><i class="fa fa-check"></i><b>B</b> Further issues in emulator structure</a><ul>
-<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a></li>
-<li class="chapter" data-level="B.2" data-path="emulstr.html"><a href="emulstr.html#correlation-structure"><i class="fa fa-check"></i><b>B.2</b> Correlation structure</a></li>
+<li class="chapter" data-level="B" data-path="further-issues-in-emulator-structure.html"><a href="further-issues-in-emulator-structure.html"><i class="fa fa-check"></i><b>B</b> Further issues in emulator structure</a><ul>
+<li class="chapter" data-level="B.1" data-path="further-issues-in-emulator-structure.html"><a href="further-issues-in-emulator-structure.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a></li>
+<li class="chapter" data-level="B.2" data-path="further-issues-in-emulator-structure.html"><a href="further-issues-in-emulator-structure.html#correlation-structure"><i class="fa fa-check"></i><b>B.2</b> Correlation structure</a></li>
 </ul></li>
 </ul>
 
@@ -227,62 +227,73 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="perfoming-a-full-wave-of-emulation-and-history-matching" class="section level1">
-<h1><span class="header-section-number">3</span> Perfoming a full wave of emulation and history matching</h1>
-<p>In this section we show a simple and direct way of performing a full wave of emulation and history matching (the first wave). This is done by using the function
-<code>full_wave</code>, which needs the following information:</p>
-<ul>
-<li><p>Training data;</p></li>
-<li><p>Validation data;</p></li>
-<li><p>A list of ranges for the parameters;</p></li>
-<li><p>A list with the names of the model outputs to emulate;</p></li>
-<li><p>The targets: for each of the model outputs to emulate, we need a pair (val, sigma) that we will use to evaluate implausibility. The ‘val’ component represents the mean value of the output and ‘sigma’ represents our uncertainty about it;</p></li>
-<li><p>The number of parameter sets to generate for the next wave;</p></li>
-<li><p>The sampling method we want to use.</p></li>
-</ul>
-<p>We already have almost all of these pieces. We just need the model output names</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">output_names &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>, <span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
-<p>and the targets:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">targets =<span class="st"> </span><span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb8-2" title="2">  <span class="dt">I10 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">240</span>, <span class="dt">sigma =</span> <span class="fl">25.27</span>),</a>
-<a class="sourceLine" id="cb8-3" title="3">  <span class="dt">I15 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">396</span>, <span class="dt">sigma =</span> <span class="fl">40.99</span>),</a>
-<a class="sourceLine" id="cb8-4" title="4">  <span class="dt">I20 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">453</span>, <span class="dt">sigma =</span> <span class="fl">46.48</span>),</a>
-<a class="sourceLine" id="cb8-5" title="5">  <span class="dt">I25 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">428</span>, <span class="dt">sigma =</span> <span class="fl">43.98</span>),</a>
-<a class="sourceLine" id="cb8-6" title="6">  <span class="dt">I30 =</span> <span class="kw">list</span>(<span class="dt">val =</span> <span class="dv">392</span>, <span class="dt">sigma =</span> <span class="fl">40.30</span>)</a>
-<a class="sourceLine" id="cb8-7" title="7">)</a></code></pre></div>
-<p><infobutton id="displayTextunnamed-chunk-12" onclick="javascript:toggle('unnamed-chunk-12');">Show: More on how targets were set</infobutton></p>
-<div id="toggleTextunnamed-chunk-12" style="display: none">
-<div class="panel panel-default">
-<div class="panel-body">
-As our dataset is synthetic, we couldn’t rely on observed data to define our targets. Instead, we ran the model from a chosen parameter set, with a large number of repetitions. The means from the various runs provided the mean values, while the standard deviations, estimating the ensemble variability, provided the sigmas. Note that here we factor in neither model discrepancy nor observation uncertainty when defining the sigmas. These two sources of uncertainty need to be included when dealing with empirical data.
+<div id="further-issues-in-emulator-structure" class="section level1">
+<h1><span class="header-section-number">B</span> Further issues in emulator structure</h1>
+<p>The general structure of a univariate emulator is as follows:
+<span class="math display">\[f(x) = g(x)^T \beta + u(x),\]</span>
+where <span class="math inline">\(g(x)^T \beta\)</span> is the mean function and <span class="math inline">\(u(x)\)</span> is a Gaussian process with mean zero.</p>
+<p>In this appendix we briefly discuss some of the choices that can be made in terms of regression functions and of correlation functions.</p>
+<div id="regression-structure" class="section level2">
+<h2><span class="header-section-number">B.1</span> Regression structure</h2>
 </div>
+<div id="correlation-structure" class="section level2">
+<h2><span class="header-section-number">B.2</span> Correlation structure</h2>
+<p>Once we choose the regression functions, we need to specify the correlation between <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x^\prime)\)</span> for all possible values of <span class="math inline">\(x\)</span> and <span class="math inline">\(x^\prime\)</span>. This is a key step, since it will determine how the response <span class="math inline">\(f(x)\)</span> at one parameter set <span class="math inline">\(x\)</span> is affected by the response at any other parameter set <span class="math inline">\(x^\prime\)</span>.</p>
+<p>A common assumption for the correlation structure is that the variance of <span class="math inline">\(u(x)\)</span> is independent of <span class="math inline">\(x\)</span>. If its constant value is denoted by <span class="math inline">\(\sigma^2\)</span>, we can then write the correlation of <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x^\prime)\)</span> in the form
+<span class="math display">\[\sigma^2  c(x,x^{\prime})\]</span>
+where <span class="math inline">\(c\)</span>, which satisfies <span class="math inline">\(c(x,x)=1\)</span>, is the correlation function, or kernel. In our tutorial we also introduced a nugget term <span class="math inline">\(\delta I_{\{x=x^\prime\}}\)</span>
+that operates on all variables:
+<span class="math display">\[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}.\]</span>
+This term represents the proportion of the overall variance due to the ensemble variability and ensures that the covariance matrix of <span class="math inline">\(u(x)\)</span> is not ill-conditioned, making the computation of its inverse possible.</p>
+<p>The choice of the function <span class="math inline">\(c\)</span> reflects fundamental characteristics of the process <span class="math inline">\(u(x)\)</span>, such as stationarity, isotropy and smoothness. For example, <span class="math inline">\(u(x)\)</span> is
+<span class="abbr" title="A Gaussian process u(x) is stationary if 
+- for any x and x&#39;, the mean of u(x) is the same as the mean of u(x&#39;); 
+- the covariance between u(x) and u(x&#39;) only depends on the difference x-x&#39;."><abbr title="A Gaussian process u(x) is stationary if 
+- for any x and x', the mean of u(x) is the same as the mean of u(x'); 
+- the covariance between u(x) and u(x') only depends on the difference x-x'.">
+stationary</abbr></span>
+if
+<span class="math inline">\(c(x,x^{\prime})\)</span> depends only on <span class="math inline">\(x-x^{\prime}\)</span>. In this overview we will always assume stationarity, but non-stationary approaches are also possible.</p>
+<p>An example of a stationary kernel is the
+squared-exponential correlation function, used in this tutorial:
+<span class="math display">\[c_{SE}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).\]</span>
+This function, also called Gaussian correlation function, has the mathematical advantage of being differentiable infinitely many times. In particular, this implies that observing a small continuous fraction of the input space is sufficient to recover the whole process. Such a strong property is not always suitable, since it might be unrealistic to assume that information from a small portion of the input space allows to infer the behaviour of the process everywhere else.</p>
+<p>In such cases, it might be preferable to use the Matérn correlation functions, a family of parametric stationary kernels. The Matérn kernel of order <span class="math inline">\(\nu\)</span> is defined as
+<span class="math display">\[c_\nu(x,x^{\prime}) = \prod\limits_{i}\frac{(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)^\nu K_\nu(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)}{2^{\nu -1}\Gamma(\nu)},\]</span>
+where <span class="math inline">\(K_\nu\)</span> is the modified Bessel function of the second kind and order <span class="math inline">\(\nu\)</span>. Compared to the Gaussian kernel, which is differentiable infinitely many times, <span class="math inline">\(c_\nu\)</span> is ‘less smooth’, being differentiable only
+<span class="math inline">\((\left \lceil{\nu}\right \rceil -1)\)</span> times (here <span class="math inline">\(\left \lceil{\nu}\right \rceil\)</span> denotes the ceiling function). The Matérn kernels can be thought as a generalisation of the Gaussian kernel: when <span class="math inline">\(\nu \rightarrow \infty\)</span>, the kernel <span class="math inline">\(c_\nu\)</span> converges to <span class="math inline">\(c_{SE}\)</span>.</p>
+<p>When <span class="math inline">\(\nu=1/2\)</span>, the kernel <span class="math inline">\(c_{1/2}\)</span> coincides with the so called exponential kernel:
+<span class="math display">\[c_{\text{exp}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{|x_{i,A}-x_{i,A}^{\prime}|}{\theta_i}\right).\]</span>
+Note that the sample paths with the exponential kernel are not smooth.</p>
+<p>A third example of stationarity is the rational quadratic kernel, defined by
+<span class="math display">\[c_{RQ}(x,x^{\prime}) = \prod\limits_{i}\frac{1}{1+(x_{i,A}-x_{i,A}^{\prime})^2/\theta_i^2} .\]</span>
+This correlation function is differentiable infinitely many times, as the Gaussian kernel.</p>
+<p>Another key property of kernels is isotropy. A stationary kernel is said to be isotropic (or homogeneous) when it depends only on the distance of <span class="math inline">\(x\)</span> and <span class="math inline">\(x^\prime\)</span>, rather than on the full vector <span class="math inline">\(x-x^\prime\)</span>. In other words, an isotropic kernel depends on the length of <span class="math inline">\(x-x^\prime\)</span>, but not on its direction.
+All the stationary kernels mentioned above are isotropic if and only if <span class="math inline">\(\theta_i=\theta_j\)</span> for all <span class="math inline">\(i,j\)</span>.</p>
+<!--
+# TJ material
+
+
+
+```
+rmd_files:
+    html: ['index.Rmd', 'ch1.Rmd']
+    latex: ['index.Rmd', 'ch1.Rmd', 'ch_appendix.Rmd']
+output_dir: "docs"
+```
+
+
+-->
+
 </div>
-</div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">test_full_wave &lt;-<span class="st"> </span><span class="kw">full_wave</span>(train0, valid0, ranges, output_names, targets, <span class="dv">120</span>, <span class="dt">sample_method =</span> <span class="st">&#39;importance&#39;</span>)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="co">#&gt; Running diagnostics...</span></a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt; Generating new sample points...</span></a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt; 497 non-implausible points generated. Applying V-optimality...</span></a>
-<a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt; </span></a></code></pre></div>
-<p>Here we set the argument <code>sample_method</code> to ‘importance’, to specify that <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> should be used when selecting parameter sets for the next wave. The <code>full_wave</code> function does the following for us:</p>
-<ul>
-<li><p>creates <code>base_emulators</code>: these are a premilinary version of the emulators necessary to set our priors for the Bayes Linear method;</p></li>
-<li><p>creates the <code>emulators</code>: these are obtained by adjusting the base emulators through the Bayes Linear update formulae;</p></li>
-<li><p>provides us with <code>new_ranges</code>, the parameter ranges for the next wave,</p></li>
-<li><p>provides us with <code>next_sample</code>, the new sample parameter sets, where the model will be run to build the next wave emulators.</p></li>
-</ul>
-<p>To see how the parameter space has changed after the first wave of the process, we use the function <code>wave_points</code>, which plots the old and the new set of parameters on the same pair of axis:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, test_full_wave<span class="op">$</span>next_sample), <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /></p>
-<p>Here <code>wave0</code> parameter sets are in yellow and the new sets are in purple. The plots in the main diagonal show the distribution of points in the two sets. Let us take a look at the yellow and purple distributions for the delta parameter. While the distribution of points in <code>wave0</code> is rather uniform, the distribution of the new wave peaks at low values of delta and decreases to zero for large values of delta. Similarly, if we look at the delta-mu plot, the yellow points are uniformly distributed, while the purple points are concentrated in the upper left region: this suggests that parameter sets with high values of delta and low values of mu are unlikely to give a good fit for the model.</p>
-<p>In the following sections we will explain step by step what <code>full_wave</code> does behind the scenes. This will not only enhance the reader’s overall understanding, but will also provide them with the necessary tools to have more control over the process and customise it through their judgement.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="intro.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="buildemul.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="bayes.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
