@@ -51,6 +51,26 @@ First of all the model is run at a manageable number of parameter sets, to provi
 
 Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator output, rather than the model output. This speeds up the process and allows for a comprehensive exploration of the input space.
 
+## History matching and emulation in a nutshell
+Figure \@ref(fig:fig3)  shows a typical history matching workflow. 
+
+<div class="figure" style="text-align: center">
+<img src="hmeflowchart.png" alt="History matching and emulation flowchart" width="90%" />
+<p class="caption">(\#fig:fig3)History matching and emulation flowchart</p>
+</div>
+
+The various steps of the process can be summarised as follows.
+
+1) A number of parameter sets (design points) are selected. 
+2) The model (simulator) is run at the design points.
+3) Emulators are built using the training data provided by the previous step. Note that here we choose to construct separate emulators, one for the mean of each model output, but other approaches are possible.
+3) Emulators are evaluated at a large number of parameter sets. The implausibility of each of these is then assessed.
+4) Parameter sets classified as non-implausible provide the design points for the next wave of the process. From here, we go back to step 2).
+
+This circular process continues till one of the stopping criteria (see end of section \@ref(stoprule)) applies.  
+
+Section \@ref(intro) of this tutorial treats step 1 and 2, section \@ref(buildemul) goes through step 3, section \@ref(diagn) explains step 4 and section \@ref(newpoints) describes step 5.
+
 ## A simple example of history matching and emulation
 To show how history matching and emulation work, we present an example with a one-dimensional emulator.
 
@@ -90,7 +110,7 @@ decreased in the region of interest. Consequently, the non-implausible
 region has shrunk dramatically, indicating that a
 match can only be found for $30.5 <x <32.5$ and $42.5 < x < 44.5,$
 where indeed the function $f (x)$ takes values between $-0.8$ and 
-$-0.63$.
+$-0.63$. It is worth highlighting the importance of the location of the extra point (here $x=36$). In general, we choose points that improve the emulators the most. Note that these points are not necessarily the ones giving the best match to the observed data.
 
 <div class="figure" style="text-align: center">
 <img src="sinwave2.png" alt="Second wave of history matching" width="70%" />
@@ -99,7 +119,7 @@ $-0.63$.
 
 Based on the level of accuracy required, one can either stop here or perform more iterations of the process.
 
-# Introduction to the model
+# Introduction to the model {#intro}
 
 The model in question is a stochastic <span class="abbr" title="A model consisting of four compartments 
 
@@ -351,7 +371,7 @@ Here `wave0` parameter sets are in yellow and the new sets are in purple. The pl
 
 In the following sections we will explain step by step what `full_wave` does behind the scenes. This will not only enhance the reader's overall understanding, but will also provide them with the necessary tools to have more control over the process and customise it through their judgement.
 
-# Constructing the emulators
+# Constructing the emulators {#buildemul}
 
 The first task that the `full_wave` function accomplishes, is to build the emulators based on the training data. We start this section by establishing the structure of the emulators that we want to construct. We then show how to build emulators step by step. 
 
@@ -359,17 +379,19 @@ The first task that the `full_wave` function accomplishes, is to build the emula
 An [emulator](https://en.wikipedia.org/wiki/Emulator) is a way of representing our beliefs about the behaviour of an unknown function. In our case, where the model is stochastic, the unknown function is taken to be the mean of each of the model outputs over multiple runs. Given a set of model runs and an estimate of the parameters, we can use the emulator to get a probability distribution for the mean of a model output at any parameter set, without the need to run the model at the chosen set.
 
 In this tutorial, we will construct an emulator for each of the model outputs separately. The general structure of a univariate emulator is as follows:
-$$f(x) = g(x) \beta + u(x),$$
-where $g(x)$ are the regression functions, $\beta$ the regression parameters, and $u(x)$ is the correlation structure. We split the correlation structure further into two pieces - for two parameter sets $x$ and $x^{\prime}$, the structure is:
-$$u(x) = \sigma^2 \left[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}\right].$$
+$$f(x) = g(x)^T \beta + u(x),$$
+where $g(x)$ is a vector of known deterministic regression functions, $\beta$ is a vector of regression coefficients, and $u(x)$ is a Gaussian process with zero mean. The correlation of the process $u(x)$ is assumed to be in the following form, for two parameter sets $x$ and $x^{\prime}$:
+$$\sigma^2 \left[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}\right].$$
 Here $\sigma^2$ is the (prior) emulator variance and $c(x,x^{\prime})$ is a correlation function; the simplest such function is squared-exponential
-$$c(x,x^{\prime}) = \exp\left(-\frac{\sum\limits_{i}(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).$$
-The subscript $A$ indicates that the correlation function operates only on the active parameters for the emulator: that is, parameters that contribute to the regression surface. To ensure the correlation structure is well-defined, the 'nugget' term $\delta I_{\{x=x^{\prime}\}}$ is included: this operates on all the parameters in the input space and represents the proportion of the overall variance due to the ensemble variability. The $\theta_i$ hyperparameters are the correlation lengths for the emulator. The size of the correlation lengths determine how close two parameter sets must be in order for the corresponding
+$$c(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).$$
+The subscript $A$ indicates that the correlation function operates only on the active parameters for the emulator: that is, parameters that contribute to the regression surface. The 'nugget' term $\delta I_{\{x=x^{\prime}\}}$  operates on all the parameters in the input space and represents the proportion of the overall variance due to the ensemble variability. This term also ensures that the covariance matrix of $u(x)$ is not ill-conditioned, making the computation of its inverse possible (a key operation in the training of emulators, see Appendix \@ref(bayes)). The $\theta_i$ hyperparameters are the correlation lengths for the emulator. The size of the correlation lengths determine how close two parameter sets must be in order for the corresponding
 residual values to be highly correlated. A smaller $\theta_i$ value means that we believe
 that the function is less smooth with respect to parameter $i$, and thus that the values
 for the corresponding parameters $x_i$ and $x_i^{\prime}$ must be closer together in order to be highly
 correlated. The simplifying assumption that all the correlation length parameters
 are the same, that is $\theta_i = \theta$ for all $i$, can be made. In such case, the larger $\theta$ is, the smoother the local variations of the emulators will be.
+
+We would like to warn the reader that several emulator structures and the correlation functions are available.  Alternatives choices to the ones made above are discussed in Appendix \@ref(emulstr). 
 
 ## Constructing the emulators step by step
 To construct the emulators, two steps are required:
@@ -382,7 +404,7 @@ Let us now go through each step in detail.
 
 ### Step 1
 
-The function `emulator_from_data` creates the initial emulators for us. We pass `emulator_from_data` the training data, the name of the model outputs we want to emulate, the list of parameter ranges and the ensemble variability . Taken this information, `emulator_from_data` finds both the regression parameters and the active parameters for each of the indicated model outputs. Model selection is performed using [stepwise addition or deletion](https://en.wikipedia.org/wiki/Stepwise_regression) (as appropriate), using the [AIC criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) to find the minimal best fit. 
+The function `emulator_from_data` creates the initial emulators for us. We pass `emulator_from_data` the training data, the name of the model outputs we want to emulate, the list of parameter ranges and the ensemble variability . Taken this information, `emulator_from_data` finds both the regression parameters and the active parameters for each of the indicated model outputs. Model selection is performed through [stepwise addition or deletion](https://en.wikipedia.org/wiki/Stepwise_regression) (as appropriate), using the [AIC criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) to find the minimal best fit. Note that the default behaviour of `emulator_from_data` is to fit a quadratic regression surface. If we want instead a linear regression surface, we just need to set `quadratic=FALSE`. 
 
 
 ```r
@@ -416,7 +438,7 @@ The print statement provides an overview of the emulator specifications and corr
 
 - first and second order specifications for $\beta$ and $u(x)$. Note that  by default `emulator_from_data` assumes that $\text{Var}[\beta]=0$: the regression surface is known and coefficients are fixed. This explains why Beta Variance and Mixed Covariance (which shows the covariance of $\beta$ and $u(x)$) are both zero. One can set beta.var=TRUE in order to consider the beta parameters as random variables. </div></div></div>
 
-We can plot the emulators to see how they represent the output space: the `emulator_plot` function does this for emulator expectation, variance, standard deviation, and implausibility (more on which later).
+We can plot the emulators to see how they represent the output space: the `emulator_plot` function does this for emulator expectation, variance, standard deviation, and implausibility (more on which later). Note that all functions in the emulatorr package that produce plots have a colorblind-friendly option: it is sufficient to specify `cb=TRUE`. 
 
 
 ```r
@@ -479,7 +501,7 @@ Note the comparative speeds of evaluation, here. The initial $80$ parameter sets
 
 We now need to consider whether these emulators are actually performing as we would expect them to. For this, we need to consider emulator diagnostics.
 
-# Emulator diagnostics
+# Emulator diagnostics {#diagn}
 
 For a given set of emulators, we want to assess how accurately they reflect the model outputs over the input space. To do so, we can consider a number of diagnostic tests. 
 
@@ -521,7 +543,7 @@ The default behaviour of the diagnostics and plots we will see here is to take a
 
 
 ```r
-emulator_plot(ems0_adjusted[[1]], 'imp', targets = targets[[1]], cb=TRUE)
+emulator_plot(ems0_adjusted[[1]], 'imp', targets = targets[[1]])
 ```
 
 <img src="_main_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
@@ -650,7 +672,7 @@ The adjusted $R^2$ of the linear models are all high, so the correlation structu
 
 The diagnostics here give an indication of the suitability of the emulators in emulating the outputs at this wave. If there are particular model outputs for which the emulators do not give a good fit, then we can modify the specifications for that emulator directly (for example, modifying the correlation length, the variance, or the regression surface) and re-train; if the emulator simply cannot provide a good fit to a model output, we can choose not to emulate this output for the wave in question.
 
-# Point Generation
+# Point Generation {#newpoints}
 
 Having generated emulators based on `wave0` data, evaluated their suitability, and considered a means by which to rule out parameter sets, we can now produce a new set of parameter sets to pass to the model. 
 
@@ -750,7 +772,7 @@ We can apply diagnostics to this as before, using `valid1` as the validation set
 ```r
 all_waves <- c(ems0_adjusted, ems1_adjusted)
 all_targets <- c(targets, targets)
-emulator_plot(all_waves, var = 'maximp', targets = all_targets, cb=TRUE)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets)
 ```
 
 <img src="_main_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" />
@@ -821,7 +843,7 @@ ems2_adjusted <- map(seq_along(ems2), ~ems2[[.]]$adjust(train2, output_names[[.]
 names(ems2_adjusted) <- output_names
 ```
 
-### Evaluating implausibility across all waves
+### Evaluating implausibility across all waves {#stoprule}
 
 As before, we need to consider implausibility across all waves, rather than just the wave under consideration at the time.
 
@@ -829,7 +851,7 @@ As before, we need to consider implausibility across all waves, rather than just
 ```r
 all_waves <- c(ems0_adjusted, ems1_adjusted, ems2_adjusted)
 all_targets <- c(targets, targets, targets)
-emulator_plot(all_waves, var = 'maximp', targets = all_targets, cb=TRUE)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets)
 ```
 
 <img src="_main_files/figure-html/unnamed-chunk-40-1.png" style="display: block; margin: auto;" />
@@ -890,10 +912,14 @@ sigmas2
 #> 31.86318 15.87364 28.85938 30.41292 23.41641
 ```
 
-We see that while `ems0` uncertainties (`sigmas0`) are larger than the ensemble variabilities, `ems2` uncertainties (`sigmas2`) are similar or smaller than the ensemble variabilities. Since the emulators variance is smaller than the uncertainty inherent to the model, the non-implausible
+We see that while `ems0` uncertainties (`sigmas0`) are larger than the ensemble variabilities, `ems2` uncertainties (`sigmas2`) are similar or smaller than the ensemble variabilities. This means that we reached one of the possible stopping criteria: since the emulators variance is smaller than the uncertainty inherent to the model, the non-implausible
 space already contains acceptable matches and is unlikely to
-decrease in size in the next iteration. 
-For this reason, we conclude here the iterating process and therefore the tutorial. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the non-implausible space down further. 
+decrease in size in the next iteration.
+For this reason, we conclude here the iterating process. Note that if we could revise the uncertainties present in our model and decrease them, we would then be able to perform other waves of the history matching process and shrink the non-implausible space down further. 
+
+In general, another stopping criterion consists in having all the input space deemed implausible at the end of the current wave. In this situation, one deduces that there are no parameter sets that give an acceptable match with the data: in particular, this raises doubts about the adequacy of the chosen model.
+Finally, we can stop the history matching process if all model runs at the non-implausible space of the current wave are accurate enough, i.e. if they are close enough to the targets.
+
 
 # Glossary
 
@@ -934,7 +960,7 @@ and R to S, when a recovered individual becomes susceptible again.
 
 # (APPENDIX) Appendix {-} 
 
-# Bayes Linear Emulation
+# Bayes Linear Emulation {#bayes}
 
 In the [emulatorr](https://github.com/Tandethsquire/emulatorr) package we adopt a [Bayes Linear](https://en.wikipedia.org/wiki/Bayes_linear_statistics) approach to build emulators. While a full Bayesian analysis requires specification of a full joint prior probability
 distribution to reflect beliefs about uncertain quantities, in the Bayes linear approach expectations are taken as a primitive and only first and second order specifications are needed when defining the prior. Operationally, this means that one just sets prior  mean vectors and covariance matrices for the uncertain quantities,  without having to decide exactly which distribution is responsible for the chosen mean and covariance. A Bayes Linear analysis may therefore be viewed as a pragmatic approach to a full Bayesian analysis, where the task of specifying beliefs has been simplified. As in any Bayesian approach, our priors (mean vectors and covariance matrices) are then adjusted to the observed data.
@@ -959,7 +985,60 @@ the best linear fit for $B$ given $D$ in terms of minimising the expected square
 functions $E[(B_k-a_k^TD)^2]$ over choices of $a_k$ for each quantity in $B; k = 1,\dots,r$, that
 is, the linear combination of $D$ most informative for $B$. 
 
+# Further issues in emulator structure {#emulstr}
 
+The general structure of a univariate emulator is as follows:
+$$f(x) = g(x)^T \beta + u(x),$$
+where $g(x)^T \beta$ is the mean function and $u(x)$ is a Gaussian process with mean zero. 
+
+In this appendix we briefly discuss some of the choices that can be made in terms of regression functions and of correlation functions.
+
+## Regression structure
+As already seen, the mean of the process is expressed as a linear combination of the regression functions. The simplest possible choice for the regression functions is that of a constant mean: $g(x)=1$ and $\beta$ just a scalar. 
+A sligtly less trivial structure is given by a polynomial regression. When the input space is one dimensional, this corresponds to $g(x)^T=(1,x,x^2,...,x^p)$ for $p$ a natural number. For example if $p=1$, we are trying to fit a hyperplane, if $p=2$ we fit a quadratic surface. The default behaviour of the `emulator_from_data` function in emulatorr is quadratic regression, while by setting `quadratic=FALSE` one can choose linear regression.
+
+## Correlation structure 
+Once the regression functions are chosen, we need to specify the correlation between $u(x)$ and $u(x^\prime)$ for all possible values of $x$ and $x^\prime$. This is a key step, since it will determine how the response $f(x)$ at one parameter set $x$ is affected by the response at any other parameter set $x^\prime$.
+
+A common assumption for the correlation structure is that the variance of $u(x)$ is independent of $x$. If its constant value is denoted by $\sigma^2$, we can then write the correlation of $u(x)$ and $u(x^\prime)$ in the form
+$$\sigma^2  c(x,x^{\prime})$$
+where $c$, which satisfies $c(x,x)=1$, is the correlation function, or kernel. In our tutorial we also introduced a nugget term $\delta I_{\{x=x^\prime\}}$
+that operates on all variables:
+$$(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}.$$
+This term represents the proportion of the overall variance due to the ensemble variability and ensures that the covariance matrix of $u(x)$ is not ill-conditioned, making the computation of its inverse possible. 
+
+The choice of the function $c$ reflects fundamental characteristics of the process $u(x)$, such as stationarity, isotropy and smoothness. For example, $u(x)$ is 
+<span class="abbr" title="A Gaussian process u(x) is stationary if 
+- for any x and x', the mean of u(x) is the same as the mean of u(x'); 
+- the covariance between u(x) and u(x') only depends on the difference x-x'."><abbr title="A Gaussian process u(x) is stationary if 
+- for any x and x', the mean of u(x) is the same as the mean of u(x'); 
+- the covariance between u(x) and u(x') only depends on the difference x-x'.">
+stationary</abbr></span>
+if 
+$c(x,x^{\prime})$ depends only on $x-x^{\prime}$. In this overview we will always assume stationarity, but non-stationary approaches are also possible. 
+
+An example of a stationary kernel is the
+squared-exponential correlation function, used in this tutorial:
+$$c_{SE}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).$$
+This function, also called Gaussian correlation function, has the mathematical advantage of being differentiable infinitely many times. In particular, this implies that observing a small continuous fraction of the input space is sufficient to recover the whole process. Such a strong property is not always suitable, since it might be unrealistic to assume that information from a small portion of the input space allows to infer the behaviour of the process everywhere else. 
+
+In such cases, it might be preferable to use the Matérn correlation functions, a family of parametric stationary kernels. The Matérn kernel of order $\nu$ is defined as
+$$c_\nu(x,x^{\prime}) = \prod\limits_{i}\frac{(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)^\nu K_\nu(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)}{2^{\nu -1}\Gamma(\nu)},$$
+where $K_\nu$ is the modified Bessel function of the second kind and order  $\nu$. Compared to the Gaussian kernel, which is differentiable infinitely many times, $c_\nu$ is 'less smooth', being differentiable only 
+$(\left \lceil{\nu}\right \rceil -1)$ times (here $\left \lceil{\nu}\right \rceil$ denotes the ceiling function). The Matérn kernels can be thought as a generalisation of the Gaussian kernel: when $\nu \rightarrow \infty$, the kernel $c_\nu$ converges to $c_{SE}$. 
+
+When $\nu=1/2$, the kernel $c_{1/2}$ coincides with the so called exponential kernel:
+$$c_{\text{exp}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{|x_{i,A}-x_{i,A}^{\prime}|}{\theta_i}\right).$$
+Note that the sample paths with the exponential kernel are not smooth. 
+
+A third example of stationarity is the rational quadratic kernel, defined by
+$$c_{RQ}(x,x^{\prime}) = \prod\limits_{i}\frac{1}{1+(x_{i,A}-x_{i,A}^{\prime})^2/\theta_i^2} .$$
+This correlation function is differentiable infinitely many times, as the Gaussian kernel.
+
+Another key property of kernels is isotropy. A stationary kernel is said to be isotropic (or homogeneous) when it depends only on the distance of $x$ and $x^\prime$, rather than on the full vector $x-x^\prime$. In other words, an isotropic kernel depends on the length of $x-x^\prime$, but not on its direction.
+All the stationary kernels mentioned above are isotropic if and only if $\theta_i=\theta_j$ for all $i,j$.
+
+We conclude by recalling the role of the hyperparameters $\theta_i$, which are called correlation lengths. As just seen, when  $\theta_i=\theta$ for all $i$, the kernel is isotropic and therefore has rotational symmetry. In this case, the value $\theta$ has the following interpretation: the larger $\theta$ is, the smoother the local variations of the emulators will be. In the non-isotropic case, $\theta_i<\theta_j$ means that we believe the function to be less smooth with respect to parameter $i$ than parameter $j$.
 
 <!--
 # TJ material
