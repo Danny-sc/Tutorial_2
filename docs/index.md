@@ -989,13 +989,13 @@ is, the linear combination of $D$ most informative for $B$.
 
 The general structure of a univariate emulator is as follows:
 $$f(x) = g(x)^T \beta + u(x),$$
-where $g(x)^T \beta$ is the mean function and $u(x)$ is a Gaussian process with mean zero. 
+where $g(x)^T \beta$ is the mean function and $u(x)$ is a [Gaussian process](https://en.wikipedia.org/wiki/Gaussian_process) with mean zero. 
 
 In this appendix we briefly discuss some of the choices that can be made in terms of regression functions and of correlation functions.
 
 ## Regression structure
 As already seen, the mean of the process is expressed as a linear combination of the regression functions. The simplest possible choice for the regression functions is that of a constant mean: $g(x)=1$ and $\beta$ just a scalar. 
-A sligtly less trivial structure is given by a polynomial regression. When the input space is one dimensional, this corresponds to $g(x)^T=(1,x,x^2,...,x^p)$ for $p$ a natural number. For example if $p=1$, we are trying to fit a hyperplane, if $p=2$ we fit a quadratic surface. 
+A less trivial structure is given by a polynomial regression. When the input space is one dimensional, this corresponds to $g(x)^T=(1,x,x^2,...,x^p)$ for $p$ a natural number. For example if $p=1$, we are trying to fit a hyperplane, if $p=2$ we fit a quadratic surface. 
 
 The default behaviour of the `emulator_from_data` function in emulatorr is quadratic, while by setting `quadratic=FALSE` one can choose to fit a hyperplane. Here we highlight the method implemented by the `emulator_from_data` function in its default setting(quadratic surface).
 
@@ -1027,20 +1027,20 @@ $c(x,x^{\prime})$ depends only on $x-x^{\prime}$. In this overview we will alway
 
 An example of a stationary kernel is the
 squared-exponential correlation function, used in this tutorial:
-$$c_{SE}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).$$
+$$c_{\text{SE}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).$$
 This function, also called Gaussian correlation function, has the mathematical advantage of being differentiable infinitely many times. In particular, this implies that observing a small continuous fraction of the input space is sufficient to recover the whole process. Such a strong property is not always suitable, since it might be unrealistic to assume that information from a small portion of the input space allows to infer the behaviour of the process everywhere else. 
 
 In such cases, it might be preferable to use the Matérn correlation functions, a family of parametric stationary kernels. The Matérn kernel of order $\nu$ is defined as
 $$c_\nu(x,x^{\prime}) = \prod\limits_{i}\frac{(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)^\nu K_\nu(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)}{2^{\nu -1}\Gamma(\nu)},$$
-where $K_\nu$ is the modified Bessel function of the second kind and order  $\nu$. Compared to the Gaussian kernel, which is differentiable infinitely many times, $c_\nu$ is 'less smooth', being differentiable only 
-$(\left \lceil{\nu}\right \rceil -1)$ times (here $\left \lceil{\nu}\right \rceil$ denotes the ceiling function). The Matérn kernels can be thought as a generalisation of the Gaussian kernel: when $\nu \rightarrow \infty$, the kernel $c_\nu$ converges to $c_{SE}$. 
+where $K_\nu$ is the [modified Bessel function](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1) of the second kind and order  $\nu$. Compared to the Gaussian kernel, which is differentiable infinitely many times, $c_\nu$ is 'less smooth', being differentiable only 
+$(\left \lceil{\nu}\right \rceil -1)$ times (here $\left \lceil{\nu}\right \rceil$ denotes the ceiling function). The Matérn kernels can be thought as a generalisation of the Gaussian kernel: when $\nu \rightarrow \infty$, the kernel $c_\nu$ converges to $c_{\text{SE}}$. 
 
 When $\nu=1/2$, the kernel $c_{1/2}$ coincides with the so called exponential kernel:
 $$c_{\text{exp}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{|x_{i,A}-x_{i,A}^{\prime}|}{\theta_i}\right).$$
 Note that the sample paths with the exponential kernel are not smooth. 
 
 A third example of stationarity is the rational quadratic kernel, defined by
-$$c_{RQ}(x,x^{\prime}) = \prod\limits_{i}\frac{1}{1+(x_{i,A}-x_{i,A}^{\prime})^2/\theta_i^2} .$$
+$$c_{\text{RQ}}(x,x^{\prime}) = \prod\limits_{i}\frac{1}{1+(x_{i,A}-x_{i,A}^{\prime})^2/\theta_i^2} .$$
 This correlation function is differentiable infinitely many times, as the Gaussian kernel.
 
 Another key property of kernels is isotropy. A stationary kernel is said to be isotropic (or homogeneous) when it depends only on the distance of $x$ and $x^\prime$, rather than on the full vector $x-x^\prime$. In other words, an isotropic kernel depends on the length of $x-x^\prime$, but not on its direction.
