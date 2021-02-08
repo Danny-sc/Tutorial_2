@@ -1,0 +1,358 @@
+## ----setup, include = FALSE--------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 12,
+  fig.height = 8,
+  cache = TRUE
+)
+set.seed(123)
+## getOutputs takes a set of parameter sets 'points' and a set of times 'times' and runs the model (specified below) at each parameter set. It then creates a data.frame with a row for each element in 'points' and where columns contain the number of infectious people and the ensemble variability at each time in 'times'. 
+getOutputs <- function(points, times, ev = TRUE) {
+  out_df <- data.frame()
+  for (i in 1:length(points[,1])) {
+    model <- mparse(compartments = compartments, transitions = transitions, u0 = u0, tspan = 1:max(times), gdata = points[i,])
+    res <- run(model)
+    traj <- trajectory(res)
+    trajI <- tidyr::spread(traj[,c('node','time','I')], node, I)
+    Iattimes <- trajI[seq_along(trajI[,1])%in%times,]
+    aggs <- data.frame(cbind(Iattimes$time, apply(Iattimes[,-1], 1, mean), apply(Iattimes[,-1], 1, function(x) sd(x)/sqrt(nreps)+0.03*(max(x)-min(x))))) %>% setNames(c('time', 'mu', 'sd'))
+    if (ev)
+      shaped <- c(aggs$mu, aggs$sd) %>% setNames(c(paste0('I', aggs$time, sep = ""), paste0('EV', aggs$time, sep = "")))
+    else
+      shaped <- c(aggs$mu) %>% setNames(paste0('I', aggs$time, sep = ""))
+    if (i == 1) {
+      out_df <- t(data.frame(shaped))
+      rownames(out_df) <- NULL
+    }
+    else
+      out_df <- rbind(out_df, shaped)
+  }
+  rownames(out_df) <- NULL
+  return(out_df)
+}
+
+
+## ----echo = FALSE, message = FALSE-------------------------------------
+library(emulatorr)
+library(purrr)
+library(SimInf)
+library(lhs)
+library(knitr)
+
+
+## ---- echo = FALSE, fig.cap='SEIRS Diagram'----------------------------
+knitr::include_graphics('SEIRSdiagram.png')
+
+
+## ---- echo= -c(1,2,3)--------------------------------------------------
+## Defines the compartments, the transitions between them, 
+## the number of repetitions per parameter set and the initial value of each compartment.
+
+compartments <- c("S","E","I","R")
+transitions <- c(
+  "S -> beta*I*S/(S+I+E+R) -> E",
+  "E -> gamma*E -> I",
+  "I -> delta*I -> R",
+  "R -> mu*R -> S"
+)
+nreps <- 50
+u0 <- data.frame(
+  S = rep(950, nreps),
+  E = rep(0, nreps),
+  I = rep(50, nreps),
+  R = rep(0, nreps)
+)
+
+
+## ---- echo=-c(1,5)-----------------------------------------------------
+## Selects parameter values, parses the model through the function mparse and runs it. 
+params <- c(beta = 0.5, gamma = 0.5, delta = 0.1, mu = 0.1)
+model <- mparse(transitions = transitions, compartments = compartments,
+                u0 = u0, gdata = params, tspan = 1:60)
+result = run(model)
+## Plots the trajectories of exposed, infectious and recovered people.
+plot(result, compartments = c("E","I","R"), col=c("#07AF3F", "#FAAE48","#48E2FA"))
+
+
+## ----------------------------------------------------------------------
+points <- expand.grid(list(beta = c(0.4, 0.6),
+                           gamma = c(0.4, 0.6),
+                           delta = c(0.05, 0.15),
+                           mu = c(0.05, 0.15)
+))
+results <- getOutputs(points, seq(10,30,by=5))
+outputs <- data.frame(cbind(points, results))
+head(outputs)
+
+
+## ----------------------------------------------------------------------
+ranges <- list(
+  beta = c(0.2, 0.8),
+  gamma = c(0.2, 1),
+  delta = c(0.1, 0.5),
+  mu = c(0.1, 0.5)
+)
+pts <- 2*(maximinLHS(80, 4)-1/2)
+r_centers <- map_dbl(ranges, ~(.[2]+.[1])/2)
+r_scales <- map_dbl(ranges, ~(.[2]-.[1])/2)
+pts <- data.frame(t(apply(pts, 1, function(x) x*r_scales + r_centers)))
+head(pts)
+
+
+## ----------------------------------------------------------------------
+wave0 <- data.frame(cbind(pts,getOutputs(pts, seq(10,30,by=5)))) %>% 
+  setNames(c(names(ranges), paste0("I",seq(10,30,by=5)),paste0('EV',seq(10,30,by=5))))
+head(wave0)
+
+
+## ----------------------------------------------------------------------
+samples <- sample(nrow(wave0), 40)
+train0 <- wave0[samples,1:9]
+valid0 <- wave0[!seq_along(wave0[,1])%in%samples,1:9]
+
+
+## ----------------------------------------------------------------------
+output_names <- paste0("I", seq(10,30, by=5))
+
+
+## ----------------------------------------------------------------------
+targets = list(
+  I10 = list(val = 240, sigma = 25.27),
+  I15 = list(val = 396, sigma = 40.99),
+  I20 = list(val = 453, sigma = 46.48),
+  I25 = list(val = 428, sigma = 43.98),
+  I30 = list(val = 392, sigma = 40.30)
+)
+
+
+## As our dataset is synthetic, we couldn't rely on observed data to define our targets. Instead, we ran the model from a chosen parameter set, with a large number of repetitions. The means from the various runs provided the mean values, while  the standard deviations, estimating the ensemble variability, provided the sigmas. Note that here we factor in neither model discrepancy nor observation uncertainty when defining the sigmas. These two sources of uncertainty need to be included when dealing with empirical data.
+
+
+## ----------------------------------------------------------------------
+test_full_wave <- full_wave(train0, valid0, ranges, output_names, targets, 120, sample_method = 'importance')
+
+
+## ----------------------------------------------------------------------
+wave_points(list(wave0, test_full_wave$next_sample), names(ranges))
+
+
+## ----------------------------------------------------------------------
+ems0 <- emulator_from_data(train0, output_names, ranges, quadratic=TRUE)
+
+
+## ----------------------------------------------------------------------
+delts <- apply(wave0[10:ncol(wave0)], 2, mean)/map_dbl(ems0, ~.$u_sigma)
+ems0 <- emulator_from_data(train0, output_names, ranges, quadratic = TRUE, deltas = delts)
+ems0[[1]]
+
+
+## The print statement provides an overview of the emulator specifications and correlation structure, including
+
+## 
+## - Basis Functions (here we have the four parameters beta, gamma, delta, mu and products of them, since we chose quadratic regression),
+
+## 
+## - Active variables,
+
+## 
+## - first and second order specifications for $\beta$ and $u(x)$. Note that  by default `emulator_from_data` assumes that $\text{Var}[\beta]=0$: the regression surface is known and coefficients are fixed. This explains why Beta Variance and Mixed Covariance (which shows the covariance of $\beta$ and $u(x)$) are both zero. One can set beta.var=TRUE in order to consider the beta parameters as random variables.
+
+
+## ----------------------------------------------------------------------
+for (i in 1:length(ems0)) ems0[[i]]$output_name <- output_names[i]
+names(ems0) <- output_names
+emulator_plot(ems0)
+
+
+## ----------------------------------------------------------------------
+emulator_plot(ems0, 'sd')
+
+
+## ----------------------------------------------------------------------
+ems0_adjusted <- map(seq_along(ems0), ~ems0[[.]]$adjust(train0, output_names[[.]]))
+
+
+## ----------------------------------------------------------------------
+names(ems0_adjusted) <- output_names
+emulator_plot(ems0_adjusted)
+emulator_plot(ems0_adjusted, var = 'sd')
+
+
+## ----------------------------------------------------------------------
+em_evals <- ems0_adjusted$I10$get_exp(train0[,names(ranges)])
+all(abs(em_evals - train0$I10) < 10^(-12))
+all(ems0_adjusted$I10$get_cov(train0[,names(ranges)]) < 10^(-12))
+
+
+## ----------------------------------------------------------------------
+emulator_plot(ems0_adjusted[[1]], 'imp', targets = targets[[1]], cb=TRUE)
+
+
+## ----------------------------------------------------------------------
+which_invalid <- validation_diagnostics(ems0_adjusted, valid0, output_names, targets = targets)
+
+
+## ----------------------------------------------------------------------
+which_invalid
+
+
+## ----------------------------------------------------------------------
+vp <- validation_pairs(ems0_adjusted, valid0, targets)
+
+
+## Where we are emulating multiple outputs, emulator functions make a call to `nth_implausible` with default $n=1$. This can be modified in any function call that uses it. For instance, the above diagnostic plot will consider minimum implausibility in its upper plots if we set $n$ to be the number of emulators:
+
+## 
+## ``{r}
+
+## vp2 <- validation_pairs(ems0_adjusted, valid0, targets, n=length(ems0))
+
+## ``
+
+## 
+
+## ----------------------------------------------------------------------
+sp1 <- space_removed(ems0_adjusted, valid0, targets)
+
+
+## We can also consider what would happen if we were to modify the emulator variances or the
+
+## <span class="abbr" title="The correlation lengths are hyperparameters that appear in the structure of the emulators. They determine how close two parameter sets must be in order for the corresponding residual values to be highly correlated. Large values for the correlation lenghts are chosen if we believe the model to be a smooth function of the parameters."><abbr title="The correlation lengths are hyperparameters that appear in the structure of the emulators. They determine how close two parameter sets must be in order for the corresponding residual values to be highly correlated. Large values for the correlation lenghts are chosen if we believe the model to be a smooth function of the parameters.">
+
+## correlation lengths</abbr></span>. To do this we set `modified ='var'` or `modified='corr'`. This evaluates over a fairly large set of parameter sets and has to retrain multiple sets of emulators, so does take a while to run. For the purposes of speed, here, we set `n_points` to $5$: this creates a set of $5^d$ parameter sets to evaluate over, where $d$ is the dimension of the input space. As before, the default behaviour considers steps of $10\%$ around $100\%$. Here we set the `u_mod` argument in the function call to choose different steps for the variance.
+
+## 
+## ``{r}
+
+## sp2 <- space_removed(ems0_adjusted, valid0, targets, u_mod = c(0.75, 1, 1.25), modified = 'var', n_points = 5)
+
+## sp3 <- space_removed(ems0_adjusted, valid0, targets, modified = 'corr', n_points = 5)
+
+## ``
+
+## 
+## We can see that changing the correlation lengths has a minimal impact on the resultant space reduction: this should not be surprising in this case, as the linear part of the emulators (i.e. the $g(x)\beta$ term) is sufficient to capture much of the dynamics of the system:
+
+## 
+## ``{r}
+
+## map_dbl(ems0, ~summary(.$model)$adj.r.squared)
+
+## ``
+
+## 
+## The adjusted $R^2$ of the linear models are all high, so the correlation structure is having to do very little 'work' for the emulators to match the training data. If we instead had a model where the linear part cannot accurately represent the model output surface, the choice of correlation lengths would be a much more important choice, and the final plot above would be a much stronger indicator of suitability.
+
+
+## ----------------------------------------------------------------------
+new_points <- generate_new_runs(ems0_adjusted, ranges, n_points = 120, z = targets)
+plot(new_points, pch = 16, cex = 0.5)
+
+
+## ----------------------------------------------------------------------
+wave_points(list(wave0, new_points), in_names = names(ranges))
+
+
+## ----------------------------------------------------------------------
+next_wave <- getOutputs(new_points, seq(10,30,by=5))
+
+
+## ----------------------------------------------------------------------
+wave1 <- data.frame(cbind(new_points,next_wave))%>%   
+  setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
+all_points <- list(wave0[1:9], wave1[1:9])
+simulator_plot(all_points, targets)
+
+
+## ----------------------------------------------------------------------
+sampling <- sample(nrow(wave1), 40)
+train1 <- wave1[sampling,1:9]
+valid1 <- wave1[!seq_along(wave1[,1])%in%sampling,1:9]
+new_ranges <- map(names(ranges), ~c(min(wave1[,.]), max(wave1[,.]))) %>% setNames(names(ranges))
+ems1 <- emulator_from_data(train1, output_names, new_ranges, quadratic = T)
+deltas <- apply(wave1[,10:14], 2, mean)/map_dbl(ems1, ~.$u_sigma)
+ems1 <- emulator_from_data(train1, output_names, new_ranges, deltas = deltas, quadratic = TRUE)
+for (i in 1:length(ems1)) ems1[[i]]$output_name <- output_names[i]
+ems1_adjusted <- map(seq_along(ems1), ~ems1[[.]]$adjust(train1, output_names[[.]]))
+names(ems1_adjusted) <- output_names
+
+
+## ----------------------------------------------------------------------
+all_waves <- c(ems0_adjusted, ems1_adjusted)
+all_targets <- c(targets, targets)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets)
+
+
+## ----------------------------------------------------------------------
+new_new_points <- generate_new_runs(all_waves, ranges, n_points = 120, z = all_targets)
+plot(new_new_points, pch = 16, cex = 0.5)
+
+
+## ----------------------------------------------------------------------
+wave_points(list(wave1, new_new_points), in_names = names(ranges))
+
+
+## ----------------------------------------------------------------------
+next_next_wave <- getOutputs(new_new_points, seq(10,30,by=5))
+wave2 <- data.frame(cbind(new_new_points,next_next_wave))%>%   
+  setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
+
+
+## ----------------------------------------------------------------------
+all_points <- list(wave0[1:9], wave1[1:9], wave2[1:9])
+simulator_plot(all_points, targets)
+
+
+## ----------------------------------------------------------------------
+sampling <- sample(nrow(wave2), 40)
+train2 <- wave2[sampling,1:9]
+valid2 <- wave2[!seq_along(wave2[,1])%in%sampling,1:9]
+new_new_ranges <- map(names(ranges), ~c(min(wave2[,.]), max(wave2[,.]))) %>% setNames(names(ranges))
+ems2 <- emulator_from_data(train2, output_names, new_new_ranges, quadratic = T)
+deltas <- apply(wave2[,10:14], 2, mean)/map_dbl(ems2, ~.$u_sigma)
+ems2 <- emulator_from_data(train2, output_names, new_new_ranges, deltas = deltas, quadratic = TRUE)
+for (i in 1:length(ems2)) ems2[[i]]$output_name <- output_names[i]
+ems2_adjusted <- map(seq_along(ems2), ~ems2[[.]]$adjust(train2, output_names[[.]]))
+names(ems2_adjusted) <- output_names
+
+
+## ----------------------------------------------------------------------
+all_waves <- c(ems0_adjusted, ems1_adjusted, ems2_adjusted)
+all_targets <- c(targets, targets, targets)
+emulator_plot(all_waves, var = 'maximp', targets = all_targets)
+
+
+## ----------------------------------------------------------------------
+new_new_new_points <- generate_new_runs(all_waves, ranges, n_points = 120, z = all_targets)
+plot(new_new_new_points, pch = 16, cex = 0.5)
+
+
+## ----------------------------------------------------------------------
+next_next_next_wave <- getOutputs(new_new_new_points, seq(10,30,by=5))
+wave3 <- data.frame(cbind(new_new_new_points,next_next_next_wave))%>%   
+  setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
+
+
+## ----------------------------------------------------------------------
+all_points <- list(wave2[1:9], wave3[1:9])
+simulator_plot(all_points, targets)
+
+
+## ----------------------------------------------------------------------
+targets$I10$sigma
+targets$I15$sigma
+targets$I20$sigma
+targets$I25$sigma
+targets$I30$sigma
+sigmas0 <- map_dbl(ems0, ~.$u_sigma)
+sigmas0
+sigmas2 <- map_dbl(ems2, ~.$u_sigma)
+sigmas2
+
+
+
+
+## ---- include = F------------------------------------------------------
+library(tidyverse)
+
