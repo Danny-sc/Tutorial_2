@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>6 Point Generation | Case Study -1: An introduction to the Emulatorr package</title>
+  <title>6 Constructing the next wave of the history match: point generation | Tutorial 2: An introduction to the main functionalities of the Emulatorr package</title>
   <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:title" content="6 Constructing the next wave of the history match: point generation | Tutorial 2: An introduction to the main functionalities of the Emulatorr package" />
   <meta property="og:type" content="book" />
   
   
@@ -16,12 +16,12 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="6 Point Generation | Case Study -1: An introduction to the Emulatorr package" />
+  <meta name="twitter:title" content="6 Constructing the next wave of the history match: point generation | Tutorial 2: An introduction to the main functionalities of the Emulatorr package" />
   
   <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
   
 
-<meta name="author" content="Danny Scarponi" />
+<meta name="author" content="Andy Iskauskas, Danny Scarponi" />
 
 
 
@@ -30,7 +30,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="diagn.html"/>
+<link rel="prev" href="diagnostics.html"/>
 <link rel="next" href="further-waves.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,6 +49,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script language="javascript"> 
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
@@ -91,9 +92,9 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 pre.sourceCode { margin: 0; }
@@ -102,14 +103,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -118,9 +121,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  { background-color: #f8f8f8; }
+  {  background-color: #f8f8f8; }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ef2929; } /* Alert */
 code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
@@ -165,33 +168,30 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
-<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#history-matching-and-emulation-in-a-nutshell"><i class="fa fa-check"></i><b>1.3</b> History matching and emulation in a nutshell</a></li>
-<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.4</b> A simple example of history matching and emulation</a></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
-<li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
-<li class="chapter" data-level="4" data-path="buildemul.html"><a href="buildemul.html"><i class="fa fa-check"></i><b>4</b> Constructing the emulators</a><ul>
-<li class="chapter" data-level="4.1" data-path="buildemul.html"><a href="buildemul.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>4.1</b> Background: the structure of an emulator</a></li>
-<li class="chapter" data-level="4.2" data-path="buildemul.html"><a href="buildemul.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>4.2</b> Constructing the emulators step by step</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="buildemul.html"><a href="buildemul.html#step-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 1</a></li>
-<li class="chapter" data-level="4.2.2" data-path="buildemul.html"><a href="buildemul.html#step-2"><i class="fa fa-check"></i><b>4.2.2</b> Step 2</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction to the model</a></li>
+<li class="chapter" data-level="2" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>2</b> Perfoming a full wave of emulation and history matching</a></li>
+<li class="chapter" data-level="3" data-path="buildemul.html"><a href="buildemul.html"><i class="fa fa-check"></i><b>3</b> Constructing the emulators</a><ul>
+<li class="chapter" data-level="3.1" data-path="buildemul.html"><a href="buildemul.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>3.1</b> Background: the structure of an emulator</a></li>
+<li class="chapter" data-level="3.2" data-path="buildemul.html"><a href="buildemul.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>3.2</b> Constructing the emulators step by step</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="buildemul.html"><a href="buildemul.html#step-1"><i class="fa fa-check"></i><b>3.2.1</b> Step 1</a></li>
+<li class="chapter" data-level="3.2.2" data-path="buildemul.html"><a href="buildemul.html#step-2"><i class="fa fa-check"></i><b>3.2.2</b> Step 2</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="diagn.html"><a href="diagn.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
-<li class="chapter" data-level="5.1" data-path="diagn.html"><a href="diagn.html#background-the-implausibility-measure"><i class="fa fa-check"></i><b>5.1</b> Background: the implausibility measure</a></li>
-<li class="chapter" data-level="5.2" data-path="diagn.html"><a href="diagn.html#implausibility-visualisations"><i class="fa fa-check"></i><b>5.2</b> Implausibility visualisations</a></li>
-<li class="chapter" data-level="5.3" data-path="diagn.html"><a href="diagn.html#three-emulator-diagnostics"><i class="fa fa-check"></i><b>5.3</b> Three emulator diagnostics</a></li>
-<li class="chapter" data-level="5.4" data-path="diagn.html"><a href="diagn.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.4</b> Parameter sets failing diagnostics</a><ul>
-<li class="chapter" data-level="5.4.1" data-path="diagn.html"><a href="diagn.html#visualisation"><i class="fa fa-check"></i><b>5.4.1</b> Visualisation</a></li>
-<li class="chapter" data-level="5.4.2" data-path="diagn.html"><a href="diagn.html#space-removed-function"><i class="fa fa-check"></i><b>5.4.2</b> Space removed function</a></li>
+<li class="chapter" data-level="4" data-path="implau.html"><a href="implau.html"><i class="fa fa-check"></i><b>4</b> History matching using implausibility</a><ul>
+<li class="chapter" data-level="4.1" data-path="implau.html"><a href="implau.html#the-implausibility-measure"><i class="fa fa-check"></i><b>4.1</b> The implausibility measure</a></li>
+<li class="chapter" data-level="4.2" data-path="implau.html"><a href="implau.html#combining-outputs-together"><i class="fa fa-check"></i><b>4.2</b> Combining outputs together</a></li>
+<li class="chapter" data-level="4.3" data-path="implau.html"><a href="implau.html#implausibility-visualisations"><i class="fa fa-check"></i><b>4.3</b> Implausibility visualisations</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="diagnostics.html"><a href="diagnostics.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
+<li class="chapter" data-level="5.1" data-path="diagnostics.html"><a href="diagnostics.html#the-three-main-diagnostics"><i class="fa fa-check"></i><b>5.1</b> The three main diagnostics</a></li>
+<li class="chapter" data-level="5.2" data-path="diagnostics.html"><a href="diagnostics.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.2</b> Parameter sets failing diagnostics</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="diagnostics.html"><a href="diagnostics.html#visualisation"><i class="fa fa-check"></i><b>5.2.1</b> Visualisation</a></li>
+<li class="chapter" data-level="5.2.2" data-path="diagnostics.html"><a href="diagnostics.html#space-removed-function"><i class="fa fa-check"></i><b>5.2.2</b> Space removed function</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="newpoints.html"><a href="newpoints.html"><i class="fa fa-check"></i><b>6</b> Point Generation</a><ul>
+<li class="chapter" data-level="6" data-path="newpoints.html"><a href="newpoints.html"><i class="fa fa-check"></i><b>6</b> Constructing the next wave of the history match: point generation</a><ul>
 <li class="chapter" data-level="6.1" data-path="newpoints.html"><a href="newpoints.html#generating-sets-of-parameters-for-the-next-wave"><i class="fa fa-check"></i><b>6.1</b> Generating sets of parameters for the next wave</a></li>
-<li class="chapter" data-level="6.2" data-path="newpoints.html"><a href="newpoints.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
+<li class="chapter" data-level="6.2" data-path="newpoints.html"><a href="newpoints.html#comparing-new-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing new and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
 <li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
@@ -200,14 +200,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-2"><i class="fa fa-check"></i><b>7.2</b> Next wave: wave 2</a><ul>
 <li class="chapter" data-level="7.2.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-2-emulators"><i class="fa fa-check"></i><b>7.2.1</b> Training wave 2 emulators</a></li>
-<li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#stoprule"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
+<li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-3"><i class="fa fa-check"></i><b>7.3</b> Next wave: wave 3</a><ul>
+<li class="chapter" data-level="7.3.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-3-emulators"><i class="fa fa-check"></i><b>7.3.1</b> Training wave 3 emulators</a></li>
+<li class="chapter" data-level="7.3.2" data-path="further-waves.html"><a href="further-waves.html#stoprule"><i class="fa fa-check"></i><b>7.3.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="bayes.html"><a href="bayes.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 <li class="chapter" data-level="B" data-path="emulstr.html"><a href="emulstr.html"><i class="fa fa-check"></i><b>B</b> Further issues in emulator structure</a><ul>
-<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a></li>
+<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a><ul>
+<li class="chapter" data-level="B.1.1" data-path="emulstr.html"><a href="emulstr.html#active-variables-identification-and-benefits"><i class="fa fa-check"></i><b>B.1.1</b> Active variables identification and benefits</a></li>
+<li class="chapter" data-level="B.1.2" data-path="emulstr.html"><a href="emulstr.html#building-the-model"><i class="fa fa-check"></i><b>B.1.2</b> Building the model</a></li>
+</ul></li>
 <li class="chapter" data-level="B.2" data-path="emulstr.html"><a href="emulstr.html#correlation-structure"><i class="fa fa-check"></i><b>B.2</b> Correlation structure</a></li>
 </ul></li>
 </ul>
@@ -219,7 +226,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Case Study -1: An introduction to the Emulatorr package</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Tutorial 2: An introduction to the main functionalities of the Emulatorr package</a>
           </h1>
         </div>
 
@@ -228,7 +235,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="newpoints" class="section level1">
-<h1><span class="header-section-number">6</span> Point Generation</h1>
+<h1><span class="header-section-number">6</span> Constructing the next wave of the history match: point generation</h1>
 <p>Having generated emulators based on <code>wave0</code> data, evaluated their suitability, and considered a means by which to rule out parameter sets, we can now produce a new set of parameter sets to pass to the model.</p>
 <p>This section is divided in two parts:</p>
 <ol style="list-style-type: decimal">
@@ -244,28 +251,30 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li>Using these as seeding points, more parameter sets are generated using <a href="https://en.wikipedia.org/wiki/Importance_sampling">importance sampling</a> to attempt to fully cover the non-implausible region.</li>
 </ul>
 <p>All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="co">#&gt; [1] &quot;Performing Latin hypercube sampling with rejection...&quot;</span></a>
-<a class="sourceLine" id="cb27-3" title="3"><span class="co">#&gt; [1] &quot;Performing line sampling...&quot;</span></a>
-<a class="sourceLine" id="cb27-4" title="4"><span class="co">#&gt; [1] &quot;Performing importance sampling...&quot;</span></a>
-<a class="sourceLine" id="cb27-5" title="5"><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="newpoints.html#cb30-1"></a>new_points &lt;-<span class="st"> </span><span class="kw">generate_new_runs</span>(ems0_adjusted, ranges, <span class="dt">n_points =</span> <span class="dv">120</span>, <span class="dt">z =</span> targets)</span>
+<span id="cb30-2"><a href="newpoints.html#cb30-2"></a><span class="co">#&gt; [1] &quot;Performing LH sampling with rejection...&quot;</span></span>
+<span id="cb30-3"><a href="newpoints.html#cb30-3"></a><span class="co">#&gt; Only 119 points generated.</span></span>
+<span id="cb30-4"><a href="newpoints.html#cb30-4"></a><span class="co">#&gt; </span></span>
+<span id="cb30-5"><a href="newpoints.html#cb30-5"></a><span class="co">#&gt; [1] &quot;Performing line sampling...&quot;</span></span>
+<span id="cb30-6"><a href="newpoints.html#cb30-6"></a><span class="co">#&gt; [1] &quot;Performing importance sampling...&quot;</span></span>
+<span id="cb30-7"><a href="newpoints.html#cb30-7"></a><span class="kw">plot</span>(new_points, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">cex =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /></p>
 <p>We can start to see the structure of the non-implausible region, here. The <code>wave_points</code> function provides a better indication of the difference between the two sets of wave data.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="newpoints.html#cb31-1"></a><span class="kw">wave_points</span>(<span class="kw">list</span>(wave0, new_points), <span class="dt">in_names =</span> <span class="kw">names</span>(ranges))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /></p>
 <p>Here <code>wave0</code> parameter sets are in yellow and <code>new_points</code> (i.e. new parameter sets) are in purple. The plots in the main diagonal show the distribution of parameter sets in <code>wave0</code> and that of <code>new_points</code>.</p>
 </div>
-<div id="comparing-next-and-old-parameter-sets" class="section level2">
-<h2><span class="header-section-number">6.2</span> Comparing next and old parameter sets</h2>
+<div id="comparing-new-and-old-parameter-sets" class="section level2">
+<h2><span class="header-section-number">6.2</span> Comparing new and old parameter sets</h2>
 <p>Now we can put <code>new_points</code> into the model and obtain the model outputs:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1">next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="newpoints.html#cb32-1"></a>next_wave &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(new_points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</span></code></pre></div>
 <p>Binding together <code>new_points</code> and <code>next_wave</code> we obtain <code>wave1</code>, the full data for the next wave.</p>
 <p>We can see how much better the <code>wave1</code> parameter sets perform compared to the original <code>wave0</code> parameter sets using <code>simulator_plot</code>.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></a>
-<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</a>
-<a class="sourceLine" id="cb30-3" title="3">all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</a>
-<a class="sourceLine" id="cb30-4" title="4"><span class="kw">simulator_plot</span>(all_points, targets)</a></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="newpoints.html#cb33-1"></a>wave1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(new_points,next_wave))<span class="op">%&gt;%</span><span class="st">   </span></span>
+<span id="cb33-2"><a href="newpoints.html#cb33-2"></a><span class="st">  </span><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges),<span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),   <span class="kw">paste0</span>(<span class="st">&quot;EV&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</span>
+<span id="cb33-3"><a href="newpoints.html#cb33-3"></a>all_points &lt;-<span class="st"> </span><span class="kw">list</span>(wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>], wave1[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>])</span>
+<span id="cb33-4"><a href="newpoints.html#cb33-4"></a><span class="kw">simulator_plot</span>(all_points, targets)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /></p>
 <p>We can see that, compared to the space-filling random parameter sets used to train the first emulators, the new parameter sets are in much closer agreement with our targets. Subsequent waves, trained on these new parameter sets, will be more confident in the new non-implausible region and will therefore refine the region in light of the greater certainty.</p>
 </div>
 </div>
@@ -274,7 +283,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="diagn.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="diagnostics.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="further-waves.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
