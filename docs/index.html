@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Case Study -1: An introduction to the Emulatorr package</title>
+  <title>Tutorial 2: An introduction to the main functionalities of the Emulatorr package</title>
   <meta name="description" content="An easy guide to the main functionalities of the Emulatorr package" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Case Study -1: An introduction to the Emulatorr package" />
+  <meta property="og:title" content="Tutorial 2: An introduction to the main functionalities of the Emulatorr package" />
   <meta property="og:type" content="book" />
   
   
@@ -16,12 +16,12 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Case Study -1: An introduction to the Emulatorr package" />
+  <meta name="twitter:title" content="Tutorial 2: An introduction to the main functionalities of the Emulatorr package" />
   
   <meta name="twitter:description" content="An easy guide to the main functionalities of the Emulatorr package" />
   
 
-<meta name="author" content="Danny Scarponi" />
+<meta name="author" content="Andy Iskauskas, Danny Scarponi" />
 
 
 
@@ -31,7 +31,7 @@
   
   
 
-<link rel="next" href="intro.html"/>
+<link rel="next" href="perfoming-a-full-wave-of-emulation-and-history-matching.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -49,6 +49,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script language="javascript"> 
     function toggle(id) {
         var ele = document.getElementById("toggleText" + id);
@@ -91,9 +92,9 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 pre.sourceCode { margin: 0; }
@@ -102,14 +103,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -118,9 +121,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  { background-color: #f8f8f8; }
+  {  background-color: #f8f8f8; }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ef2929; } /* Alert */
 code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
@@ -165,33 +168,30 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#history-matching"><i class="fa fa-check"></i><b>1.1</b> History Matching</a></li>
-<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#emulators"><i class="fa fa-check"></i><b>1.2</b> Emulators</a></li>
-<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#history-matching-and-emulation-in-a-nutshell"><i class="fa fa-check"></i><b>1.3</b> History matching and emulation in a nutshell</a></li>
-<li class="chapter" data-level="1.4" data-path="index.html"><a href="index.html#a-simple-example-of-history-matching-and-emulation"><i class="fa fa-check"></i><b>1.4</b> A simple example of history matching and emulation</a></li>
-</ul></li>
-<li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction to the model</a></li>
-<li class="chapter" data-level="3" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>3</b> Perfoming a full wave of emulation and history matching</a></li>
-<li class="chapter" data-level="4" data-path="buildemul.html"><a href="buildemul.html"><i class="fa fa-check"></i><b>4</b> Constructing the emulators</a><ul>
-<li class="chapter" data-level="4.1" data-path="buildemul.html"><a href="buildemul.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>4.1</b> Background: the structure of an emulator</a></li>
-<li class="chapter" data-level="4.2" data-path="buildemul.html"><a href="buildemul.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>4.2</b> Constructing the emulators step by step</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="buildemul.html"><a href="buildemul.html#step-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 1</a></li>
-<li class="chapter" data-level="4.2.2" data-path="buildemul.html"><a href="buildemul.html#step-2"><i class="fa fa-check"></i><b>4.2.2</b> Step 2</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction to the model</a></li>
+<li class="chapter" data-level="2" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>2</b> Perfoming a full wave of emulation and history matching</a></li>
+<li class="chapter" data-level="3" data-path="buildemul.html"><a href="buildemul.html"><i class="fa fa-check"></i><b>3</b> Constructing the emulators</a><ul>
+<li class="chapter" data-level="3.1" data-path="buildemul.html"><a href="buildemul.html#background-the-structure-of-an-emulator"><i class="fa fa-check"></i><b>3.1</b> Background: the structure of an emulator</a></li>
+<li class="chapter" data-level="3.2" data-path="buildemul.html"><a href="buildemul.html#constructing-the-emulators-step-by-step"><i class="fa fa-check"></i><b>3.2</b> Constructing the emulators step by step</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="buildemul.html"><a href="buildemul.html#step-1"><i class="fa fa-check"></i><b>3.2.1</b> Step 1</a></li>
+<li class="chapter" data-level="3.2.2" data-path="buildemul.html"><a href="buildemul.html#step-2"><i class="fa fa-check"></i><b>3.2.2</b> Step 2</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="diagn.html"><a href="diagn.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
-<li class="chapter" data-level="5.1" data-path="diagn.html"><a href="diagn.html#background-the-implausibility-measure"><i class="fa fa-check"></i><b>5.1</b> Background: the implausibility measure</a></li>
-<li class="chapter" data-level="5.2" data-path="diagn.html"><a href="diagn.html#implausibility-visualisations"><i class="fa fa-check"></i><b>5.2</b> Implausibility visualisations</a></li>
-<li class="chapter" data-level="5.3" data-path="diagn.html"><a href="diagn.html#three-emulator-diagnostics"><i class="fa fa-check"></i><b>5.3</b> Three emulator diagnostics</a></li>
-<li class="chapter" data-level="5.4" data-path="diagn.html"><a href="diagn.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.4</b> Parameter sets failing diagnostics</a><ul>
-<li class="chapter" data-level="5.4.1" data-path="diagn.html"><a href="diagn.html#visualisation"><i class="fa fa-check"></i><b>5.4.1</b> Visualisation</a></li>
-<li class="chapter" data-level="5.4.2" data-path="diagn.html"><a href="diagn.html#space-removed-function"><i class="fa fa-check"></i><b>5.4.2</b> Space removed function</a></li>
+<li class="chapter" data-level="4" data-path="implau.html"><a href="implau.html"><i class="fa fa-check"></i><b>4</b> History matching using implausibility</a><ul>
+<li class="chapter" data-level="4.1" data-path="implau.html"><a href="implau.html#the-implausibility-measure"><i class="fa fa-check"></i><b>4.1</b> The implausibility measure</a></li>
+<li class="chapter" data-level="4.2" data-path="implau.html"><a href="implau.html#combining-outputs-together"><i class="fa fa-check"></i><b>4.2</b> Combining outputs together</a></li>
+<li class="chapter" data-level="4.3" data-path="implau.html"><a href="implau.html#implausibility-visualisations"><i class="fa fa-check"></i><b>4.3</b> Implausibility visualisations</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="diagnostics.html"><a href="diagnostics.html"><i class="fa fa-check"></i><b>5</b> Emulator diagnostics</a><ul>
+<li class="chapter" data-level="5.1" data-path="diagnostics.html"><a href="diagnostics.html#the-three-main-diagnostics"><i class="fa fa-check"></i><b>5.1</b> The three main diagnostics</a></li>
+<li class="chapter" data-level="5.2" data-path="diagnostics.html"><a href="diagnostics.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>5.2</b> Parameter sets failing diagnostics</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="diagnostics.html"><a href="diagnostics.html#visualisation"><i class="fa fa-check"></i><b>5.2.1</b> Visualisation</a></li>
+<li class="chapter" data-level="5.2.2" data-path="diagnostics.html"><a href="diagnostics.html#space-removed-function"><i class="fa fa-check"></i><b>5.2.2</b> Space removed function</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="newpoints.html"><a href="newpoints.html"><i class="fa fa-check"></i><b>6</b> Point Generation</a><ul>
+<li class="chapter" data-level="6" data-path="newpoints.html"><a href="newpoints.html"><i class="fa fa-check"></i><b>6</b> Constructing the next wave of the history match: point generation</a><ul>
 <li class="chapter" data-level="6.1" data-path="newpoints.html"><a href="newpoints.html#generating-sets-of-parameters-for-the-next-wave"><i class="fa fa-check"></i><b>6.1</b> Generating sets of parameters for the next wave</a></li>
-<li class="chapter" data-level="6.2" data-path="newpoints.html"><a href="newpoints.html#comparing-next-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing next and old parameter sets</a></li>
+<li class="chapter" data-level="6.2" data-path="newpoints.html"><a href="newpoints.html#comparing-new-and-old-parameter-sets"><i class="fa fa-check"></i><b>6.2</b> Comparing new and old parameter sets</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>7</b> Further waves</a><ul>
 <li class="chapter" data-level="7.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>7.1</b> Next wave: wave 1</a><ul>
@@ -200,14 +200,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-2"><i class="fa fa-check"></i><b>7.2</b> Next wave: wave 2</a><ul>
 <li class="chapter" data-level="7.2.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-2-emulators"><i class="fa fa-check"></i><b>7.2.1</b> Training wave 2 emulators</a></li>
-<li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#stoprule"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
+<li class="chapter" data-level="7.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>7.2.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-3"><i class="fa fa-check"></i><b>7.3</b> Next wave: wave 3</a><ul>
+<li class="chapter" data-level="7.3.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-3-emulators"><i class="fa fa-check"></i><b>7.3.1</b> Training wave 3 emulators</a></li>
+<li class="chapter" data-level="7.3.2" data-path="further-waves.html"><a href="further-waves.html#stoprule"><i class="fa fa-check"></i><b>7.3.2</b> Evaluating implausibility across all waves</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>8</b> Glossary</a></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="bayes.html"><a href="bayes.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
 <li class="chapter" data-level="B" data-path="emulstr.html"><a href="emulstr.html"><i class="fa fa-check"></i><b>B</b> Further issues in emulator structure</a><ul>
-<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a></li>
+<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a><ul>
+<li class="chapter" data-level="B.1.1" data-path="emulstr.html"><a href="emulstr.html#active-variables-identification-and-benefits"><i class="fa fa-check"></i><b>B.1.1</b> Active variables identification and benefits</a></li>
+<li class="chapter" data-level="B.1.2" data-path="emulstr.html"><a href="emulstr.html#building-the-model"><i class="fa fa-check"></i><b>B.1.2</b> Building the model</a></li>
+</ul></li>
 <li class="chapter" data-level="B.2" data-path="emulstr.html"><a href="emulstr.html#correlation-structure"><i class="fa fa-check"></i><b>B.2</b> Correlation structure</a></li>
 </ul></li>
 </ul>
@@ -219,7 +226,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Case Study -1: An introduction to the Emulatorr package</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Tutorial 2: An introduction to the main functionalities of the Emulatorr package</a>
           </h1>
         </div>
 
@@ -228,93 +235,158 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="header">
-<h1 class="title">Case Study -1: An introduction to the Emulatorr package</h1>
-<p class="author"><em>Danny Scarponi</em></p>
+<h1 class="title">Tutorial 2: An introduction to the main functionalities of the Emulatorr package</h1>
+<p class="author"><em>Andy Iskauskas, Danny Scarponi</em></p>
 </div>
-<div id="introduction" class="section level1">
-<h1><span class="header-section-number">1</span> Introduction</h1>
-<p>This tutorial is an introduction to the main functionality of the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package, using a synthetic example of an epidemiological model. We start by briefly highlighting what history matching with emulation is and how it works.</p>
-<p>Computer models, otherwise known as simulators, have been widely used in almost all fields in science and technology.
-A computer model is a way of representing the fundamental dynamics of a system. Due to the complexity of the interactions within a system, computer models frequently contain large numbers of parameters.</p>
-<p>Before using a model (e.g. for prediction or planning) it is fundamental to explore plausible values for its parameters, calibrating the model to the observed data. This poses a significant problem, considering that it may take several minutes or even hours for the evaluation of a single scenario of a complex model. This difficulty is compounded for stochastic models, when tens to thousands of realisations can be required for each scenario. As a consequence, comprehensive analysis of the entire input space, requiring vast numbers of model evaluations, is often unfeasible. Emulation, combined with history matching, allows us to overcome this issue.</p>
-<div id="history-matching" class="section level2">
-<h2><span class="header-section-number">1.1</span> History Matching</h2>
-<p>History matching concerns the problem of identifying those parameter sets that would give rise to acceptable matches between the model outputs and the observed data. This part of the input space is referred to as non-implausible, while its complement is known as implausible. History matching proceeds as a series of iterations, or waves, where implausible parameter sets are identified and discarded. Each wave focuses the search for implausible space in the space that was characterized as non-implausible in all previous waves: thus the non-implausible space shrinks with each iteration. To decide whether a parameter set <span class="math inline">\(x\)</span> is implausible we introduce the implausibility measure, which evaluates the difference between the emulator and computer model results, weighted by how uncertain we are at <span class="math inline">\(x\)</span>. If such measure is too high, the parameter set is discarded in the next wave of the process.</p>
-<p>Note that history matching as just described still relies on the evaluation of the model at a large number of parameter sets, which is often unfeasible. Here is where emulators play a crucial role.</p>
-</div>
-<div id="emulators" class="section level2">
-<h2><span class="header-section-number">1.2</span> Emulators</h2>
-<p>A long established method for handling computationally expensive models is to first construct an emulator: a fast statistical approximation of the model that can be used as a surrogate. In other words, we can think of an emulator as a way of representing our
-<span class="abbr" title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials."><abbr title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. Note that this approach differs from the frequentist interpretation, that defines the probability of an event as the limit of its relative frequence in many trials.">beliefs</abbr></span> about the behaviour of a complex model.</p>
-<p>First of all the model is run at a manageable number of parameter sets, to provide training data to build the emulator. Then prior beliefs about the structure of the emulator are set to reflect our prior knowledge. Once this is done, the training data can be exploited to adjust our prior beliefs and obtain a more accurate representation of the model. The trained emulator will then provide an expected value of the model output at any parameter set <span class="math inline">\(x\)</span>, along with a corresponding uncertainty estimate reflecting our beliefs about the uncertainty in the approximation.</p>
-<p>Emulators have two advantages. First, they are computationally efficient - typically orders of magnitude faster than the computer models they approximate. Second, they allow for the uncertainty in their approximations to be taken into account. These two properties mean that emulators can be used to make inferences as a surrogate for the model itself. In particular, when going through the history matching process, it is possible to evaluate the implausibility measure at any given parameter set by comparing the observed data to the emulator output, rather than the model output. This speeds up the process and allows for a comprehensive exploration of the input space.</p>
-</div>
-<div id="history-matching-and-emulation-in-a-nutshell" class="section level2">
-<h2><span class="header-section-number">1.3</span> History matching and emulation in a nutshell</h2>
-<p>Figure <a href="index.html#fig:fig3">1.1</a> shows a typical history matching workflow.</p>
-<div class="figure" style="text-align: center"><span id="fig:fig3"></span>
-<img src="hmeflowchart.png" alt="History matching and emulation flowchart" width="90%" />
+<div id="intro" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction to the model</h1>
+<p>In this tutorial we present the main functionalities of the <a href="https://github.com/Tandethsquire/emulatorr">emulatorr</a> package, using a synthetic example of an epidemiological model. Although self-contained, this tutorial is the natural continuation of Tutorial 1 (hyperlink), which gives an overview of the history matching with emulation process and shows how it works through a simple one-dimensional example. Readers that are not familiar with history matching and emulation will find Tutorial 1 particularly helpful.</p>
+<p>The model that we chose for demonstration purposes is a stochastic <span class="abbr" title="A model consisting of four compartments 
+
+- $S$: Susceptible individuals,
+- $E$: Exposed individuals (i.e. people that are infected but not infectious yet), 
+- $I$: Infectious individuals,  
+- $R$: Recovered individuals, 
+
+and four possible transitions
+
+- $S \rightarrow E$, when a susceptible individual becomes infected, 
+- $E \rightarrow I$, when an infected individual becomes infectious,
+- $I \rightarrow R$, when an infectious individual recovers,
+- $R \rightarrow S$, when a recovered individual becomes susceptible again.
+
+SEIRS models are used to study those infectious diseases that do not confer permanent immunity."><abbr title="A model consisting of four compartments 
+
+- S: Susceptible individuals,
+- E: Exposed individuals (i.e. people that are infected but not infectious yet), 
+- I: Infectious individuals,  
+- R: Recovered individuals, 
+
+and four possible transitions
+
+- S to E, when a susceptible individual becomes infected, 
+- E to I, when an infected individual becomes infectious,
+- I to R, when an infectious individual recovers,
+- R to S, when a recovered individual becomes susceptible again.
+
+SEIRS models are suitable to study those infectious diseases that have an incubation period and do not confer permanent immunity.">
+SEIRS</abbr></span>
+model, with four parameters: rate of transmission between each infectious person and each susceptible person <span class="math inline">\(\beta_M\)</span>; transition rate from exposed to infectious <span class="math inline">\(\gamma_M\)</span>; recovery rate from infectious to recovered <span class="math inline">\(\delta_M\)</span>; and a ‘loss of immunity’ rate from recovered to susceptible <span class="math inline">\(\mu_M\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-3"></span>
+<img src="SEIRSdiagram.PNG" alt="SEIRS Diagram"  />
 <p class="caption">
-Figure 1.1: History matching and emulation flowchart
+Figure 1.1: SEIRS Diagram
 </p>
 </div>
-<p>The various steps of the process can be summarised as follows.</p>
-<ol style="list-style-type: decimal">
-<li>A number of parameter sets (design points) are selected.</li>
-<li>The model (simulator) is run at the design points.</li>
-<li>Emulators are built using the training data provided by the previous step. Note that here we choose to construct separate emulators, one for the mean of each model output, but other approaches are possible.</li>
-<li>Emulators are evaluated at a large number of parameter sets. The implausibility of each of these is then assessed.</li>
-<li>Parameter sets classified as non-implausible provide the design points for the next wave of the process. From here, we go back to step 2).</li>
-</ol>
-<p>This circular process continues till one of the stopping criteria (see end of section <a href="further-waves.html#stoprule">7.2.2</a>) applies.</p>
-<p>Section <a href="intro.html#intro">2</a> of this tutorial treats step 1 and 2, section <a href="buildemul.html#buildemul">4</a> goes through step 3, section <a href="diagn.html#diagn">5</a> explains step 4 and section <a href="newpoints.html#newpoints">6</a> describes step 5.</p>
-</div>
-<div id="a-simple-example-of-history-matching-and-emulation" class="section level2">
-<h2><span class="header-section-number">1.4</span> A simple example of history matching and emulation</h2>
-<p>To show how history matching and emulation work, we present an example with a one-dimensional emulator.</p>
-<p>The model we consider is the deterministic function
-<span class="math inline">\(f (x)=\sin (0.04\pi x)\)</span>. The value of <span class="math inline">\(f(x)\)</span> is considered unknown at all parameters, apart from <span class="math inline">\(x=\{0,10,20,30,45,50\}\)</span>, where the
-model is run. These six known points are represented by the black dots in the top graph of
-figure <a href="index.html#fig:fig1">1.2</a> and are used to train the emulator. The blue line is the emulator’s posterior mean, and the red
-lines represent its posterior uncertainty. The three horizontal
-lines represent the observed data <span class="math inline">\((z=-0.7)\)</span> and the <span class="math inline">\(95\%\)</span> confidence interval <span class="math inline">\((\pm 0.06)\)</span> that we use to history match the model.</p>
-<div class="figure" style="text-align: center"><span id="fig:fig1"></span>
-<img src="sinwave1.png" alt="First wave of history matching" width="70%" />
+<p>Expressed in terms of differential equations, the transitions are
+<span class="math display">\[\begin{align}
+\frac{dS}{dt} &amp;= -\frac{\beta_M S I}{N} + \mu_M R \\
+\frac{dE}{dt} &amp;= -\gamma_M E + \frac{\beta_M S I}{N} \\
+\frac{dI}{dt} &amp;= -\delta_M I + \gamma_M E \\
+\frac{dR}{dt} &amp;= -\mu_M R + \delta_M I
+\end{align}\]</span>
+where <span class="math inline">\(N\)</span> represents the total population, <span class="math inline">\(N=S+E+I+R\)</span>. For simplicity, we consider a closed population, so that <span class="math inline">\(N\)</span> is constant.</p>
+<p>To generate runs from this model, we use <a href="https://cran.r-project.org/web/packages/SimInf/index.html">SimInf</a>, a package that provides a framework to conduct data-driven epidemiological modelling in realistic large scale disease spread simulations. Note that the emulatorr package is code-agnostic: although we chose SimInf for this case study, the user of emulatorr is completely free to select the package (and programming language) that most suits them to obtain simulations of their computer model. SimInf requires us to define the transitions, the compartments, and the initial population. If
+we want multiple repetitions for each choice of parameters, we create a data.frame with identical rows, each of which has the same initial population. Here we will choose <span class="math inline">\(50\)</span> repetitions per choice of parameters and consider an initial population of <span class="math inline">\(1000\)</span> of whom <span class="math inline">\(50\)</span> are infected. Note that if we were to start
+with one infectious individual, there would a be a significant probability that some runs of the model would not show an epidemic (since it could happen that the only infectious person recovers before infecting other people). Choosing a relatively high number of initial infectious people helps us circumvent any problems that would come from bimodality and keep the tutorial simple. Bimodality will be dealt in the more advanced case studies.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="index.html#cb2-1"></a>compartments &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;R&quot;</span>)</span>
+<span id="cb2-2"><a href="index.html#cb2-2"></a>transitions &lt;-<span class="st"> </span><span class="kw">c</span>(</span>
+<span id="cb2-3"><a href="index.html#cb2-3"></a>  <span class="st">&quot;S -&gt; beta*I*S/(S+I+E+R) -&gt; E&quot;</span>,</span>
+<span id="cb2-4"><a href="index.html#cb2-4"></a>  <span class="st">&quot;E -&gt; gamma*E -&gt; I&quot;</span>,</span>
+<span id="cb2-5"><a href="index.html#cb2-5"></a>  <span class="st">&quot;I -&gt; delta*I -&gt; R&quot;</span>,</span>
+<span id="cb2-6"><a href="index.html#cb2-6"></a>  <span class="st">&quot;R -&gt; mu*R -&gt; S&quot;</span></span>
+<span id="cb2-7"><a href="index.html#cb2-7"></a>)</span>
+<span id="cb2-8"><a href="index.html#cb2-8"></a>nreps &lt;-<span class="st"> </span><span class="dv">50</span></span>
+<span id="cb2-9"><a href="index.html#cb2-9"></a>u0 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb2-10"><a href="index.html#cb2-10"></a>  <span class="dt">S =</span> <span class="kw">rep</span>(<span class="dv">950</span>, nreps),</span>
+<span id="cb2-11"><a href="index.html#cb2-11"></a>  <span class="dt">E =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps),</span>
+<span id="cb2-12"><a href="index.html#cb2-12"></a>  <span class="dt">I =</span> <span class="kw">rep</span>(<span class="dv">50</span>, nreps),</span>
+<span id="cb2-13"><a href="index.html#cb2-13"></a>  <span class="dt">R =</span> <span class="kw">rep</span>(<span class="dv">0</span>, nreps)</span>
+<span id="cb2-14"><a href="index.html#cb2-14"></a>)</span></code></pre></div>
+<p>We select parameter values and parse the model using the function <code>mparse</code>, which takes transitions, compartments, initial values of each compartment, parameter values and the time span to simulate a trajectory. We then run the model and plot the trajectories of interest.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="index.html#cb3-1"></a>params &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">beta =</span> <span class="fl">0.5</span>, <span class="dt">gamma =</span> <span class="fl">0.5</span>, <span class="dt">delta =</span> <span class="fl">0.1</span>, <span class="dt">mu =</span> <span class="fl">0.1</span>)</span>
+<span id="cb3-2"><a href="index.html#cb3-2"></a>model &lt;-<span class="st"> </span><span class="kw">mparse</span>(<span class="dt">transitions =</span> transitions, <span class="dt">compartments =</span> compartments, <span class="dt">u0 =</span> u0, <span class="dt">gdata =</span> params, <span class="dt">tspan =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">60</span>)</span>
+<span id="cb3-3"><a href="index.html#cb3-3"></a>result =<span class="st"> </span><span class="kw">run</span>(model)</span>
+<span id="cb3-4"><a href="index.html#cb3-4"></a><span class="kw">plot</span>(result)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /></p>
+<p>In order to extract the relevant information from the data provided by the SimInf run, a helper function <code>getOutputs</code> has been included in this document. It takes a data.frame of parameter sets and a list of times, and returns a data.frame of the results. We then create a data.frame <code>outputs</code> by binding the parameter values and the results obtained.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="index.html#cb4-1"></a>points &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="kw">list</span>(<span class="dt">beta =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
+<span id="cb4-2"><a href="index.html#cb4-2"></a>                           <span class="dt">gamma =</span> <span class="kw">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
+<span id="cb4-3"><a href="index.html#cb4-3"></a>                           <span class="dt">delta =</span> <span class="kw">c</span>(<span class="fl">0.05</span>, <span class="fl">0.15</span>),</span>
+<span id="cb4-4"><a href="index.html#cb4-4"></a>                           <span class="dt">mu =</span> <span class="kw">c</span>(<span class="fl">0.05</span>, <span class="fl">0.15</span>)</span>
+<span id="cb4-5"><a href="index.html#cb4-5"></a>))</span>
+<span id="cb4-6"><a href="index.html#cb4-6"></a>results &lt;-<span class="st"> </span><span class="kw">getOutputs</span>(points, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))</span>
+<span id="cb4-7"><a href="index.html#cb4-7"></a>outputs &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(points, results))</span>
+<span id="cb4-8"><a href="index.html#cb4-8"></a><span class="kw">head</span>(outputs)</span>
+<span id="cb4-9"><a href="index.html#cb4-9"></a><span class="co">#&gt;   beta gamma delta   mu    I10    I15    I20    I25    I30     EV10     EV15</span></span>
+<span id="cb4-10"><a href="index.html#cb4-10"></a><span class="co">#&gt; 1  0.4   0.4  0.05 0.05 221.50 405.46 543.52 571.92 537.30 5.698469 7.729000</span></span>
+<span id="cb4-11"><a href="index.html#cb4-11"></a><span class="co">#&gt; 2  0.6   0.4  0.05 0.05 365.70 599.28 633.32 574.88 517.78 7.225607 5.610822</span></span>
+<span id="cb4-12"><a href="index.html#cb4-12"></a><span class="co">#&gt; 3  0.4   0.6  0.05 0.05 279.72 490.88 595.46 580.54 534.48 7.260588 8.011528</span></span>
+<span id="cb4-13"><a href="index.html#cb4-13"></a><span class="co">#&gt; 4  0.6   0.6  0.05 0.05 464.84 664.26 634.62 562.00 510.44 8.169654 4.577007</span></span>
+<span id="cb4-14"><a href="index.html#cb4-14"></a><span class="co">#&gt; 5  0.4   0.4  0.15 0.05 108.94 164.18 210.14 225.46 216.06 4.977698 6.598832</span></span>
+<span id="cb4-15"><a href="index.html#cb4-15"></a><span class="co">#&gt; 6  0.6   0.4  0.15 0.05 199.56 302.46 313.72 260.48 209.50 7.484863 7.184362</span></span>
+<span id="cb4-16"><a href="index.html#cb4-16"></a><span class="co">#&gt;       EV20     EV25     EV30</span></span>
+<span id="cb4-17"><a href="index.html#cb4-17"></a><span class="co">#&gt; 1 6.692455 4.506137 4.242956</span></span>
+<span id="cb4-18"><a href="index.html#cb4-18"></a><span class="co">#&gt; 2 4.338955 4.974998 4.811440</span></span>
+<span id="cb4-19"><a href="index.html#cb4-19"></a><span class="co">#&gt; 3 5.154793 4.252850 4.251787</span></span>
+<span id="cb4-20"><a href="index.html#cb4-20"></a><span class="co">#&gt; 4 4.165780 4.501462 4.414445</span></span>
+<span id="cb4-21"><a href="index.html#cb4-21"></a><span class="co">#&gt; 5 6.915291 5.450934 4.659115</span></span>
+<span id="cb4-22"><a href="index.html#cb4-22"></a><span class="co">#&gt; 6 4.866044 4.805986 5.270938</span></span></code></pre></div>
+<p>Each row of <code>outputs</code> corresponds to a parameter set and contains information regarding the number of infectious individuals <span class="math inline">\(I\)</span> for that set. Each row of column <span class="math inline">\(I10\)</span> (resp. <span class="math inline">\(I15, I20, I25, I30\)</span>) contains the mean value of <span class="math inline">\(I\)</span> at time <span class="math inline">\(10\)</span> (resp. <span class="math inline">\(15, 20, 25, 30\)</span>) for the <span class="math inline">\(50\)</span> runs of the relative parameter set. Similarly, columns <span class="math inline">\(EV10, EV15, EV20, EV25, EV30\)</span> provide a measure of the
+<span class="abbr" title="Running a stochastic model at a given set of parameters produces different results each time. We refer to this form of uncertainty as Ensemble Variability"><abbr title="Running a stochastic model at a given set of parameters produces different results each time. We refer to this form of uncertainty as Ensemble Variability.">
+ensemble variability</abbr></span>
+for each parameter set, at each desidered time: this is defined here as the standard deviation of the <span class="math inline">\(50\)</span> runs, plus <span class="math inline">\(3\%\)</span> of the range of the runs. The trained emulators outputs will be estimates of the means, while the ensemble variability will be used to quantify the uncertainty of such estimates.</p>
+<p>Before we tackle the emulation, we need a set of <code>wave0</code> data. For this, we define a set of ranges for the parameters, and generate parameter sets using a <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube</a> design (see fig. <a href="index.html#fig:figlhs">1.2</a> for a Latin hypercube example in two dimensions). We will run the model over <span class="math inline">\(80\)</span> parameter sets; <span class="math inline">\(40\)</span> of these will be used for training while the other <span class="math inline">\(40\)</span> will form the validation set for the emulators.</p>
+<div class="figure" style="text-align: center"><span id="fig:figlhs"></span>
+<img src="LHS.PNG" alt="An example of Latin hypercube in two dimensions: there is only one sample point in each row and each column." width="60%" />
 <p class="caption">
-Figure 1.2: First wave of history matching
+Figure 1.2: An example of Latin hypercube in two dimensions: there is only one sample point in each row and each column.
 </p>
 </div>
-<p>The next step involves choosing an implausibility measure. Such measure weighs the difference between <span class="math inline">\(z\)</span> and
-the value suggested by the emulator at a given point, taking into consideration all the uncertainties that are present in the system.
-The bottom graph of figure <a href="index.html#fig:fig1">1.2</a> shows the implausibility for the emulator and observed
-data. The horizontal green line is an implausibility
-cut-off, which determines whether an input <span class="math inline">\(x\)</span> is implausible or not.
-The implausibility plot shows that a match between the model’s
-output and the observed data is unlikely to be found for values of
-x smaller than 30 and larger than 45.</p>
-<p>With the emulator and the implausibility measure at our
-disposal, we can now sample the non-implausible space to obtain a new set of points that will be used to run the model in the next wave of the history matching process.
-Note that at each wave the emulator is only
-constructed over a smaller region of input space compared to the
-previous wave: this means that there is a higher density of
-model runs in the new reduced input space, which leads
-to improvements in the precision of the emulator.</p>
-<p>Figure <a href="index.html#fig:fig2">1.3</a> shows the second wave of history matching for our simple sin model. The model was run for the
-non-implausible value of <span class="math inline">\(x=36\)</span> and this point was included in the
-training data. Note how the emulator’s posterior variance has
-decreased in the region of interest. Consequently, the non-implausible
-region has shrunk dramatically, indicating that a
-match can only be found for <span class="math inline">\(30.5 &lt;x &lt;32.5\)</span> and <span class="math inline">\(42.5 &lt; x &lt; 44.5,\)</span>
-where indeed the function <span class="math inline">\(f (x)\)</span> takes values between <span class="math inline">\(-0.8\)</span> and
-<span class="math inline">\(-0.63\)</span>. It is worth highlighting the importance of the location of the extra point (here <span class="math inline">\(x=36\)</span>). In general, we choose points that improve the emulators the most. Note that these points are not necessarily the ones giving the best match to the observed data.</p>
-<div class="figure" style="text-align: center"><span id="fig:fig2"></span>
-<img src="sinwave2.png" alt="Second wave of history matching" width="70%" />
-<p class="caption">
-Figure 1.3: Second wave of history matching
-</p>
-</div>
-<p>Based on the level of accuracy required, one can either stop here or perform more iterations of the process.</p>
-</div>
+<p>Through the function <code>maxminLHS</code> we create two hypercube designs with 40 parameter sets each: one to train emulators and one to validate them.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="index.html#cb5-1"></a>ranges &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb5-2"><a href="index.html#cb5-2"></a>  <span class="dt">beta =</span> <span class="kw">c</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>),</span>
+<span id="cb5-3"><a href="index.html#cb5-3"></a>  <span class="dt">gamma =</span> <span class="kw">c</span>(<span class="fl">0.2</span>, <span class="dv">1</span>),</span>
+<span id="cb5-4"><a href="index.html#cb5-4"></a>  <span class="dt">delta =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>),</span>
+<span id="cb5-5"><a href="index.html#cb5-5"></a>  <span class="dt">mu =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>)</span>
+<span id="cb5-6"><a href="index.html#cb5-6"></a>)</span>
+<span id="cb5-7"><a href="index.html#cb5-7"></a>pts_train &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>(<span class="kw">maximinLHS</span>(<span class="dv">40</span>, <span class="dv">4</span>)<span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb5-8"><a href="index.html#cb5-8"></a>pts_valid &lt;-<span class="st"> </span><span class="dv">2</span><span class="op">*</span>(<span class="kw">maximinLHS</span>(<span class="dv">40</span>, <span class="dv">4</span>)<span class="op">-</span><span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb5-9"><a href="index.html#cb5-9"></a>r_centers &lt;-<span class="st"> </span><span class="kw">map_dbl</span>(ranges, <span class="op">~</span>(.[<span class="dv">2</span>]<span class="op">+</span>.[<span class="dv">1</span>])<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb5-10"><a href="index.html#cb5-10"></a>r_scales &lt;-<span class="st"> </span><span class="kw">map_dbl</span>(ranges, <span class="op">~</span>(.[<span class="dv">2</span>]<span class="op">-</span>.[<span class="dv">1</span>])<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb5-11"><a href="index.html#cb5-11"></a>pts_train &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">t</span>(<span class="kw">apply</span>(pts_train, <span class="dv">1</span>, <span class="cf">function</span>(x) x<span class="op">*</span>r_scales <span class="op">+</span><span class="st"> </span>r_centers)))</span>
+<span id="cb5-12"><a href="index.html#cb5-12"></a>pts_valid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">t</span>(<span class="kw">apply</span>(pts_valid, <span class="dv">1</span>, <span class="cf">function</span>(x) x<span class="op">*</span>r_scales <span class="op">+</span><span class="st"> </span>r_centers)))</span>
+<span id="cb5-13"><a href="index.html#cb5-13"></a>pts &lt;-<span class="st"> </span><span class="kw">rbind</span>(pts_train, pts_valid)</span>
+<span id="cb5-14"><a href="index.html#cb5-14"></a><span class="kw">head</span>(pts)</span>
+<span id="cb5-15"><a href="index.html#cb5-15"></a><span class="co">#&gt;        beta     gamma     delta        mu</span></span>
+<span id="cb5-16"><a href="index.html#cb5-16"></a><span class="co">#&gt; 1 0.7253858 0.5757375 0.4098635 0.3173502</span></span>
+<span id="cb5-17"><a href="index.html#cb5-17"></a><span class="co">#&gt; 2 0.4563490 0.4547064 0.3612369 0.2629990</span></span>
+<span id="cb5-18"><a href="index.html#cb5-18"></a><span class="co">#&gt; 3 0.3805118 0.5178988 0.2539448 0.3085176</span></span>
+<span id="cb5-19"><a href="index.html#cb5-19"></a><span class="co">#&gt; 4 0.5078035 0.3498551 0.3527162 0.2034571</span></span>
+<span id="cb5-20"><a href="index.html#cb5-20"></a><span class="co">#&gt; 5 0.4844859 0.6493015 0.3242757 0.3799582</span></span>
+<span id="cb5-21"><a href="index.html#cb5-21"></a><span class="co">#&gt; 6 0.4068807 0.8537545 0.1923016 0.1318259</span></span></code></pre></div>
+<p>Note that the first time we create <code>pts_train</code> (or <code>pts_valid</code>), we get <span class="math inline">\(40\)</span> parameter sets where each parameter value is distributed on <span class="math inline">\([-1,1]\)</span>. This is not exactly what we need, since each parameter has a different range. We therefore define <code>r_centers</code> (resp. <code>r_scales</code>) which contains the midpoint (resp. the size) of the range of each parameter. Using these two pieces of information, we re-center and re-scale <code>pts_train</code> (and <code>pts_valid</code>).</p>
+<p>We obtain the model runs for the parameter sets in <code>pts</code> through the <code>getOutputs</code> function. We bind the parameter sets in <code>pts</code> to the model runs and save everything in the data.frame <code>wave0</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="index.html#cb6-1"></a>wave0 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(pts,<span class="kw">getOutputs</span>(pts, <span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)))) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-2"><a href="index.html#cb6-2"></a><span class="kw">setNames</span>(<span class="kw">c</span>(<span class="kw">names</span>(ranges), <span class="kw">paste0</span>(<span class="st">&quot;I&quot;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>)),<span class="kw">paste0</span>(<span class="st">&#39;EV&#39;</span>,<span class="kw">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>,<span class="dt">by=</span><span class="dv">5</span>))))</span>
+<span id="cb6-3"><a href="index.html#cb6-3"></a><span class="kw">head</span>(wave0)</span>
+<span id="cb6-4"><a href="index.html#cb6-4"></a><span class="co">#&gt;        beta     gamma     delta        mu    I10    I15    I20    I25    I30</span></span>
+<span id="cb6-5"><a href="index.html#cb6-5"></a><span class="co">#&gt; 1 0.7253858 0.5757375 0.4098635 0.3173502  89.92 116.94 136.48 145.22 146.32</span></span>
+<span id="cb6-6"><a href="index.html#cb6-6"></a><span class="co">#&gt; 2 0.4563490 0.4547064 0.3612369 0.2629990  37.42  41.98  47.34  48.88  49.26</span></span>
+<span id="cb6-7"><a href="index.html#cb6-7"></a><span class="co">#&gt; 3 0.3805118 0.5178988 0.2539448 0.3085176  56.02  69.12  82.44  96.48 106.96</span></span>
+<span id="cb6-8"><a href="index.html#cb6-8"></a><span class="co">#&gt; 4 0.5078035 0.3498551 0.3527162 0.2034571  41.38  49.10  58.82  64.18  70.02</span></span>
+<span id="cb6-9"><a href="index.html#cb6-9"></a><span class="co">#&gt; 5 0.4844859 0.6493015 0.3242757 0.3799582  62.40  80.08  93.84 103.78 117.82</span></span>
+<span id="cb6-10"><a href="index.html#cb6-10"></a><span class="co">#&gt; 6 0.4068807 0.8537545 0.1923016 0.1318259 120.92 171.66 206.74 214.72 216.44</span></span>
+<span id="cb6-11"><a href="index.html#cb6-11"></a><span class="co">#&gt;       EV10     EV15     EV20     EV25     EV30</span></span>
+<span id="cb6-12"><a href="index.html#cb6-12"></a><span class="co">#&gt; 1 5.673286 6.317488 5.603514 3.990735 5.043979</span></span>
+<span id="cb6-13"><a href="index.html#cb6-13"></a><span class="co">#&gt; 2 2.954996 3.237577 3.673379 3.731541 3.725365</span></span>
+<span id="cb6-14"><a href="index.html#cb6-14"></a><span class="co">#&gt; 3 3.649543 4.682559 5.332532 5.781993 6.368925</span></span>
+<span id="cb6-15"><a href="index.html#cb6-15"></a><span class="co">#&gt; 4 2.685131 3.152139 4.407604 5.237344 4.687587</span></span>
+<span id="cb6-16"><a href="index.html#cb6-16"></a><span class="co">#&gt; 5 4.272857 4.789298 5.847034 5.572719 5.413788</span></span>
+<span id="cb6-17"><a href="index.html#cb6-17"></a><span class="co">#&gt; 6 5.806106 6.054552 5.866510 4.886092 4.979186</span></span></code></pre></div>
+<p>Finally, we split <code>wave0</code> into two parts: the training set, on which we will train the emulators, and a validation set, which will be used to do diagnostics of the emulators.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="index.html#cb7-1"></a>train0 &lt;-<span class="st"> </span>wave0[<span class="dv">1</span><span class="op">:</span><span class="dv">40</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>]</span>
+<span id="cb7-2"><a href="index.html#cb7-2"></a>valid0 &lt;-<span class="st"> </span>wave0[<span class="dv">41</span><span class="op">:</span><span class="dv">80</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>]</span></code></pre></div>
 </div>
             </section>
 
@@ -322,7 +394,7 @@ Figure 1.3: Second wave of history matching
         </div>
       </div>
 
-<a href="intro.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="perfoming-a-full-wave-of-emulation-and-history-matching.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
