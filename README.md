@@ -1,4 +1,4 @@
-# Aim of this tutorial
+# Aim of Tutorial 2
 
 In this tutorial we present the main functionalities of the hmer package, using a synthetic example of an epidemiological model. The model that we chose for demonstration purposes is a stochastic SEIRS model, with four parameters: rate of transmission between each infectious person and each susceptible person; transition rate from exposed to infectious; recovery rate from infectious to recovered; and a loss of immunity rate from recovered to susceptible. Although self-contained, this tutorial is the natural continuation of [Tutorial 1](https://danny-sc.github.io/Tutorial_1/), which gives an overview of the history matching with emulation process and shows how it works through a simple one-dimensional example. Readers that are not familiar with history matching and emulation will find [Tutorial 1](https://danny-sc.github.io/Tutorial_1/) particularly helpful.
 
