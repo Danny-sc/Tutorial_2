@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>B Further issues in emulator structure | Tutorial 2: An introduction to the main functionalities of the hmer package</title>
+  <title>4 Constructing the emulators | Tutorial 2: An introduction to the main functionalities of the hmer package</title>
   <meta name="description" content="An easy guide to the main functionalities of the hmer package" />
   <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="B Further issues in emulator structure | Tutorial 2: An introduction to the main functionalities of the hmer package" />
+  <meta property="og:title" content="4 Constructing the emulators | Tutorial 2: An introduction to the main functionalities of the hmer package" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="An easy guide to the main functionalities of the hmer package" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="B Further issues in emulator structure | Tutorial 2: An introduction to the main functionalities of the hmer package" />
+  <meta name="twitter:title" content="4 Constructing the emulators | Tutorial 2: An introduction to the main functionalities of the hmer package" />
   
   <meta name="twitter:description" content="An easy guide to the main functionalities of the hmer package" />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="bayes.html"/>
-
+<link rel="prev" href="the-structure-of-an-emulator.html"/>
+<link rel="next" href="implau.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -251,88 +251,65 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="emulstr" class="section level1 hasAnchor" number="11">
-<h1><span class="header-section-number">B</span> Further issues in emulator structure<a href="emulstr.html#emulstr" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>The general structure of a univariate emulator is as follows:
-<span class="math display">\[f(x) = g(x)^T \beta + u(x),\]</span>
-where <span class="math inline">\(g(x)^T \beta\)</span> is the mean function and <span class="math inline">\(u(x)\)</span>, with mean zero, is a <a href="https://en.wikipedia.org/wiki/Gaussian_process">Gaussian process</a> or a weakly second order stationary process. For a general introduction to univariate emulators we refer to the reader to the article <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003968">Bayesian History Matching of Complex Infectious Disease Models Using Emulation: A Tutorial and a Case Study on HIV in Uganda</a>.</p>
-<p>In this appendix we briefly discuss some of the choices that can be made in terms of regression functions and of correlation functions.</p>
-<div id="regression-structure" class="section level2 hasAnchor" number="11.1">
-<h2><span class="header-section-number">B.1</span> Regression structure<a href="emulstr.html#regression-structure" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>As already seen, in this tutorial we chose to emulate the mean of the process and this is expressed as a linear combination of the regression functions. The simplest possible choice for the regression functions is that of a constant mean: <span class="math inline">\(g(x)=1\)</span> and <span class="math inline">\(\beta\)</span> just a scalar.
-A less trivial structure is given by a polynomial regression. When the input space is one dimensional, this corresponds to <span class="math inline">\(g(x)^T=(1,x,x^2,...,x^p)\)</span> for <span class="math inline">\(p\)</span> a natural number. For example if <span class="math inline">\(p=1\)</span>, we are trying to fit a hyperplane, if <span class="math inline">\(p=2\)</span> we fit a quadratic surface.</p>
-<p>The default behaviour of the <code>emulator_from_data</code> function in <em>hmer</em> is quadratic, while by setting <code>quadratic=FALSE</code> one can choose to fit a hyperplane. Here we highlight the method implemented by the <code>emulator_from_data</code> function in its default setting (quadratic surface). We will deal with general basis functions in more advances case studies.</p>
-<div id="active-variables-identification-and-benefits" class="section level3 hasAnchor" number="11.1.1">
-<h3><span class="header-section-number">B.1.1</span> Active variables identification and benefits<a href="emulstr.html#active-variables-identification-and-benefits" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>The first step is the identification of the active variables, i.e. those variables that have the most explanatory power relative to our data. Restricting our attention to active variables we reduce the dimension of the input space and therefore the complexity of our model.
-Given the data, we start by fitting a model consisting of linear terms and pure quadratic terms, without considering possible interaction terms between parameters. We then perform <a href="https://en.wikipedia.org/wiki/Stepwise_regression">stepwise deletion</a> on the obtained model, using the <a href="https://en.wikipedia.org/wiki/Bayesian_information_criterion">Bayes Information Criterion</a> (BIC). This process is repeated till no further deletion can improve the BIC. At this point, any parameters that have either their linear or quadratic term left in the model are designated active variables for the surface.</p>
+<div id="constructing-the-emulators" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Constructing the emulators<a href="constructing-the-emulators.html#constructing-the-emulators" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>To construct the emulators, we use the function <code>emulator_from_data</code>, which requires at least the training data, the name of the model outputs to emulate and the list of parameter ranges. In this case study we also use the optional argument <code>ev</code> to pass our estimates of the ensemble variability. We first define the model output names and we calculate the ensemble variability <code>evs</code> taking the mean of the column <span class="math inline">\(EV\)</span> in <code>wave0</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="constructing-the-emulators.html#cb17-1" tabindex="-1"></a>output_names <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;I&quot;</span>, <span class="fu">seq</span>(<span class="dv">10</span>,<span class="dv">30</span>, <span class="at">by=</span><span class="dv">5</span>))</span>
+<span id="cb17-2"><a href="constructing-the-emulators.html#cb17-2" tabindex="-1"></a>evs <span class="ot">&lt;-</span> <span class="fu">apply</span>(wave0[<span class="dv">10</span><span class="sc">:</span><span class="fu">ncol</span>(wave0)], <span class="dv">2</span>, mean)</span></code></pre></div>
+<p>The function <code>emulator_from_data</code> uses <code>evs</code> to estimate the delta parameter, i.e. the proportion of the overall variance due to the ensemble variability.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="constructing-the-emulators.html#cb18-1" tabindex="-1"></a>ems0 <span class="ot">&lt;-</span> <span class="fu">emulator_from_data</span>(train0, output_names, ranges, <span class="at">ev=</span>evs)</span>
+<span id="cb18-2"><a href="constructing-the-emulators.html#cb18-2" tabindex="-1"></a>ems0[[<span class="dv">1</span>]]</span>
+<span id="cb18-3"><a href="constructing-the-emulators.html#cb18-3" tabindex="-1"></a><span class="co">#&gt; Parameters and ranges:  beta: c(0.2, 0.8): gamma: c(0.2, 1): delta: c(0.1, 0.5): mu: c(0.1, 0.5) </span></span>
+<span id="cb18-4"><a href="constructing-the-emulators.html#cb18-4" tabindex="-1"></a><span class="co">#&gt; Specifications: </span></span>
+<span id="cb18-5"><a href="constructing-the-emulators.html#cb18-5" tabindex="-1"></a><span class="co">#&gt;   Basis functions:  (Intercept); beta; gamma; delta; mu; I(delta^2); beta:gamma; beta:delta; gamma:delta </span></span>
+<span id="cb18-6"><a href="constructing-the-emulators.html#cb18-6" tabindex="-1"></a><span class="co">#&gt;   Active variables beta; gamma; delta; mu </span></span>
+<span id="cb18-7"><a href="constructing-the-emulators.html#cb18-7" tabindex="-1"></a><span class="co">#&gt;   Regression Surface Expectation:  79.4188; 93.1408; 42.2031; -102.4974; 4.5401; 54.2205; 50.5944; -72.7635; -32.854 </span></span>
+<span id="cb18-8"><a href="constructing-the-emulators.html#cb18-8" tabindex="-1"></a><span class="co">#&gt;   Regression surface Variance (eigenvalues):  0; 0; 0; 0; 0; 0; 0; 0; 0 </span></span>
+<span id="cb18-9"><a href="constructing-the-emulators.html#cb18-9" tabindex="-1"></a><span class="co">#&gt; Correlation Structure: </span></span>
+<span id="cb18-10"><a href="constructing-the-emulators.html#cb18-10" tabindex="-1"></a><span class="co">#&gt; Bayes-adjusted emulator - prior specifications listed. </span></span>
+<span id="cb18-11"><a href="constructing-the-emulators.html#cb18-11" tabindex="-1"></a><span class="co">#&gt;   Variance (Representative):  251.1956 </span></span>
+<span id="cb18-12"><a href="constructing-the-emulators.html#cb18-12" tabindex="-1"></a><span class="co">#&gt;   Expectation:  0 </span></span>
+<span id="cb18-13"><a href="constructing-the-emulators.html#cb18-13" tabindex="-1"></a><span class="co">#&gt;   Correlation type: exp_sq </span></span>
+<span id="cb18-14"><a href="constructing-the-emulators.html#cb18-14" tabindex="-1"></a><span class="co">#&gt;   Hyperparameters:  theta: 0.8621 </span></span>
+<span id="cb18-15"><a href="constructing-the-emulators.html#cb18-15" tabindex="-1"></a><span class="co">#&gt;   Nugget term: 0 </span></span>
+<span id="cb18-16"><a href="constructing-the-emulators.html#cb18-16" tabindex="-1"></a><span class="co">#&gt; Mixed covariance:  0 0 0 0 0 0 0 0 0</span></span></code></pre></div>
+<p><infobutton id="displayTextunnamed-chunk-28" onclick="javascript:toggle('unnamed-chunk-28');">Show: More details about the emulator_from_data and its output</infobutton></p>
+<div id="toggleTextunnamed-chunk-28" style="display: none">
+<div class="panel panel-default">
+<div class="panel-body">
+<p>The <code>emulator_from_data</code> buils emulators in two distinct steps. It first creates a set of ‘initial’ emulators by fitting a regression surface to <code>train0</code>. Both the regression parameters and the active parameters for each of the indicated model outputs are found: model selection is performed through <a href="https://en.wikipedia.org/wiki/Stepwise_regression">stepwise addition or deletion</a> (as appropriate), using the <a href="https://en.wikipedia.org/wiki/Akaike_information_criterion">AIC criterion</a> to find the minimal best fit. The default behaviour of <code>emulator_from_data</code> is to fit a quadratic regression surface: if we want instead a linear regression surface, we just need to set <code>quadratic=FALSE</code>. We note that in principle we can insert basis functions of any form for the regression surface.</p>
+<p>The ‘initial’ emulators, which provide not only estimates for the regression surface parameters, but also estimates for the correlation specifications, are then adjusted to the training data through the Bayes Linear update formulae.</p>
+<p>The print statement ‘ems0[[1]]’ provides an overview of the emulator specifications and correlation structure, including</p>
+<ul>
+<li><p>Basis Functions: here we have the four parameters beta, gamma, delta, mu and some products of them, since we chose quadratic regression. Note that beta:mu and all pure quadratic terms (such as beta:beta) are not listed: this means that stepwise addition and deletion led to discarding them,</p></li>
+<li><p>Active variables,</p></li>
+<li><p>first and second order specifications for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(u(x)\)</span>. Note that by default <code>emulator_from_data</code> assumes that <span class="math inline">\(\text{Var}[\beta]=0\)</span>: the regression surface is known and coefficients are fixed. This explains why Beta Variance and Mixed Covariance (which shows the covariance of <span class="math inline">\(\beta\)</span> and <span class="math inline">\(u(x)\)</span>) are both zero. One can set beta.var=TRUE in order to consider the beta parameters as random variables.</p>
 </div>
-<div id="building-the-model" class="section level3 hasAnchor" number="11.1.2">
-<h3><span class="header-section-number">B.1.2</span> Building the model<a href="emulstr.html#building-the-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We now build a new model including all linear, quadratic, and interaction terms in the active variables only. As before, stepwise deletion is used to prune the model. Note that when there are fewer data points than there are terms in the model, stepwise addition is used instead, starting from a purely linear model.</p>
-<p>While the first step allowed us to identify the active variables, this final model determines the basis functions and coefficients of the regression surface. The residuals of the final model are computed and used to estimate the correlation length and variance <span class="math inline">\(\sigma^2\)</span> for the correlation structure.</p>
 </div>
-</div>
-<div id="correlation-structure" class="section level2 hasAnchor" number="11.2">
-<h2><span class="header-section-number">B.2</span> Correlation structure<a href="emulstr.html#correlation-structure" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Once the regression functions are chosen, we need to specify the correlation between <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x^\prime)\)</span> for all possible values of <span class="math inline">\(x\)</span> and <span class="math inline">\(x^\prime\)</span>. This is a key step, since it will determine how the response <span class="math inline">\(f(x)\)</span> at one parameter set <span class="math inline">\(x\)</span> is affected by the response at any other parameter set <span class="math inline">\(x^\prime\)</span>.</p>
-<p>A common assumption for the correlation structure is that the variance of <span class="math inline">\(u(x)\)</span> is independent of <span class="math inline">\(x\)</span>. If its constant value is denoted by <span class="math inline">\(\sigma^2\)</span>, we can then write the correlation of <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x^\prime)\)</span> in the form
-<span class="math display">\[\sigma^2  c(x,x^{\prime})\]</span>
-where <span class="math inline">\(c\)</span>, which satisfies <span class="math inline">\(c(x,x)=1\)</span>, is the correlation function, or kernel. In our tutorial we also introduced a nugget term <span class="math inline">\(\delta I_{\{x=x^\prime\}}\)</span>
-that operates on all variables:
-<span class="math display">\[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}.\]</span>
-This term represents the proportion of the overall variance due to the ensemble variability and ensures that the covariance matrix of <span class="math inline">\(u(x)\)</span> is not ill-conditioned, making the computation of its inverse possible.</p>
-<p>The choice of the function <span class="math inline">\(c\)</span> reflects fundamental characteristics of the process <span class="math inline">\(u(x)\)</span>, such as stationarity, isotropy and smoothness. For example, <span class="math inline">\(u(x)\)</span> is
-<span class="abbr" title="A Gaussian process u(x) is stationary if 
-- for any x and x&#39;, the mean of u(x) is the same as the mean of u(x&#39;); 
-- the covariance between u(x) and u(x&#39;) only depends on the difference x-x&#39;."><abbr title="A Gaussian process u(x) is stationary if 
-- for any x and x', the mean of u(x) is the same as the mean of u(x'); 
-- the covariance between u(x) and u(x') only depends on the difference x-x'.">
-stationary</abbr></span>
-if
-<span class="math inline">\(c(x,x^{\prime})\)</span> depends only on <span class="math inline">\(x-x^{\prime}\)</span>. In this overview we will always assume stationarity, but non-stationary approaches are also possible.</p>
-<p>From now on we will add a subscript <span class="math inline">\(A\)</span> whenever referring to input points: this indicates that we are operating only on the active parameters for the emulator: that is, parameters that contribute to the regression surface.</p>
-<p>An example of a stationary kernel is the
-squared-exponential correlation function, used in this tutorial:
-<span class="math display">\[c_{\text{SE}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i,A}-x_{i,A}^{\prime})^2}{\theta_i^2}\right).\]</span>
-This function, also called Gaussian correlation function, has the mathematical advantage of being differentiable infinitely many times. In particular, this implies that observing a small continuous fraction of the input space is sufficient to recover the whole process. Such a strong property is not always suitable, since it might be unrealistic to assume that information from a small portion of the input space allows to infer the behaviour of the process everywhere else.</p>
-<p>In such cases, it might be preferable to use the Matérn correlation functions, a family of parametric stationary kernels. The Matérn kernel of order <span class="math inline">\(\nu\)</span> is defined as
-<span class="math display">\[c_\nu(x,x^{\prime}) = \prod\limits_{i}\frac{(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)^\nu K_\nu(|x_{i,A}-x_{i,A}^{\prime}|/\theta_i)}{2^{\nu -1}\Gamma(\nu)},\]</span>
-where <span class="math inline">\(K_\nu\)</span> is the <a href="https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions:_I%CE%B1,_K%CE%B1">modified Bessel function</a> of the second kind and order <span class="math inline">\(\nu\)</span>. Compared to the Gaussian kernel, which is differentiable infinitely many times, <span class="math inline">\(c_\nu\)</span> is ‘less smooth’, being differentiable only
-<span class="math inline">\((\left \lceil{\nu}\right \rceil -1)\)</span> times (here <span class="math inline">\(\left \lceil{\nu}\right \rceil\)</span> denotes the ceiling function). The Matérn kernels can be thought as a generalisation of the Gaussian kernel: when <span class="math inline">\(\nu \rightarrow \infty\)</span>, the kernel <span class="math inline">\(c_\nu\)</span> converges to <span class="math inline">\(c_{\text{SE}}\)</span>.</p>
-<p>When <span class="math inline">\(\nu=1/2\)</span>, the kernel <span class="math inline">\(c_{1/2}\)</span> coincides with the so called exponential kernel:
-<span class="math display">\[c_{\text{exp}}(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{|x_{i,A}-x_{i,A}^{\prime}|}{\theta_i}\right).\]</span>
-Note that the sample paths with the exponential kernel are not smooth.</p>
-<p>A third example of stationarity is the rational quadratic kernel, defined by
-<span class="math display">\[c_{\text{RQ}}(x,x^{\prime}) = \prod\limits_{i}\frac{1}{1+(x_{i,A}-x_{i,A}^{\prime})^2/\theta_i^2} .\]</span>
-This correlation function is differentiable infinitely many times, as the Gaussian kernel.</p>
-<p>Another key property of kernels is isotropy. A stationary kernel is said to be isotropic (or homogeneous) when it depends only on the distance of <span class="math inline">\(x\)</span> and <span class="math inline">\(x^\prime\)</span>, rather than on the full vector <span class="math inline">\(x-x^\prime\)</span>. In other words, an isotropic kernel depends on the length of <span class="math inline">\(x-x^\prime\)</span>, but not on its direction.
-All the stationary kernels mentioned above are isotropic if and only if <span class="math inline">\(\theta_i=\theta_j\)</span> for all <span class="math inline">\(i,j\)</span>.</p>
-<p>We conclude by recalling the role of the hyperparameters <span class="math inline">\(\theta_i\)</span>, which are called correlation lengths. As just seen, when <span class="math inline">\(\theta_i=\theta\)</span> for all <span class="math inline">\(i\)</span>, the kernel is isotropic and therefore has rotational symmetry. In this case, the value <span class="math inline">\(\theta\)</span> has the following interpretation: the larger <span class="math inline">\(\theta\)</span> is, the smoother the local variations of the emulators will be. In the non-isotropic case, <span class="math inline">\(\theta_i&lt;\theta_j\)</span> means that we believe the function to be less smooth with respect to parameter <span class="math inline">\(i\)</span> than parameter <span class="math inline">\(j\)</span>.
-<!--
-# TJ material
-
-
-
-```
-rmd_files:
-    html: ['index.Rmd', 'ch1.Rmd']
-    latex: ['index.Rmd', 'ch1.Rmd', 'ch_appendix.Rmd']
-output_dir: "docs"
-```
-
-
---></p>
-
-</div>
+</div></li>
+</ul>
+<p>We can plot the emulators to see how they represent the output space: the <code>emulator_plot</code> function does this for emulator expectation, variance, standard deviation, and implausibility (more on which later). Note that all functions in the <em>hmer</em> package that produce plots have a colorblind-friendly option: it is sufficient to specify <code>cb=TRUE</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="constructing-the-emulators.html#cb19-1" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ems0)) ems0[[i]]<span class="sc">$</span>output_name <span class="ot">&lt;-</span> output_names[i]</span>
+<span id="cb19-2"><a href="constructing-the-emulators.html#cb19-2" tabindex="-1"></a><span class="fu">names</span>(ems0) <span class="ot">&lt;-</span> output_names</span>
+<span id="cb19-3"><a href="constructing-the-emulators.html#cb19-3" tabindex="-1"></a><span class="fu">emulator_plot</span>(ems0, <span class="at">cb=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /></p>
+<p>The emulator expectation plots show the structure of the regression surface, which is at most quadratic in its parameters, through a 2D slice of the input space. Here parameters <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\gamma\)</span> are selected and we get a plot for each model output. For each pair <span class="math inline">\((\bar \beta,\bar \gamma)\)</span> the plot shows the expected value produced by the relative emulator at the point <span class="math inline">\((\bar \beta,\bar \gamma, \delta_{\text{mid-range}}, \mu_{\text{mid-range}})\)</span>, where <span class="math inline">\(\delta_{\text{mid-range}}\)</span> indicates the mid-range value of <span class="math inline">\(\delta\)</span> and similarly for <span class="math inline">\(\mu_{\text{mid-range}}\)</span>.</p>
+<p>To plot the emulators standard deviation we just use <code>emulator_plot</code> passing ‘sd’ as second argument:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="constructing-the-emulators.html#cb20-1" tabindex="-1"></a><span class="fu">emulator_plot</span>(ems0, <span class="st">&#39;sd&#39;</span>, <span class="at">cb=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /></p>
+<p>We can see that the emulators reasonably show the structure of the model: the closer the evaluation point is to a training point, the lower the variance (as it ‘knows’ the value at this point). In fact, evaluating these emulators at parameter sets in the training data demonstrates this fact:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="constructing-the-emulators.html#cb21-1" tabindex="-1"></a>em_evals <span class="ot">&lt;-</span> ems0<span class="sc">$</span>I10<span class="sc">$</span><span class="fu">get_exp</span>(train0[,<span class="fu">names</span>(ranges)])</span>
+<span id="cb21-2"><a href="constructing-the-emulators.html#cb21-2" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">abs</span>(em_evals <span class="sc">-</span> train0<span class="sc">$</span>I10) <span class="sc">&lt;</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">12</span>))</span>
+<span id="cb21-3"><a href="constructing-the-emulators.html#cb21-3" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>In the next section we will define the implausibility measure while in section <a href="diagnostics.html#diagnostics">6</a> we will explain how to assess whether the emulators we trained are performing as we would expect them to.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="bayes.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="the-structure-of-an-emulator.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="implau.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

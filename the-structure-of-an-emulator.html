@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3 The structure of an emulator | Tutorial 2: An introduction to the main functionalities of the hmer package</title>
+  <meta name="description" content="An easy guide to the main functionalities of the hmer package" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3 The structure of an emulator | Tutorial 2: An introduction to the main functionalities of the hmer package" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="An easy guide to the main functionalities of the hmer package" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3 The structure of an emulator | Tutorial 2: An introduction to the main functionalities of the hmer package" />
+  
+  <meta name="twitter:description" content="An easy guide to the main functionalities of the hmer package" />
+  
+
+<meta name="author" content="Danny Scarponi, Andy Iskauskas" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="perfoming-a-full-wave-of-emulation-and-history-matching.html"/>
+<link rel="next" href="constructing-the-emulators.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script language="javascript"> 
+    function toggle(id) {
+        var ele = document.getElementById("toggleText" + id);
+        var text = document.getElementById("displayText" + id);
+        var buttonText = text.innerHTML.replace("Show ", "");
+        buttonText = buttonText.replace("Hide ", "");
+        if(ele.style.display == "block") {
+            ele.style.display = "none";
+            text.innerHTML = "Show " + buttonText;
+        } else {
+            ele.style.display = "block";
+            text.innerHTML = "Hide " + buttonText;
+        }
+    } 
+</script>
+
+<script language="javascript">
+    function openCode(evt, codeName, id) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent" + id);
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks" + id);
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(codeName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+<script language="javascript">
+    function hide(id){
+        document.getElementById(id).style.display = "none";
+    }
+</script>
+</script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #204a87; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #204a87; font-weight: bold; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction to the model</a></li>
+<li class="chapter" data-level="2" data-path="perfoming-a-full-wave-of-emulation-and-history-matching.html"><a href="perfoming-a-full-wave-of-emulation-and-history-matching.html"><i class="fa fa-check"></i><b>2</b> Perfoming a full wave of emulation and history matching</a></li>
+<li class="chapter" data-level="3" data-path="the-structure-of-an-emulator.html"><a href="the-structure-of-an-emulator.html"><i class="fa fa-check"></i><b>3</b> The structure of an emulator</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="the-structure-of-an-emulator.html"><a href="the-structure-of-an-emulator.html#the-global-behaviour-of-the-output"><i class="fa fa-check"></i><b>3.1</b> The global behaviour of the output</a></li>
+<li class="chapter" data-level="3.2" data-path="the-structure-of-an-emulator.html"><a href="the-structure-of-an-emulator.html#the-local-deviations-from-the-global-behaviour"><i class="fa fa-check"></i><b>3.2</b> The local deviations from the global behaviour</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="constructing-the-emulators.html"><a href="constructing-the-emulators.html"><i class="fa fa-check"></i><b>4</b> Constructing the emulators</a></li>
+<li class="chapter" data-level="5" data-path="implau.html"><a href="implau.html"><i class="fa fa-check"></i><b>5</b> History matching using implausibility</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="implau.html"><a href="implau.html#the-implausibility-measure"><i class="fa fa-check"></i><b>5.1</b> The implausibility measure</a></li>
+<li class="chapter" data-level="5.2" data-path="implau.html"><a href="implau.html#combining-outputs-together"><i class="fa fa-check"></i><b>5.2</b> Combining outputs together</a></li>
+<li class="chapter" data-level="5.3" data-path="implau.html"><a href="implau.html#implausibility-visualisations"><i class="fa fa-check"></i><b>5.3</b> Implausibility visualisations</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="diagnostics.html"><a href="diagnostics.html"><i class="fa fa-check"></i><b>6</b> Emulator diagnostics</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="diagnostics.html"><a href="diagnostics.html#the-three-main-diagnostics"><i class="fa fa-check"></i><b>6.1</b> The three main diagnostics</a></li>
+<li class="chapter" data-level="6.2" data-path="diagnostics.html"><a href="diagnostics.html#parameter-sets-failing-diagnostics"><i class="fa fa-check"></i><b>6.2</b> Parameter sets failing diagnostics</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="diagnostics.html"><a href="diagnostics.html#visualisation"><i class="fa fa-check"></i><b>6.2.1</b> Visualisation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="diagnostics.html"><a href="diagnostics.html#space-removed-function"><i class="fa fa-check"></i><b>6.2.2</b> Space removed function</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="newpoints.html"><a href="newpoints.html"><i class="fa fa-check"></i><b>7</b> Constructing the next wave of the history match: point generation</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="newpoints.html"><a href="newpoints.html#generating-sets-of-parameters-for-the-next-wave"><i class="fa fa-check"></i><b>7.1</b> Generating sets of parameters for the next wave</a></li>
+<li class="chapter" data-level="7.2" data-path="newpoints.html"><a href="newpoints.html#comparing-new-and-old-parameter-sets"><i class="fa fa-check"></i><b>7.2</b> Comparing new and old parameter sets</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="further-waves.html"><a href="further-waves.html"><i class="fa fa-check"></i><b>8</b> Further waves</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="further-waves.html"><a href="further-waves.html#wave1"><i class="fa fa-check"></i><b>8.1</b> Next wave: wave 1</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-1-emulators"><i class="fa fa-check"></i><b>8.1.1</b> Training wave 1 emulators</a></li>
+<li class="chapter" data-level="8.1.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves"><i class="fa fa-check"></i><b>8.1.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-2"><i class="fa fa-check"></i><b>8.2</b> Next wave: wave 2</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-2-emulators"><i class="fa fa-check"></i><b>8.2.1</b> Training wave 2 emulators</a></li>
+<li class="chapter" data-level="8.2.2" data-path="further-waves.html"><a href="further-waves.html#evaluating-implausibility-across-all-waves-1"><i class="fa fa-check"></i><b>8.2.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="further-waves.html"><a href="further-waves.html#next-wave-wave-3"><i class="fa fa-check"></i><b>8.3</b> Next wave: wave 3</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="further-waves.html"><a href="further-waves.html#training-wave-3-emulators"><i class="fa fa-check"></i><b>8.3.1</b> Training wave 3 emulators</a></li>
+<li class="chapter" data-level="8.3.2" data-path="further-waves.html"><a href="further-waves.html#stoprule"><i class="fa fa-check"></i><b>8.3.2</b> Evaluating implausibility across all waves</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="glossary.html"><a href="glossary.html"><i class="fa fa-check"></i><b>9</b> Glossary</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="bayes.html"><a href="bayes.html"><i class="fa fa-check"></i><b>A</b> Bayes Linear Emulation</a></li>
+<li class="chapter" data-level="B" data-path="emulstr.html"><a href="emulstr.html"><i class="fa fa-check"></i><b>B</b> Further issues in emulator structure</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="emulstr.html"><a href="emulstr.html#regression-structure"><i class="fa fa-check"></i><b>B.1</b> Regression structure</a>
+<ul>
+<li class="chapter" data-level="B.1.1" data-path="emulstr.html"><a href="emulstr.html#active-variables-identification-and-benefits"><i class="fa fa-check"></i><b>B.1.1</b> Active variables identification and benefits</a></li>
+<li class="chapter" data-level="B.1.2" data-path="emulstr.html"><a href="emulstr.html#building-the-model"><i class="fa fa-check"></i><b>B.1.2</b> Building the model</a></li>
+</ul></li>
+<li class="chapter" data-level="B.2" data-path="emulstr.html"><a href="emulstr.html#correlation-structure"><i class="fa fa-check"></i><b>B.2</b> Correlation structure</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Tutorial 2: An introduction to the main functionalities of the hmer package</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="the-structure-of-an-emulator" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> The structure of an emulator<a href="the-structure-of-an-emulator.html#the-structure-of-an-emulator" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The first task that the <code>full_wave</code> function accomplishes, is to build the emulators based on the training data. In this section we discuss the structure of the emulators that we want to construct. We then show how to build emulators step by step in the next section.</p>
+<p>An <a href="https://en.wikipedia.org/wiki/Emulator">emulator</a> is a way of representing our
+<span class="abbr" title=""><abbr title="In Bayesian statistics, probability expresses a degree of belief in an event. Such belief can be based either on prior knowledge or on personal beliefs about the event. 
+">beliefs</abbr></span>
+about the behaviour of an unknown function. In our example we have a stochastic model and we choose the unknown function to be the mean of each of the model outputs over multiple runs. Given a training dataset, i.e. a set of model runs, we can train an emulator and use it to get expectation and variance for a model output at any parameter set, without the need to run the model at the chosen set. We think of the expectation as the prediction provided by the emulator at the chosen parameter set, and we think of the variance as the uncertainty associated to that prediction. Critically an emulator is extremely fast to evaluate (compared to the model it mimics) and hence can be used to explore the input space more fully. It is worth noting that more sophisticated approaches are possible when working with stochastic models: apart from the mean of outputs, other features, such as the variance, can be approximated through emulators. We will show how to work with these in more advanced case studies.
+In this tutorial, we will construct an emulator for each of the model outputs separately (more complex techniques that combine outputs are available and will be described in more advanced case studies).</p>
+<p>The general structure of a univariate emulator is as follows:
+<span class="math display">\[f(x) = g(x)^T \beta + u(x),\]</span>
+where <span class="math inline">\(g(x)^T \beta\)</span> is a regression term and <span class="math inline">\(u(x)\)</span> is a weakly stationary process with mean zero. The role of the regression term is to mimic the global behaviour of the model output, while <span class="math inline">\(u(x)\)</span> represents localised deviations of the output from this global behaviour near to <span class="math inline">\(x\)</span>.</p>
+<div id="the-global-behaviour-of-the-output" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> The global behaviour of the output<a href="the-structure-of-an-emulator.html#the-global-behaviour-of-the-output" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The regression term is specified by:</p>
+<ul>
+<li><p>a vector of deterministic functions of the parameters <span class="math inline">\(g(x)\)</span> which determine the shape and complexity of the regression hypersurface we fit to the training data. For example, if <span class="math inline">\(x\)</span> is one dimensional, setting <span class="math inline">\(g(x)=(1,x)\)</span> (resp. <span class="math inline">\(g(x)=(1,x,x^2,...,x^n)\)</span>) corresponds to fitting a straight line (resp. a degree <span class="math inline">\(n\)</span> polynomial curve) to the training data. If <span class="math inline">\(x\)</span> is two dimensional, say <span class="math inline">\(x=(x_1,x_2)\)</span>, then setting <span class="math inline">\(g(x)=(1,x_1,x_2)\)</span> (resp. <span class="math inline">\(g(x)=(1,x_1, x_2,x_1^2,x_2^2,x_1x_2)\)</span>) corresponds to fitting a hyperplane (resp. a quadratic hypersurface) to the training data;</p></li>
+<li><p>a vector of regression coefficients <span class="math inline">\(\beta\)</span>. In the one dimensional case for example, if we set <span class="math inline">\(g(x)=(1,x)\)</span>, then <span class="math inline">\(\beta=(\beta_0,\beta_1)\)</span>, where <span class="math inline">\(\beta_0\)</span> is the <span class="math inline">\(y\)</span>-intercept and <span class="math inline">\(\beta_1\)</span> is the gradient of the straight line fitted to the training data.</p></li>
+</ul>
+<p>Common choices for <span class="math inline">\(g(x)\)</span> are polynomials of low degree, such as degree zero, one or two. Once a choice for <span class="math inline">\(g(x)\)</span> is made, the vector <span class="math inline">\(\beta\)</span> can be determined as described in Appendix <a href="emulstr.html#emulstr">B</a>. As we will see in the next section, the function <code>emulator_from_data</code> does this for us: it assumes a quadratic structure for the regression term and then determines the vector <span class="math inline">\(\beta\)</span>.</p>
+</div>
+<div id="the-local-deviations-from-the-global-behaviour" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> The local deviations from the global behaviour<a href="the-structure-of-an-emulator.html#the-local-deviations-from-the-global-behaviour" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In general, and especially when dealing with complex models, we cannot expect the regression hypersurface to perfectly explain the behaviour of the output. For this reason it is fundamental to account for the local deviations of the output from the regression hypersurface. Since these local deviations, also referred to as residuals, are unknown, we treat them as random variables: for each parameter <span class="math inline">\(x\)</span>, we then have a random variable <span class="math inline">\(u(x)\)</span> representing the residual at <span class="math inline">\(x\)</span>. Furthermore, we expect the residuals <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x&#39;)\)</span> at two parameter sets <span class="math inline">\(x\)</span> and <span class="math inline">\(x&#39;\)</span> that are close to each other to be correlated. In particular, the smoother is the model output (as a function of the parameters), the more correlated <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x&#39;)\)</span> will be. This collection of random variables, one for each point in the parameter space, is what is referred to as a <a href="https://en.wikipedia.org/wiki/Stochastic_process">stochastic process</a>, and is denoted by <span class="math inline">\(\{u(x)\}_{x\in X}\)</span>, where <span class="math inline">\(X\)</span> is the parameter space, or, a bit improperly, simply by <span class="math inline">\(u(x)\)</span>. Clearly, there exists a large variety of stochastic processes, depending on the distribution of each of the <span class="math inline">\(u(x)\)</span> and on how each pair <span class="math inline">\((u(x),u(x&#39;))\)</span> interacts.
+In the hmer package by default we assume <span class="math inline">\(u(x)\)</span> to be a weakly stationary process such that:</p>
+<ul>
+<li><p><span class="math inline">\(u(x)\)</span> has mean zero for each parameter set <span class="math inline">\(x\)</span>. Note that the mean is assumed to be zero, since, even if we expect to see local deviations, we do not expect the output to be systematically above (or below) the regression hypersurface;</p></li>
+<li><p>given any finite number of parameter sets <span class="math inline">\((x^1,...,x^n)\)</span>, the vector <span class="math inline">\((u(x^1),u(x^2),...,u(x^n))\)</span> is a multivariate variable with mean <span class="math inline">\((0,...,0)\)</span>. Remember that the covariance matrix of <span class="math inline">\((u(x^1),u(x^2),...,u(x^n))\)</span> is by definition the <span class="math inline">\(n\times n\)</span> matrix <span class="math inline">\(\Sigma\)</span> such that</p></li>
+</ul>
+<p><span class="math display">\[\Sigma_{i,j} := \text{Cov}(u(x^i),u(x^j)).\]</span>
+The higher the value of <span class="math inline">\(\Sigma_{i,j}\)</span>, the more correlated we expect the residuals at <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_j\)</span> to be. Similarly, the higher the value of
+<span class="math inline">\(\Sigma_{i,i} := \text{Cov}(u(x^i),u(x^i))= \text{Var}(u(x^i))\)</span>, the larger we expect the residual at <span class="math inline">\(x^i\)</span> to be.
+In order to fully specify the process <span class="math inline">\(u(x)\)</span>, we need to know its covariance structure, i.e. <span class="math inline">\(\text{Cov}(u(x),u(x&#39;))\)</span> for all possible pairs of parameter sets <span class="math inline">\((x,x&#39;)\)</span>.</p>
+<p>A very commonly used covariance structure, and the default option in the hmer package, is given by</p>
+<p><span class="math display">\[\text{Cov}(u(x), u(x&#39;))= \sigma^2 \left[(1-\delta) c(x,x^{\prime}) + \delta I_{\{x=x^\prime\}}\right]\]</span>
+where <span class="math inline">\(I_{\{x=x^\prime\}}\)</span> is <span class="math inline">\(1\)</span> if <span class="math inline">\(x=x^\prime\)</span> and <span class="math inline">\(0\)</span> otherwise, while <span class="math inline">\(c\)</span> is the square-exponential correlation function</p>
+<p><span class="math display">\[c(x,x^{\prime}) :=  \exp \left(\frac{-||x-x&#39;||^2}{\theta^2}\right) = \exp\left(\frac{-\sum\limits_{i}(x_{i}-x_{i}^{\prime})^2}{\theta^2}\right)\]</span></p>
+<p>where <span class="math inline">\(||x-x&#39;||\)</span> is the euclidean distance of <span class="math inline">\(x\)</span> and <span class="math inline">\(x&#39;\)</span>, and <span class="math inline">\(x_i\)</span> is the ith-component of the parameter set <span class="math inline">\(x.\)</span> Note that <span class="math inline">\(c(x,x^{\prime})\)</span>, and therefore <span class="math inline">\(\text{Cov}(u(x), u(x&#39;))\)</span>, only depend on the distance <span class="math inline">\(||x-x&#39;||\)</span> between <span class="math inline">\(x\)</span> and <span class="math inline">\(x&#39;\)</span>.</p>
+<p>Let us comment on the various terms in this covariance structure:</p>
+<ul>
+<li><p><span class="math inline">\(\sigma^2\)</span> is the variance of <span class="math inline">\(u(x)\)</span>: <span class="math display">\[\text{Var}(u(x))=\text{Cov}(u(x), u(x))=  \sigma^2 \left[(1-\delta) c(x,x) + \delta I_{\{x=x\}}\right]= \sigma^2 [(1-\delta)\exp(0) + \delta]=\sigma^2.\]</span> Note that this is independent of the chosen parameter set <span class="math inline">\(x\)</span>, i.e. all variables <span class="math inline">\(u(x)\)</span> have not only the same mean zero, but also the same variance <span class="math inline">\(\sigma^2\)</span>. The larger the value of <span class="math inline">\(\sigma\)</span>, the larger will be the variations of <span class="math inline">\(u(x)\)</span> around its mean zero.</p></li>
+<li><p>The so-called ‘nugget’ term <span class="math inline">\(\delta I_{\{x=x^{\prime}\}}\)</span> ensures that the covariance matrix of <span class="math inline">\(u(x)\)</span> is not ill-conditioned, making the computation of its inverse possible (a key operation in the training of emulators, see Appendix <a href="bayes.html#bayes">A</a>). This term does not contribute to the covariance of residuals at different points, but only to the variance of each residual. In the case of a stochastic model, as in this tutorial, it can be interpreted as the proportion of the overall variance due to the ensemble variability.</p></li>
+<li><p><span class="math inline">\(\theta\)</span> is the correlation length of the process. For a given pair <span class="math inline">\((x,x&#39;)\)</span>, the larger <span class="math inline">\(\theta\)</span> is, the larger is the value of <span class="math inline">\(c(x,x&#39;)\)</span> and therefore that of the covariance between <span class="math inline">\(u(x)\)</span> and <span class="math inline">\(u(x&#39;)\)</span>. This means that the size of <span class="math inline">\(\theta\)</span> determines how close two parameter sets must be in order for the corresponding residuals to be well correlated. Informally, we can think of <span class="math inline">\(\theta\)</span> in the following way: if the distance of two parameters sets is no more than <span class="math inline">\(\theta\)</span>, then their residuals will be well correlated. In particular, a larger <span class="math inline">\(\theta\)</span> results in a smoother (less wiggly) emulator. Note that more complex approaches are possible, for example by assuming different correlation lengths for different parameters: <span class="math inline">\(c(x,x^{\prime}) = \exp\left(-\sum\limits_{i}\frac{(x_{i}-x_{i}^{\prime})^2}{\theta_i^2}\right).\)</span> In this more general setting, a smaller <span class="math inline">\(\theta_i\)</span> value means that we believe that the output is less smooth with respect to parameter <span class="math inline">\(i\)</span>, and thus that the values for the corresponding parameters <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_i^{\prime}\)</span> must be closer in order to be well
+correlated.</p></li>
+</ul>
+<p>To enhance our understanding of the role played by <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\theta\)</span>, let us investigate how the covariance structure varies for different values of <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\theta\)</span>, assuming <span class="math inline">\(u\)</span> is a Gaussian process, i.e. that <span class="math inline">\(u(x)\)</span> is normally distributed for all <span class="math inline">\(x\)</span>. For simplicity, let’s assume that we have just one parameter and that <span class="math inline">\(\delta\)</span> is zero. Since our covariance is translation invariant, i.e. depends only on the distance between <span class="math inline">\(x\)</span> and <span class="math inline">\(x&#39;\)</span>, we can fix one of them, say <span class="math inline">\(x&#39;\)</span> to zero, and plot
+<span class="math display">\[\text{Cov}(u(x), u(0))=\sigma^2  \exp \left(\frac{-|x|^2}{\theta^2}\right)\]</span> as a function of <span class="math inline">\(x\)</span>. We plot <span class="math inline">\(\text{Cov}(u(x), u(0))\)</span> for four different pairs <span class="math inline">\((\sigma,\theta)\)</span>:</p>
+<ul>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,1)\)</span> in green,</p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,0.5)\)</span> in blue,</p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,0.1)\)</span> in black,</p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(0.5,0.5)\)</span> in red.</p></li>
+</ul>
+<p><img src="_main_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /></p>
+<p>We can note a few things here. First of all, the value of <span class="math inline">\(\sigma\)</span> regulates the height of the peak at zero, i.e. the value of the variance of the residuals. Second, for a fixed value of <span class="math inline">\(\sigma\)</span>, smaller values of <span class="math inline">\(\theta\)</span> correspond to narrower curves. For example, if we look at <span class="math inline">\(x=0.5\)</span>, the green curve gives a value around <span class="math inline">\(0.8\)</span>, while the black curve gives a value around zero. This tells us that the residual at <span class="math inline">\(x=0.5\)</span> is</p>
+<ul>
+<li><p>very well correlated with the residual at <span class="math inline">\(x=0\)</span> if <span class="math inline">\(\theta=1\)</span>, and</p></li>
+<li><p>almost not correlated with the residual at <span class="math inline">\(x=0\)</span> if <span class="math inline">\(\theta=0.1\)</span>.</p></li>
+</ul>
+<p>This is in perfect agreement with the informal interpretation of <span class="math inline">\(\theta\)</span> given above: “if the distance of two parameters sets is no more than <span class="math inline">\(\theta\)</span>, then their residuals will be well correlated”. In fact, when <span class="math inline">\(\theta=1\)</span> the point <span class="math inline">\(0.5\)</span> has distance from zero well below <span class="math inline">\(\theta\)</span>, while when <span class="math inline">\(\theta=0.1\)</span>, the point <span class="math inline">\(0.5\)</span> has distance from zero well above <span class="math inline">\(\theta\)</span>.</p>
+<p>For each of the four covariance structures plotted above, we can plot a few realisations of the corresponding Gaussian process <span class="math inline">\(u(x)\)</span>. By a realisation of the process <span class="math inline">\(u(x)\)</span> we mean any function <span class="math inline">\(t\)</span> of <span class="math inline">\(x\)</span> where <span class="math inline">\(t(x)\)</span> is sampled from a normal distribution with mean zero and variance <span class="math inline">\(\sigma^2\)</span>, and where values of <span class="math inline">\(t\)</span> at different points are in accordance with the covariance structure of <span class="math inline">\(u(x)\)</span>. An easy way of producing realisations of a given process is the following:</p>
+<ul>
+<li><p>create a sequence of points along the x-axis (since here we are still working with a 1-dimensional parameter space for simplicity)</p></li>
+<li><p>calculate the covariance matrix for these points, using the formula <span class="math inline">\(\text{Cov}(u(x), u(x&#39;))=\sigma^2 \exp \left(\frac{-|x-x&#39;|^2}{\theta^2}\right)\)</span></p></li>
+<li><p>use the function <code>rmvnorm</code> from the <code>mvtnorm</code> package to generate a sample from a multivariate normal distribution with mean vector of zeroes and covariance matrix as found in the previous step.</p></li>
+</ul>
+<p>The code below uses the method just described and plots a realisation of the Gaussian process <span class="math inline">\(u(x)\)</span> for <span class="math inline">\((\sigma,\theta)=(1,1)\)</span>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="the-structure-of-an-emulator.html#cb15-1" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb15-2"><a href="the-structure-of-an-emulator.html#cb15-2" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x,x,<span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
+<span id="cb15-3"><a href="the-structure-of-an-emulator.html#cb15-3" tabindex="-1"></a>s <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb15-4"><a href="the-structure-of-an-emulator.html#cb15-4" tabindex="-1"></a>l <span class="ot">=</span> <span class="dv">1</span> </span>
+<span id="cb15-5"><a href="the-structure-of-an-emulator.html#cb15-5" tabindex="-1"></a>Sigma_SE <span class="ot">=</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
+<span id="cb15-6"><a href="the-structure-of-an-emulator.html#cb15-6" tabindex="-1"></a>y <span class="ot">=</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE)</span>
+<span id="cb15-7"><a href="the-structure-of-an-emulator.html#cb15-7" tabindex="-1"></a><span class="fu">plot</span>(x,y, <span class="at">type=</span><span class="st">&quot;l&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /></p>
+<p>Note that we set <code>type="l"</code> in order to plot a continuous line connecting all the values in the vector <span class="math inline">\(y\)</span>.</p>
+<p>To compare realisations produced by different pairs <span class="math inline">\((\sigma,\theta)\)</span>, we create a <span class="math inline">\(4\times 4\)</span> grid where each column contains four realisations from one of the four pairs <span class="math inline">\((\sigma, \theta)\)</span>. The realisations are coloured according to the colours assigned in the covariance structure plot. We set <code>ylim=c(-3,3)</code> in all plots, to make the comparison between columns easier.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="the-structure-of-an-emulator.html#cb16-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfcol=</span><span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">4</span>),<span class="at">mar=</span><span class="fu">c</span>(<span class="fl">1.5</span>,<span class="fl">1.5</span>,<span class="fl">1.5</span>,<span class="fl">1.5</span>), <span class="at">oma=</span><span class="fu">c</span>(<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb16-2"><a href="the-structure-of-an-emulator.html#cb16-2" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>){</span>
+<span id="cb16-3"><a href="the-structure-of-an-emulator.html#cb16-3" tabindex="-1"></a>    x <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb16-4"><a href="the-structure-of-an-emulator.html#cb16-4" tabindex="-1"></a>    d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x,x,<span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
+<span id="cb16-5"><a href="the-structure-of-an-emulator.html#cb16-5" tabindex="-1"></a>    s <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb16-6"><a href="the-structure-of-an-emulator.html#cb16-6" tabindex="-1"></a>    l <span class="ot">=</span> <span class="dv">1</span> </span>
+<span id="cb16-7"><a href="the-structure-of-an-emulator.html#cb16-7" tabindex="-1"></a>    Sigma_SE <span class="ot">=</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
+<span id="cb16-8"><a href="the-structure-of-an-emulator.html#cb16-8" tabindex="-1"></a>    y <span class="ot">=</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE)</span>
+<span id="cb16-9"><a href="the-structure-of-an-emulator.html#cb16-9" tabindex="-1"></a>    <span class="fu">plot</span>(x,y, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, <span class="at">col=</span><span class="st">&quot;green&quot;</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb16-10"><a href="the-structure-of-an-emulator.html#cb16-10" tabindex="-1"></a>    <span class="fu">mtext</span>(<span class="st">&quot;Guassian process realisation&quot;</span>, <span class="at">line=</span><span class="dv">2</span>, <span class="at">side=</span><span class="dv">2</span>, <span class="at">outer=</span>T)</span>
+<span id="cb16-11"><a href="the-structure-of-an-emulator.html#cb16-11" tabindex="-1"></a>    <span class="fu">mtext</span>(<span class="st">&quot;x&quot;</span>, <span class="at">side=</span><span class="dv">1</span>, <span class="at">line=</span><span class="dv">2</span>, <span class="at">outer=</span>T)</span>
+<span id="cb16-12"><a href="the-structure-of-an-emulator.html#cb16-12" tabindex="-1"></a>} </span>
+<span id="cb16-13"><a href="the-structure-of-an-emulator.html#cb16-13" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>){</span>
+<span id="cb16-14"><a href="the-structure-of-an-emulator.html#cb16-14" tabindex="-1"></a>    x <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb16-15"><a href="the-structure-of-an-emulator.html#cb16-15" tabindex="-1"></a>    d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x,x,<span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
+<span id="cb16-16"><a href="the-structure-of-an-emulator.html#cb16-16" tabindex="-1"></a>    s <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb16-17"><a href="the-structure-of-an-emulator.html#cb16-17" tabindex="-1"></a>    l <span class="ot">=</span> <span class="fl">0.5</span> </span>
+<span id="cb16-18"><a href="the-structure-of-an-emulator.html#cb16-18" tabindex="-1"></a>    Sigma_SE <span class="ot">=</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
+<span id="cb16-19"><a href="the-structure-of-an-emulator.html#cb16-19" tabindex="-1"></a>    y <span class="ot">=</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE)</span>
+<span id="cb16-20"><a href="the-structure-of-an-emulator.html#cb16-20" tabindex="-1"></a>    <span class="fu">plot</span>(x,y, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, <span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb16-21"><a href="the-structure-of-an-emulator.html#cb16-21" tabindex="-1"></a>} </span>
+<span id="cb16-22"><a href="the-structure-of-an-emulator.html#cb16-22" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>){</span>
+<span id="cb16-23"><a href="the-structure-of-an-emulator.html#cb16-23" tabindex="-1"></a>    x <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb16-24"><a href="the-structure-of-an-emulator.html#cb16-24" tabindex="-1"></a>    d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x,x,<span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
+<span id="cb16-25"><a href="the-structure-of-an-emulator.html#cb16-25" tabindex="-1"></a>    s <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb16-26"><a href="the-structure-of-an-emulator.html#cb16-26" tabindex="-1"></a>    l <span class="ot">=</span> <span class="fl">0.1</span> </span>
+<span id="cb16-27"><a href="the-structure-of-an-emulator.html#cb16-27" tabindex="-1"></a>    Sigma_SE <span class="ot">=</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
+<span id="cb16-28"><a href="the-structure-of-an-emulator.html#cb16-28" tabindex="-1"></a>    y <span class="ot">=</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE)</span>
+<span id="cb16-29"><a href="the-structure-of-an-emulator.html#cb16-29" tabindex="-1"></a>    <span class="fu">plot</span>(x,y, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb16-30"><a href="the-structure-of-an-emulator.html#cb16-30" tabindex="-1"></a>} </span>
+<span id="cb16-31"><a href="the-structure-of-an-emulator.html#cb16-31" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>){</span>
+<span id="cb16-32"><a href="the-structure-of-an-emulator.html#cb16-32" tabindex="-1"></a>    x <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb16-33"><a href="the-structure-of-an-emulator.html#cb16-33" tabindex="-1"></a>    d <span class="ot">=</span> <span class="fu">abs</span>(<span class="fu">outer</span>(x,x,<span class="st">&quot;-&quot;</span>)) <span class="co"># compute distance matrix, d_{ij} = |x_i - x_j|</span></span>
+<span id="cb16-34"><a href="the-structure-of-an-emulator.html#cb16-34" tabindex="-1"></a>    s <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb16-35"><a href="the-structure-of-an-emulator.html#cb16-35" tabindex="-1"></a>    l <span class="ot">=</span> <span class="fl">0.5</span></span>
+<span id="cb16-36"><a href="the-structure-of-an-emulator.html#cb16-36" tabindex="-1"></a>    Sigma_SE <span class="ot">=</span> s<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>d<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(l<span class="sc">^</span><span class="dv">2</span>)) <span class="co"># squared exponential kernel</span></span>
+<span id="cb16-37"><a href="the-structure-of-an-emulator.html#cb16-37" tabindex="-1"></a>    y <span class="ot">=</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>,<span class="at">sigma=</span>Sigma_SE)</span>
+<span id="cb16-38"><a href="the-structure-of-an-emulator.html#cb16-38" tabindex="-1"></a>    <span class="fu">plot</span>(x,y, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>))</span>
+<span id="cb16-39"><a href="the-structure-of-an-emulator.html#cb16-39" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /></p>
+<p>First of all we can see that the residuals in the fourth column, generated with a smaller <span class="math inline">\(\sigma\)</span>, tend to show smaller oscillations then the other columns. If we then compare the first three columns, which correspond to the same <span class="math inline">\(\sigma\)</span>, we see that black lines are more wiggly than blue lines, which in turn are more wiggly than the green lines. This is what we expected: smaller values of <span class="math inline">\(\theta\)</span> produce less smooth residuals. Finally it is interesting to compare the red and the blue lines: they show the same level of smoothness, since they have the same <span class="math inline">\(\theta\)</span>, but they size of the oscillations tends to be smaller in the red lines, which have a smaller <span class="math inline">\(\sigma\)</span>.</p>
+<p>From these plots it is clear that choosing values for <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\theta\)</span> corresponds to making a judgment about how far we expect the output to be from the regression hypersurface (<span class="math inline">\(\sigma\)</span>) and about its smoothness (<span class="math inline">\(\theta\)</span>). In this tutorial we entirely rely on the hmer package, and in particular the function <code>emulator_from_data</code>, which selects values of <span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\delta\)</span> for us, based on the provided training data. In later tutorials, we will discuss how we can intervene to customise the choice of these hyperparameters.</p>
+<p>We conclude this section by showing how to visualise the covariance structure when the parameter space is not one-dimensional. As before we can fix <span class="math inline">\(x&#39;\)</span> to be the origin for example, but now <span class="math inline">\(x\)</span> has several coordinates. For example say that we have two parameters, so that <span class="math inline">\(x=(x_1,x_2)\)</span> and for simplicity let us assume again that <span class="math inline">\(\delta\)</span> is zero. Now for every pair <span class="math inline">\((x_1,x_2)\)</span> we have a covariance value of <span class="math inline">\(\text{Cov}(u((x_1,x_2)), u(0))=\sigma^2 \exp \left(\frac{-x_1^2-x_2^2}{\theta^2}\right)\)</span>. A way of visualising such a function is through a contour plot:</p>
+<ul>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,1)\)</span>
+<img src="contour11.png" width="100%" style="display: block; margin: auto;" /></p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,0.5)\)</span>
+<img src="contour10.5.png" width="100%" style="display: block; margin: auto;" /></p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(1,0.1)\)</span>
+<img src="contour10.1.png" width="100%" style="display: block; margin: auto;" /></p></li>
+<li><p><span class="math inline">\((\sigma,\theta)=(0.5,0.5)\)</span>
+<img src="contour0.50.5.png" width="100%" style="display: block; margin: auto;" /></p></li>
+</ul>
+<p>We can see that the first three plots, having <span class="math inline">\(\sigma=1\)</span>, all reach the value <span class="math inline">\(1\)</span> at the origin (the point we chose as reference), while in the last plot, where <span class="math inline">\(\sigma=0.5\)</span>, the highest values are around <span class="math inline">\(0.25\)</span>, which is in fact <span class="math inline">\(\sigma^2\)</span>. Comparing the first three plots, we see that the lower the value of <span class="math inline">\(\theta\)</span>, the darker the plot, i.e. the less correlated points are with the origin. For example, if <span class="math inline">\(\theta=1\)</span> we see that points with a distance of a unit from the origin are still correlated with it (with a value <span class="math inline">\(0.3647-0.417\)</span>), while if <span class="math inline">\(\theta=0.5\)</span> points with a distance of a unit from the origin are basically uncorrelated with it (with a value <span class="math inline">\(0-0.05\)</span>). When <span class="math inline">\(\theta=0.1\)</span>, it is enough to be at a distance of <span class="math inline">\(0.25\)</span> from the origin to be uncorrelated with it (with a value <span class="math inline">\(0-0.05\)</span>).</p>
+<p><infobutton id="displayTextunnamed-chunk-25" onclick="javascript:toggle('unnamed-chunk-25');">Show: Dealing with high dimensions</infobutton></p>
+<div id="toggleTextunnamed-chunk-25" style="display: none">
+<div class="panel panel-default">
+<div class="panel-body">
+Since in this tutorial we are working with a low-dimensional input space, we chose a relatively basic structure for our emulator. Note that more complex structures may be needed when dealing with higher dimensional problems, since the complexity of the emulation process increases significantly with dimensionality. There are several ways of tackling high dimensional problems. One of these consists in reducing the number of dimensions by selecting the variables that explain the data the most. More info on active variables can be found in Appendix <a href="emulstr.html#emulstr">B</a>.
+</div>
+</div>
+</div>
+<p>We would like to advise the reader that several emulator structures and correlation functions are available. Alternatives choices to the ones made above are discussed in Appendix <a href="emulstr.html#emulstr">B</a>.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="perfoming-a-full-wave-of-emulation-and-history-matching.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="constructing-the-emulators.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": null,
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
