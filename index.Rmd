@@ -75,6 +75,8 @@ library(latex2exp)
 This tutorial presents the main functionalities of the 
 [hmer](https://cran.r-project.org/web/packages/hmer/index.html) package, using a synthetic example of an epidemiological model. Although self-contained, this tutorial is the natural continuation of [Tutorial 1](https://github.com/Danny-sc/Tutorial_1), which gives an overview of the history matching with emulation process and shows how it works through a simple one-dimensional example. Readers who are not familiar with history matching and emulation will find Tutorial 1 particularly helpful.
 
+Note that when running the workshop code on your device, you should not expect the hmer visualisation tools to produce the same exact output as the one you can find in the following sections. This is mainly because the maximinLHS function, that you will use to define the initial parameter sets on which emulators are trained, does return different Latin Hypercube designs at each call. 
+
 The model that we chose for demonstration purposes is a stochastic <span class="abbr" title="A model consisting of four compartments 
 
 - $S$: Susceptible individuals,
@@ -250,8 +252,8 @@ As our dataset is synthetic, we couldn’t rely on observed data to define our t
 Before performing a full wave of history matching with emulation we use the `simulator_plot` function to plot runs from parameter sets in `wave0` and compare them to our targets. Note the in graph titles we will refer to parameter sets in a given wave as "wave points" for the sake of shortness. 
 
 ``` {r, echo=-c(1,3), fig.height=8, fig.width=10}
-## 'wave1' is created by binding 'next_wave' to 'new_points' and a list 'all_points' is defined, with points from both 'wave0' and 'wave1'.
-all_points <- list(wave0[1:9])
+## A list 'all_points' is defined
+all_points <- list(wave0[,1:9])
 ## 'simulator_plot' compares the performance of parameter sets in 'wave0' and parameter sets in 'wave1'.
 simulator_plot(all_points, targets, palette="goldenrod1")
 ```
@@ -290,9 +292,19 @@ next_wave <- getOutputs(test_full_wave$points, seq(10,30,by=5))
 ## 'wave1' is created by binding 'next_wave' to 'new_points' and a list 'all_points' is defined, with points from both 'wave0' and 'wave1'.
 wave1 <- data.frame(cbind(test_full_wave$points,next_wave))%>%   
   setNames(c(names(ranges),paste0("I",seq(10,30,by=5)),   paste0("EV",seq(10,30,by=5))))
-all_points <- list(wave0[1:9], wave1[1:9])
+all_points <- list(wave0[,1:9], wave1[,1:9])
 ## 'simulator_plot' compares the performance of parameter sets in 'wave0' and parameter sets in 'wave1'.
 simulator_plot(all_points, targets, palette=c("goldenrod1", "red"))
+```
+In order to perform the second wave of the process, we can use `full_wave` again, this time passing it the runs in `wave1`, the `ranges` and `targets` as before, and the emulators trained in wave one `old_emulators = test_full_wave$emulators`. In general, at wave $k$, all emulators trained in earlier waves should be passed to the `full_wave` function.
+
+```{r}
+full_wave_2 <- full_wave(wave1[,1:9], ranges, targets, old_emulators = test_full_wave$emulators)
+```
+We can compare the new non-implausible points with the previous ones:
+
+```{r}
+wave_points(list(wave0, test_full_wave$points, full_wave_2$points), names(ranges))
 ```
 
 In the following sections we will explain step by step what `full_wave` does behind the scenes. This will not only enhance the reader's overall understanding, but will also provide them with the necessary tools to have more control over the process and customise it through their judgement.
@@ -693,7 +705,7 @@ This section is divided in two parts:
 
 ## Generating sets of parameters for the next wave
 
-The function `generate_new_runs` is designed to generate new sets of parameters; its default behaviour is as follows.
+The function `generate_new_design` is designed to generate new sets of parameters; its default behaviour is as follows.
 
 - If  prior parameter sets are provided, step 1 is skipped, otherwise a set is generated using a [Latin Hypercube Design](https://en.wikipedia.org/wiki/Latin_hypercube_sampling), rejecting implausible parameter sets. 
 - Pairs of parameter sets are selected at random and more sets are sampled from lines connecting them, with particular importance given to those that are close to the non-implausible boundary;
@@ -702,8 +714,8 @@ The function `generate_new_runs` is designed to generate new sets of parameters;
 All of these steps can be overridden or modified, but the default behaviour allows for a good rudimentary search of the non-implausible space.
 
 ```{r, echo=-1, fig.height=10, fig.width=10}
-## 'generate_new_runs' generates a new set of parameters for the next wave of the history matching process. The argument 'n_points' specifies how many points are to be generated.
-points_1 <- generate_new_runs(ems0, 120, targets, measure.method = 'maximin')
+## 'generate_new_design' generates a new set of parameters for the next wave of the history matching process. The argument 'n_points' specifies how many points are to be generated.
+points_1 <- generate_new_design(ems0, 120, targets, measure.method = 'maximin')
 plot(points_1, pch = 16, cex = 0.5)
 ```
 
@@ -783,7 +795,7 @@ The remainder of the analysis proceeds much as in the first wave. In generating 
 
 ```{r, echo=-1, fig.height=10, fig.width=10}
 ## It generates points for the next wave and plots them
-points_2 <- generate_new_runs(all_waves, 120, all_targets, measure.method = 'maximin')
+points_2 <- generate_new_design(all_waves, 120, all_targets, measure.method = 'maximin')
 plot(points_2, pch = 16, cex = 0.5)
 ```
 
@@ -841,7 +853,7 @@ emulator_plot(all_waves, plot_type = 'nimp', targets = all_targets, cb=TRUE)
 To generate new parameter sets:
 
 ```{r, fig.height=10, fig.width=10}
-points_3 <- generate_new_runs(all_waves, 120, all_targets, measure.method = 'maximin')
+points_3 <- generate_new_design(all_waves, 120, all_targets, measure.method = 'maximin')
 plot(points_3, pch = 16, cex = 0.5)
 ```
 
@@ -901,7 +913,7 @@ emulator_plot(all_waves, plot_type = 'nimp', targets = all_targets, cb=TRUE)
 To generate new parameter sets:
 
 ```{r, fig.height=10, fig.width=10}
-points_4 <- generate_new_runs(all_waves, 120, all_targets, measure.method = 'maximin')
+points_4 <- generate_new_design(all_waves, 120, all_targets, measure.method = 'maximin')
 plot(points_4, pch = 16, cex = 0.5)
 ```
 
